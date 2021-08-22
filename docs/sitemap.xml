@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://sizespectrum.org/mizer/index.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/newMRparams.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/plotSpectra.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/resource_params.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/valid_resource_arg.html</loc>
+  </url>
+</urlset>
