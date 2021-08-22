@@ -27,3 +27,5 @@ Collate:
     project_methods.R
     resource_dynamics.R
     resource_params.R
+URL: https://github.com/sizespectrum/mizerMR
+BugReports: https://github.com/sizespectrum/mizerMR/issues
