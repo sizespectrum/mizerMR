@@ -4,6 +4,9 @@
     <loc>https://sizespectrum.org/mizer/index.html</loc>
   </url>
   <url>
+    <loc>https://sizespectrum.org/mizer/reference/mizerMR-package.html</loc>
+  </url>
+  <url>
     <loc>https://sizespectrum.org/mizer/reference/newMRparams.html</loc>
   </url>
   <url>
@@ -13,6 +16,24 @@
     <loc>https://sizespectrum.org/mizer/reference/resource_params.html</loc>
   </url>
   <url>
+    <loc>https://sizespectrum.org/mizer/reference/setMultipleResources.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/set_resource_param_default.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/validResourceParams.html</loc>
+  </url>
+  <url>
     <loc>https://sizespectrum.org/mizer/reference/valid_resource_arg.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/valid_resource_capacity.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/valid_resource_interaction.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizer/reference/valid_resource_rate.html</loc>
   </url>
 </urlset>

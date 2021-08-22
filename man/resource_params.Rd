@@ -12,10 +12,7 @@ resource_params(params) <- value
 \arguments{
 \item{params}{A MizerParams object}
 
-\item{value}{Resource parameter data frame}
-}
-\value{
-Resource parameter data frame
+\item{value}{A data frame with the resource parameters}
 }
 \description{
 The resource parameter data frame has one row for each resource. The
@@ -30,3 +27,7 @@ variables are:
 \item \code{resource_dynamics} Name of the resource dynamics function
 }
 }
+\seealso{
+\code{\link[=validResourceParams]{validResourceParams()}}
+}
+\concept{functions for setting parameters}

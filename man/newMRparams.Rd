@@ -6,20 +6,40 @@
 \usage{
 newMRparams(
   species_params,
+  interaction = NULL,
   resource_params,
-  gear_params,
-  interaction,
-  interaction_resource
+  resource_interaction = NULL,
+  gear_params = data.frame(),
+  no_w = 100,
+  min_w = 0.001,
+  max_w = NA
 )
 }
 \arguments{
+\item{species_params}{A data frame with the species parameters, with one
+row for each species.}
+
 \item{interaction}{Optional interaction matrix between species (predator
 species x prey species). Entries should be numbers between 0 and 1. By
 default all entries are 1.}
 
-\item{interation_resource}{Optional interaction matrix between species and
+\item{resource_params}{A data frame with the resource parameters}
+
+\item{resource_interaction}{Optional interaction matrix between species and
 resources (predator species x prey resource). Entries should be numbers
 between 0 and 1. By default all entries are 1.}
+
+\item{gear_params}{A data frame with the gear parameters, with one
+row for each gear-species pair.}
+
+\item{no_w}{The number of size bins in the consumer spectrum.}
+
+\item{min_w}{Sets the size of the eggs of all species for which this is not
+given in the \code{w_min} column of the \code{species_params} dataframe.}
+
+\item{max_w}{The largest size of the consumer spectrum. By default this is
+set to the largest \code{w_inf} specified in the \code{species_params} data
+frame.}
 }
 \value{
 An object of class MizerMRParams

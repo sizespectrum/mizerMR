@@ -54,6 +54,12 @@
      
   </a>
 </li>
+<li>
+  <a href="https://github.com/sizespectrum/mizerMR/">
+    <span class="fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
       </ul>
 </div>
 <!--/.nav-collapse -->
@@ -66,17 +72,63 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
 <div id="mizermr" class="section level1">
 <div class="page-header"><h1 class="hasAnchor">
 <a href="#mizermr" class="anchor"></a>mizerMR</h1></div>
 <!-- badges: start -->
-<!-- badges: end -->
-<p>Here we are starting to develop a mizer add-on package that implements multiple resources. So far this is just a skeleton.</p>
+
+<p>Here we are starting to develop a mizer add-on package that implements multiple resources. So far this is just a skeleton and not yet functional.</p>
 </div>
+<div id="setting-up-a-model-with-multiple-resources" class="section level1">
+<h1 class="hasAnchor">
+<a href="#setting-up-a-model-with-multiple-resources" class="anchor"></a>Setting up a model with multiple resources</h1>
+<p>You can add multiple resources to any existing MizerParams object <code>params</code> with</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setMultipleResources.html">setMultipleResources</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">resource_params</span>, <span class="va">resource_interaction</span><span class="op">)</span></code></pre></div>
+<p>where <code>resource_params</code> is a data frame with one row for each resource and columns <code>kappa</code>, <code>lambda</code>, <code>r_pp</code>, <code>w_min</code>, <code>w_max</code>, and <code>resource_interaction</code> is a matrix with one row for each species and one column for each resource giving the strength of interaction between the species and the resource.</p>
+<p>Alternatively and equivalently this could be achieved with</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_params</span>
+<span class="fu">resource_interaction</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_interaction</span></code></pre></div>
+<p>By default the initial values for the resources will be equal to the carrying capacities. But if a user has their own array (resource x size) of resource number densities <code>my_n_resource</code> they can set these as the intial values with</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">initialNResource</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">`my_n_resource`</span></code></pre></div>
+<p>Users who are not happy with the allometric expressions for the resource carrying capacities or the replenishment rates but have created their own matrices <code>my_capacity</code> and <code>my_rate</code> with one row for each resource and one column for each size can set these with</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="fu">resource_capacity</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_capacity</span>
+<span class="fu">resource_rate</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_rate</span></code></pre></div>
+<p>Rather than adding the multiple resources to an existing model, the user can also create a new model with multiple resources with</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">newMRParams</span><span class="op">(</span><span class="va">species_params</span>, <span class="va">interaction</span>, <span class="va">resource_params</span>,
+                      <span class="va">resource_interaction</span>, <span class="va">gear_params</span><span class="op">)</span></code></pre></div>
+</div>
+<div id="projecting-the-model" class="section level1">
+<h1 class="hasAnchor">
+<a href="#projecting-the-model" class="anchor"></a>Projecting the model</h1>
+<p>The MizerParams object with multiple resources will be simulated as usual with <code>project()</code> and its siblings. The mizer extension mechanism ensures that the resource dynamics are reflected correctly.</p>
+<p>Each resource will follow its semichemostat dynamics unless the user specifies a different resource dynamics function via the <code>resource_dynamics</code> slot in the <code>resource_params</code> data frame.</p>
+</div>
+<div id="analysing-the-model" class="section level1">
+<h1 class="hasAnchor">
+<a href="#analysing-the-model" class="anchor"></a>Analysing the model</h1>
+<p>A MizerSim <code>sim</code> object obtained via <code>project()</code> from a MizerParams object with multiple resources, will also contain the abundances of the resources over time. These can be assessed with <code>NResource(sim)</code>, which will return an array (time x resource x size), similar to how <code>N(sim)</code> returns the fish abundances as an array (time x species x size). The only difference is that the size for the resource runs over the larger set of values <code>w_full</code>.</p>
+<p><code><a href="reference/plotSpectra.html">plotSpectra()</a></code> behaves like the one in mizer but it shows one line for each resource. Most other functions can be used just as in mizer.</p>
+</div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
-    <div class="license">
+    <div class="links">
+<h2>Links</h2>
+<ul class="list-unstyled">
+<li>Browse source code at <br><a href="https://github.com/sizespectrum/mizerMR/">https://​github.com/​sizespectrum/​mizerMR/​</a>
+</li>
+<li>Report a bug at <br><a href="https://github.com/sizespectrum/mizerMR/issues">https://​github.com/​sizespectrum/​mizerMR/​issues</a>
+</li>
+</ul>
+</div>
+<div class="license">
 <h2>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
@@ -91,7 +143,13 @@
 </ul>
 </div>
 
-  </div>
+  <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+</ul>
+</div>
+</div>
 </div>
 
 
