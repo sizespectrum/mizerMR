@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Return valid resource rate array — valid_resource_rate • mizerMR</title>
+<title>Return valid initial resource array — valid_initial_resource • mizerMR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,12 +46,9 @@
 
 
 
-<meta property="og:title" content="Return valid resource rate array — valid_resource_rate" />
-<meta property="og:description" content="If resource rate is given it is checked for validity. If it does not
-have a comment, then it is given the comment &quot;set manually&quot;. This is then
-returned. If resource rate is missing or NULL, but one was set by the
-user and stored in params with a comment, then this is returned. Otherwise
-a resource rate is calculated from the resource params in params." />
+<meta property="og:title" content="Return valid initial resource array — valid_initial_resource" />
+<meta property="og:description" content="If initial_resource is given it is checked for validity and returned.
+Otherwise the value stored in params is returned." />
 
 
 
@@ -125,20 +122,17 @@ a resource rate is calculated from the resource params in params." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Return valid resource rate array</h1>
+    <h1>Return valid initial resource array</h1>
     <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/setMultipleResources.R'><code>R/setMultipleResources.R</code></a></small>
-    <div class="hidden name"><code>valid_resource_rate.Rd</code></div>
+    <div class="hidden name"><code>valid_initial_resource.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>If <code>resource rate</code> is given it is checked for validity. If it does not
-have a comment, then it is given the comment "set manually". This is then
-returned. If <code>resource rate</code> is missing or NULL, but one was set by the
-user and stored in <code>params</code> with a comment, then this is returned. Otherwise
-a resource rate is calculated from the resource params in <code>params</code>.</p>
+    <p>If <code>initial_resource</code> is given it is checked for validity and returned.
+Otherwise the value stored in <code>params</code> is returned.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>valid_resource_rate</span><span class='op'>(</span><span class='va'>params</span>, resource_rate <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>valid_initial_resource</span><span class='op'>(</span><span class='va'>params</span>, initial_resource <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -148,14 +142,14 @@ a resource rate is calculated from the resource params in <code>params</code>.</
       <td><p>A MizerParams object</p></td>
     </tr>
     <tr>
-      <th>resource_rate</th>
+      <th>initial_resource</th>
       <td></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>An array (resource x size) with the resource capacities</p>
+    <p>An array (resource x size)</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

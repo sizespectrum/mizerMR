@@ -4,10 +4,12 @@
 \alias{validResourceParams}
 \title{Validate resource parameter data frame}
 \usage{
-validResourceParams(resource_params)
+validResourceParams(resource_params, min_w)
 }
 \arguments{
 \item{resource_params}{The user-supplied resource parameter data frame}
+
+\item{min_w}{The smallest allowed resource size}
 }
 \value{
 A valid resource parameter data frame
@@ -16,6 +18,7 @@ This function throws an error if
 \itemize{
 \item the \code{resource} column does not exist or contains duplicates
 \item \code{w_min} is not smaller than \code{w_max}
+\item \code{w_min} is smaller than \code{min_w}
 \item any parameter is negative
 }
 
@@ -24,7 +27,7 @@ It sets default values if any of the following are missing or NA
 \item \code{kappa} is set to \code{0.1}
 \item \code{lambda} is set to \code{2.05}
 \item \code{r_pp} is set to \code{4}
-\item \code{w_min} is set to \code{1e-12}
+\item \code{w_min} is set to \code{min_w}
 \item \code{w_max} is set to \code{10}
 \item \code{resource_dynamics} is set to \code{semichemostat}
 }

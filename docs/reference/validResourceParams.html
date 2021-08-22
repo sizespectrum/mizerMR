@@ -132,7 +132,7 @@ required parameters" />
 required parameters</p>
     </div>
 
-    <pre class="usage"><span class='fu'>validResourceParams</span><span class='op'>(</span><span class='va'>resource_params</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>validResourceParams</span><span class='op'>(</span><span class='va'>resource_params</span>, <span class='va'>min_w</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -140,6 +140,10 @@ required parameters</p>
     <tr>
       <th>resource_params</th>
       <td><p>The user-supplied resource parameter data frame</p></td>
+    </tr>
+    <tr>
+      <th>min_w</th>
+      <td><p>The smallest allowed resource size</p></td>
     </tr>
     </table>
 
@@ -149,6 +153,7 @@ required parameters</p>
 <p>This function throws an error if</p><ul>
 <li><p>the <code>resource</code> column does not exist or contains duplicates</p></li>
 <li><p><code>w_min</code> is not smaller than <code>w_max</code></p></li>
+<li><p><code>w_min</code> is smaller than <code>min_w</code></p></li>
 <li><p>any parameter is negative</p></li>
 </ul>
 
@@ -156,7 +161,7 @@ required parameters</p>
 <li><p><code>kappa</code> is set to <code>0.1</code></p></li>
 <li><p><code>lambda</code> is set to <code>2.05</code></p></li>
 <li><p><code>r_pp</code> is set to <code>4</code></p></li>
-<li><p><code>w_min</code> is set to <code>1e-12</code></p></li>
+<li><p><code>w_min</code> is set to <code>min_w</code></p></li>
 <li><p><code>w_max</code> is set to <code>10</code></p></li>
 <li><p><code>resource_dynamics</code> is set to <code>semichemostat</code></p></li>
 </ul>

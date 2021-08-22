@@ -4,13 +4,15 @@
 \name{mizerMR-package}
 \alias{mizerMR}
 \alias{mizerMR-package}
-\title{mizerMR: What the Package Does (One Line, Title Case)}
+\title{mizerMR: Add multiple resources to a mizer model}
 \description{
-What the package does (one paragraph).
+An add-on to the mizer package which allows multiple resource
+    spectra to be added to any mizer model.
 }
 \seealso{
 Useful links:
 \itemize{
+  \item \url{http://sizespectrum.org/mizerMR/}
   \item \url{https://github.com/sizespectrum/mizerMR}
   \item Report bugs at \url{https://github.com/sizespectrum/mizerMR/issues}
 }

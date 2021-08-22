@@ -1,4 +1,7 @@
 #' @keywords internal
+#' @import mizer ggplot2 methods assertthat
+#' @importFrom stats mvfft
+#' @importFrom rlang signal
 "_PACKAGE"
 
 # The following block is used by usethis to automatically manage

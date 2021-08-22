@@ -21,7 +21,8 @@ Imports:
     assertthat,
     ggplot2,
     methods,
-    plotly
+    plotly,
+    rlang
 Collate:
     mizerMR-package.R
     newMRParams.R
@@ -29,6 +30,7 @@ Collate:
     project_methods.R
     resource_dynamics.R
     resource_params.R
+    setMultipleResources.R
 URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB

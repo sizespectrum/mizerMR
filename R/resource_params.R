@@ -24,7 +24,7 @@ resource_params <- function(params) {
 `resource_params<-` <- function(params, value) {
     value <- validResourceParams(value)
     params@resource_params <- value
-    setMR(params)
+    setMultipleResources(params)
 }
 
 #' Validate resource parameter data frame
@@ -33,11 +33,13 @@ resource_params <- function(params) {
 #' required parameters
 #'
 #' @param resource_params The user-supplied resource parameter data frame
+#' @param min_w The smallest allowed resource size
 #' @return A valid resource parameter data frame
 #'
 #' This function throws an error if
 #' * the `resource` column does not exist or contains duplicates
 #' * `w_min` is not smaller than `w_max`
+#' * `w_min` is smaller than `min_w`
 #' * any parameter is negative
 # TODO: Implement:
 # #' * `resource_dynamics` is not a valid resource dynamics function
@@ -46,7 +48,7 @@ resource_params <- function(params) {
 #' * `kappa` is set to `0.1`
 #' * `lambda` is set to `2.05`
 #' * `r_pp` is set to `4`
-#' * `w_min` is set to `1e-12`
+#' * `w_min` is set to `min_w`
 #' * `w_max` is set to `10`
 #' * `resource_dynamics` is set to `semichemostat`
 #'
@@ -55,7 +57,7 @@ resource_params <- function(params) {
 #'
 #' @concept helper
 #' @export
-validResourceParams <- function(resource_params) {
+validResourceParams <- function(resource_params, min_w) {
     assert_that(is.data.frame(resource_params))
     # Convert a tibble back to an ordinary data frame
     rp <- as.data.frame(resource_params,
@@ -77,7 +79,7 @@ validResourceParams <- function(resource_params) {
     rp <- set_resource_param_default("kappa", 0.1)
     rp <- set_resource_param_default("lambda", 2.05)
     rp <- set_resource_param_default("r_pp", 4)
-    rp <- set_resource_param_default("w_min", 1e-12)
+    rp <- set_resource_param_default("w_min", min_w)
     rp <- set_resource_param_default("w_max", 10)
     rp <- set_resource_param_default("resource_dynamics", "semichemostat")
 
@@ -85,6 +87,11 @@ validResourceParams <- function(resource_params) {
     wrong <- rp$w_min >= rp$w_max
     if (any(wrong)) {
         stop("w_min is not smaller than w_max for ",
+             paste(rp$resource[wrong], collapse = ", "))
+    }
+    wrong <- rp$w_min < min_w
+    if (any(wrong)) {
+        stop("w_min is smaller than the smallest allowed size for ",
              paste(rp$resource[wrong], collapse = ", "))
     }
     wrong <- rp$kappa < 0 | rp$lambda < 0 | rp$r_pp < 0 | rp$w_min < 0 |
