@@ -1,39 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://sizespectrum.org/mizer/index.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/index.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/mizerMR-package.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/mizerMR-package.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/newMRparams.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/newMRparams.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/plotSpectra.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/plotSpectra.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/resource_params.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/resource_params.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/setMultipleResources.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/setMultipleResources.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/set_resource_param_default.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/set_resource_param_default.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/validResourceParams.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/validResourceParams.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/valid_resource_arg.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_arg.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/valid_resource_capacity.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_capacity.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/valid_resource_interaction.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_interaction.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizer/reference/valid_resource_rate.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_rate.html</loc>
   </url>
 </urlset>

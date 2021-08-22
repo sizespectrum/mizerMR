@@ -1,15 +1,18 @@
 # This is the configuration for the mizer website using the pkgdown package.
 
 home:
-  title: Multi-Species Dynamic Size Spectrum Modelling in R
-  description: Mizer is an R package to create and run dynamic multi-species size-spectrum models of fish communities that are subject to fishing.
+  title: Multiple resources in a mizer sizespectrum model
+  description: An add-on to the mizer package which allows multiple resource spectra to be added to any mizer model.
 
-url: https://sizespectrum.org/mizer
+url: https://sizespectrum.org/mizerMR
 
 authors:
   Gustav Delius:
     href: https://www.york.ac.uk/maths/staff/gustav-delius/
 
+template:
+  params:
+    bootswatch: cerulean
 toc:
   depth: 3
 

@@ -1,5 +1,5 @@
 Package: mizerMR
-Title: What the Package Does (One Line, Title Case)
+Title: Add multiple resources to a mizer model
 Version: 0.0.0.9000
 Authors@R: 
     person(given = "Gustav",
@@ -7,7 +7,8 @@ Authors@R:
            role = c("cre", "aut", "cph"),
            email = "gustav.delius@york.ac.uk",
            comment = c(ORCID = "0000-0003-4092-8228"))
-Description: What the package does (one paragraph).
+Description: An add-on to the mizer package which allows multiple resource
+    spectra to be added to any mizer model.
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
@@ -28,5 +29,6 @@ Collate:
     project_methods.R
     resource_dynamics.R
     resource_params.R
-URL: https://github.com/sizespectrum/mizerMR
+URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
+Language: en-GB
