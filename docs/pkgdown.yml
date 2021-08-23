@@ -2,7 +2,7 @@ pandoc: 2.11.4
 pkgdown: 1.6.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2021-08-23T12:19Z
+last_built: 2021-08-23T19:48Z
 urls:
   reference: https://sizespectrum.org/mizerMR/reference
   article: https://sizespectrum.org/mizerMR/articles
