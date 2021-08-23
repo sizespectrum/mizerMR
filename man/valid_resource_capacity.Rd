@@ -9,7 +9,8 @@ valid_resource_capacity(params, resource_capacity = NULL)
 \arguments{
 \item{params}{A MizerParams object}
 
-\item{resource_capacity}{}
+\item{resource_capacity}{Array (resource x size) of the
+intrinsic resource carrying capacities}
 }
 \value{
 An array (resource x size) with the resource capacities

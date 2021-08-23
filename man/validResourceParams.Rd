@@ -29,7 +29,7 @@ It sets default values if any of the following are missing or NA
 \item \code{r_pp} is set to \code{4}
 \item \code{w_min} is set to \code{min_w}
 \item \code{w_max} is set to \code{10}
-\item \code{resource_dynamics} is set to \code{semichemostat}
+\item \code{dynamics} is set to \code{semichemostat}
 }
 
 If \code{resource_params} was provided as a tibble it is converted back to an

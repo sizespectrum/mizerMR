@@ -9,7 +9,7 @@ valid_initial_resource(params, initial_resource = NULL)
 \arguments{
 \item{params}{A MizerParams object}
 
-\item{initial_resource}{}
+\item{initial_resource}{Array (resource x size) of initial values}
 }
 \value{
 An array (resource x size)

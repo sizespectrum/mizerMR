@@ -8,7 +8,7 @@
 #' * `r_pp`     Coefficient in the allometric replenishment rate
 #' * `w_min`    Smallest size of the resource
 #' * `w_max`    Largest size of the resource
-#' * `resource_dynamics` Name of the resource dynamics function
+#' * `dynamics` Name of the resource dynamics function
 #'
 #' @param params A MizerParams object
 #' @export
@@ -42,7 +42,7 @@ resource_params <- function(params) {
 #' * `w_min` is smaller than `min_w`
 #' * any parameter is negative
 # TODO: Implement:
-# #' * `resource_dynamics` is not a valid resource dynamics function
+# #' * `dynamics` is not a valid resource dynamics function
 #'
 #' It sets default values if any of the following are missing or NA
 #' * `kappa` is set to `0.1`
@@ -50,7 +50,7 @@ resource_params <- function(params) {
 #' * `r_pp` is set to `4`
 #' * `w_min` is set to `min_w`
 #' * `w_max` is set to `10`
-#' * `resource_dynamics` is set to `semichemostat`
+#' * `dynamics` is set to `semichemostat`
 #'
 #' If `resource_params` was provided as a tibble it is converted back to an
 #' ordinary data frame.
@@ -70,18 +70,19 @@ validResourceParams <- function(resource_params, min_w) {
     resource_names <- as.character(rp$resource)
     rp$resource <- resource_names
     row.names(rp) <- resource_names
-    no_r <- nrow(rp)
-    if (length(unique(resource_names)) != no_r) {
+    no_res <- nrow(rp)
+    if (length(unique(resource_names)) != no_res) {
         stop("The resource parameter data frame has multiple rows for the same resource")
     }
 
     # Set defaults ----
-    rp <- set_resource_param_default("kappa", 0.1)
-    rp <- set_resource_param_default("lambda", 2.05)
-    rp <- set_resource_param_default("r_pp", 4)
-    rp <- set_resource_param_default("w_min", min_w)
-    rp <- set_resource_param_default("w_max", 10)
-    rp <- set_resource_param_default("resource_dynamics", "semichemostat")
+    rp <- set_resource_param_default(rp, "kappa", 0.1)
+    rp <- set_resource_param_default(rp, "lambda", 2.05)
+    rp <- set_resource_param_default(rp, "r_pp", 4)
+    rp <- set_resource_param_default(rp, "w_min", min_w)
+    rp <- set_resource_param_default(rp, "w_max", 10)
+    rp <- set_resource_param_default(rp, "dynamics",
+                                     "resource_semichemostat")
 
     # Check values ----
     wrong <- rp$w_min >= rp$w_max
@@ -100,7 +101,7 @@ validResourceParams <- function(resource_params, min_w) {
         stop("The following resources have some negative parameters: ",
              paste(rp$resource[wrong], collapse = ", "))
     }
-
+    rp
 }
 
 
@@ -130,11 +131,11 @@ set_resource_param_default <- function(object, parname, default,
     }
     assert_that(is.data.frame(resource_params))
     assert_that(is.string(parname))
-    no_r <- nrow(resource_params)
+    no_res <- nrow(resource_params)
     if (length(default) == 1) {
-        default <- rep(default, no_r)
+        default <- rep(default, no_res)
     }
-    assert_that(length(default) == no_r)
+    assert_that(length(default) == no_res)
     if (!(parname %in% colnames(resource_params))) {
         if (!missing(message)) {
             signal(message,

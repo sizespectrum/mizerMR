@@ -9,7 +9,8 @@ valid_resource_interaction(params, resource_interaction = NULL)
 \arguments{
 \item{params}{A MizerParams object}
 
-\item{resource_interaction}{}
+\item{resource_interaction}{Interaction matrix between species and
+resources (predator species x prey resource). By default all entries are 1.}
 }
 \value{
 An array (resource x size)

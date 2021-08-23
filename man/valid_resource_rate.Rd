@@ -9,7 +9,8 @@ valid_resource_rate(params, resource_rate = NULL)
 \arguments{
 \item{params}{A MizerParams object}
 
-\item{resource_rate}{}
+\item{resource_rate}{Array (resource x size) of the
+intrinsic resource replenishment rate}
 }
 \value{
 An array (resource x size) with the resource capacities

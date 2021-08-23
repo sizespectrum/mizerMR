@@ -24,7 +24,7 @@ variables are:
 \item \code{r_pp}     Coefficient in the allometric replenishment rate
 \item \code{w_min}    Smallest size of the resource
 \item \code{w_max}    Largest size of the resource
-\item \code{resource_dynamics} Name of the resource dynamics function
+\item \code{dynamics} Name of the resource dynamics function
 }
 }
 \seealso{

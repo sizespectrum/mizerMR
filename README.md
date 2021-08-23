@@ -70,7 +70,7 @@ ensures that the resource dynamics are reflected correctly.
 
 Each resource will follow its semichemostat dynamics unless the user
 specifies a different resource dynamics function via the
-`resource_dynamics` slot in the `resource_params` data frame.
+`dynamics` slot in the `resource_params` data frame.
 
 # Analysing the model
 

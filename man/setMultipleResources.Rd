@@ -43,8 +43,7 @@ initialNResource(params) <- value
 \item{resource_params}{A data frame with the resource parameters}
 
 \item{resource_interaction}{Optional interaction matrix between species and
-resources (predator species x prey resource). Entries should be numbers
-between 0 and 1. By default all entries are 1.}
+resources (predator species x prey resource). By default all entries are 1.}
 
 \item{resource_capacity}{Optional. Array (resource x size) of the
 intrinsic resource carrying capacities}
@@ -53,6 +52,8 @@ intrinsic resource carrying capacities}
 resource growth rates}
 
 \item{initial_resource}{Optional. Array (resource x size) of initial values}
+
+\item{value}{Value to assign}
 }
 \description{
 Set up multiple resources

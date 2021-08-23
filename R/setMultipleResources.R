@@ -3,8 +3,7 @@
 #' @param params A MizerParams object
 #' @param resource_params A data frame with the resource parameters
 #' @param resource_interaction Optional interaction matrix between species and
-#'   resources (predator species x prey resource). Entries should be numbers
-#'   between 0 and 1. By default all entries are 1.
+#'   resources (predator species x prey resource). By default all entries are 1.
 #' @param resource_capacity Optional. Array (resource x size) of the
 #'   intrinsic resource carrying capacities
 #' @param resource_rate Optional. Array (resource x size) of intrinsic
@@ -18,28 +17,28 @@ setMultipleResources <- function(params,
                                  resource_rate = NULL,
                                  initial_resource = resource_capacity) {
     params <- validParams(params)
-    rp <- validResourceParams(params@resource_params, params@w_full[[1]])
+    rp <- validResourceParams(resource_params, params@w_full[[1]])
     params@resource_params <- rp
 
-    if (!"MR" %in% names(params@n_other)) {
+    if (!"MR" %in% names(params@initial_n_other)) {
         # Still need to set this up
         params <- setRateFunction(params, "Encounter", "mizerMR_encounter")
         # make empty parameters
         no_sp <- nrow(params@species_params)
-        no_r <- nrow(rp)
+        no_res <- nrow(rp)
         no_w_full <- length(params@w_full)
-        w_names <- dimnames(params@initial_n)[[2]]
-        template <- array(dim = c(no_r, no_w_full),
-                          dimnames = c(resource = rp$resource,
-                                       w = w_names))
+        w_names <- names(params@initial_n_pp)
+        r_names <- as.list(rp$resource)
+        sp_names <- dimnames(params@initial_n)[[1]]
+        template <- array(dim = c(no_res, no_w_full),
+                          dimnames = list(resource = r_names, w = w_names))
         interaction_default <-
-            array(1, dim = c(no_sp, no_r),
-                  dimnames = c(species = params@species_params$species,
-                               resource = rp$resource))
+            array(1, dim = c(no_sp, no_res),
+                  dimnames = list(sp = sp_names, resource = r_names))
         params <- setComponent(
             params = params, component = "MR",
             initial_value = template,
-            dynamics_fun =  "mizerNR_dynamics",
+            dynamics_fun =  "mizerMR_dynamics",
             component_params = list(rate = template,
                                     capacity = template,
                                     interaction = interaction_default))
@@ -53,7 +52,7 @@ setMultipleResources <- function(params,
     params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
-        dynamics_fun =  "mizerNR_dynamics",
+        dynamics_fun =  "mizerMR_dynamics",
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
                                 interaction = resource_interaction))
@@ -66,6 +65,7 @@ setMultipleResources <- function(params,
 }
 
 #' @rdname setMultipleResources
+#' @param value Value to assign
 #' @export
 `resource_capacity<-` <- function(params, value) {
     setMultipleResources(params, resource_capacity = value)
@@ -116,7 +116,8 @@ setMultipleResources <- function(params,
 #' user and stored in `params` with a comment, then this is returned. Otherwise
 #' a resource capacity is calculated from the resource params in `params`.
 #' @param params A MizerParams object
-#' @param resource_capacity
+#' @param resource_capacity Array (resource x size) of the
+#'   intrinsic resource carrying capacities
 #'
 #' @return An array (resource x size) with the resource capacities
 valid_resource_capacity <- function(params, resource_capacity = NULL) {
@@ -153,8 +154,8 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
     resource_capacity[] <- 0
     # TODO: vectorise this
     rp <- params@resource_params
-    no_r <- nrow(rp)
-    for (i in seq_len(no_r)) {
+    no_res <- nrow(rp)
+    for (i in seq_len(no_res)) {
         w_sel <- params@w_full >= rp$w_min & params@w_full <= rp$w_max
         resource_capacity[i, w_sel] <- rp$kappa[[i]] *
             params@w_full[w_sel] ^ -rp$lambda[[i]]
@@ -171,7 +172,8 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
 #' user and stored in `params` with a comment, then this is returned. Otherwise
 #' a resource rate is calculated from the resource params in `params`.
 #' @param params A MizerParams object
-#' @param resource_rate
+#' @param resource_rate Array (resource x size) of the
+#'   intrinsic resource replenishment rate
 #'
 #' @return An array (resource x size) with the resource capacities
 valid_resource_rate <- function(params, resource_rate = NULL) {
@@ -208,8 +210,8 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
     resource_rate[] <- 0
     # TODO: vectorise this
     rp <- params@resource_params
-    no_r <- nrow(rp)
-    for (i in seq_len(no_r)) {
+    no_res <- nrow(rp)
+    for (i in seq_len(no_res)) {
         w_sel <- params@w_full >= rp$w_min & params@w_full <= rp$w_max
         resource_rate[i, w_sel] <- rp$r_pp[[i]] *
             params@w_full[w_sel] ^ (params@species_params$n[[i]] - 1)
@@ -224,7 +226,8 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
 #' If `resource interaction` is given it is checked for validity and returned.
 #' Otherwise the value stored in `params` is returned.
 #' @param params A MizerParams object
-#' @param resource_interaction
+#' @param resource_interaction Interaction matrix between species and
+#'   resources (predator species x prey resource). By default all entries are 1.
 #'
 #' @return An array (resource x size)
 valid_resource_interaction <- function(params, resource_interaction = NULL) {
@@ -259,7 +262,7 @@ valid_resource_interaction <- function(params, resource_interaction = NULL) {
 #' If `initial_resource` is given it is checked for validity and returned.
 #' Otherwise the value stored in `params` is returned.
 #' @param params A MizerParams object
-#' @param initial_resource
+#' @param initial_resource Array (resource x size) of initial values
 #'
 #' @return An array (resource x size)
 valid_initial_resource <- function(params, initial_resource = NULL) {

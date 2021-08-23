@@ -1,17 +1,16 @@
-mizerMR_dynamics <- function(params, n_other, rates, dt, ...) {
-
-}
-
-
-# Have to think about this: do we want to allow different dynamics functions
-# for different resources?
-semichemostat <- function(params, n_other, rates, dt, component,
-                             ...) {
-    c <- params@other_params[[component]]
-    # name of interaction parameter for this component in species_params
-    interaction_component <- paste0("interaction_", component)
-    interaction <- params@species_params[[interaction_component]]
-    mort <- as.vector(interaction  %*% rates$pred_rate)
-    tmp <- c$rate * c$capacity / (c$rate + mort)
-    return(tmp - (tmp - n_other[[component]]) * exp(-(c$rate + mort) * dt))
+#' @export
+mizerMR_dynamics <- function(params, n_other, n_pp, ...) {
+    n_res <- n_other[["MR"]]
+    no_res <- dim(n_res)[[1]]
+    rp <- params@resource_params
+    new_n_res <- n_res
+    for (i in seq_len(no_res)) {
+        fn <- get0(rp$dynamics[[i]])
+        new_n_res[i, ] <-
+            fn(params, n_pp = n_res[i, ], n_other = n_other,
+               resource_rate = params@other_params[["MR"]]$rate[i, ],
+               resource_capacity = params@other_params[["MR"]]$rate[i, ],
+               ...)
+    }
+    new_n_res
 }

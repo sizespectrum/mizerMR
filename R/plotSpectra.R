@@ -14,7 +14,7 @@
 #'   species are selected. A vector of species names, or a
 #'   numeric vector with the species indices, or a logical vector indicating for
 #'   each species whether it is to be selected (TRUE) or not.
-#' @inheritParams valid_resource_arg
+#' @inheritParams valid_resources_arg
 #' @param time_range The time range (either a vector of values, a vector of min
 #'   and max time, or a single value) to average the abundances over. Default is
 #'   the final time step. Ignored when called with a \linkS4class{MizerParams}
@@ -28,10 +28,6 @@
 #' raised to `power`. The default \code{power = 1} gives the biomass
 #' density, whereas \code{power = 2} gives the biomass density with respect
 #' to logarithmic size bins.
-#' @param biomass `r lifecycle::badge("deprecated")`
-#'  Only used if `power` argument is missing. Then
-#'   \code{biomass = TRUE} is equivalent to \code{power=1} and
-#'   \code{biomass = FALSE} is equivalent to \code{power=0}
 #' @param total A boolean value that determines whether the total over all
 #'   species and resources in the system is plotted as well. Note that even if
 #'   the plot only shows a selection of species, the total is including all
@@ -53,11 +49,19 @@
 plotSpectra <- function(object, species = NULL, resources = NULL,
                         time_range,
                         wlim = c(NA, NA), ylim = c(NA, NA),
-                        power = 1, biomass = TRUE,
+                        power = 1,
                         total = FALSE,
                         background = TRUE,
                         highlight = NULL, return_data = FALSE, ...) {
-
+    df <- mizer::plotSpectra(object, species = species,
+                        time_range = time_range,
+                        wlim = wlim, ylim - ylim,
+                        power = power, total = total,
+                        background = background,
+                        highlight = highlight,
+                        resource = FALSE,
+                        return_data = TRUE)
+    plotDataFrame(df, params, xtrans = "log10", ytrans = "log10")
 }
 
 #' Helper function to assure validity of resources argument
@@ -81,6 +85,64 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
 #'   TRUE entry for each selected resource.
 #' @export
 #' @concept helper
-valid_resource_arg <- function(object, resources = NULL, return.logical = FALSE) {
-
+valid_resources_arg <- function(object, resources = NULL, return.logical = FALSE) {
+    # This is mostly a copy of `valid_species_arg()` from core mizer just with
+    # `species` replaced by `resources` and `no_sp` replaced with `no_res`.
+    if (is(object, "MizerSim")) {
+        params <- object@params
+    } else if (is(object, "MizerParams")) {
+        params <- object
+    } else {
+        stop("The first argument must be a MizerSim or MizerParams object.")
+    }
+    assert_that(is.logical(return.logical))
+    all_resources <- dimnames(params@initial_n)$sp
+    no_res <- nrow(params@resource_params)
+    # Set resources if missing to list of all resources
+    if (is.null(resources)) {
+        resources <- params@resource_params$resource
+        if (length(resources) == 0) {  # There are no resources.
+            if (return.logical) {
+                return(rep(FALSE, no_sp))
+            } else {
+                return(NULL)
+            }
+        }
+    }
+    if (is.logical(resources)) {
+        if (length(resources) != no_res) {
+            stop("The boolean `resources` argument has the wrong length")
+        }
+        if (return.logical) {
+            return(resources)
+        }
+        return(all_resources[resources])
+    }
+    if (is.numeric(resources)) {
+        if (!all(resources %in% (1:no_res))) {
+            warning("A numeric 'resources' argument should only contain the ",
+                    "integers 1 to ", no_res)
+        }
+        resources.logical <- 1:no_res %in% resources
+        if (sum(resources.logical) == 0) {
+            stop("None of the numbers in the resources argument are valid resource indices.")
+        }
+        if (return.logical) {
+            return(resources.logical)
+        }
+        return(all_resources[resources])
+    }
+    invalid <- setdiff(resources, all_resources)
+    if (length(invalid) > 0) {
+        warning("The following resources do not exist: ",
+                toString(invalid))
+    }
+    resources <- intersect(resources, all_resources)
+    if (length(resources) == 0) {
+        stop("The resources argument matches none of the resources in the params object")
+    }
+    if (return.logical) {
+        return(all_resources %in% resources)
+    }
+    resources
 }
