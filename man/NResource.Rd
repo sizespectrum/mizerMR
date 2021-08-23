@@ -9,7 +9,13 @@ NResource(sim)
 
 finalNResource(sim)
 }
+\arguments{
+\item{sim}{A MizerSim object}
+}
 \value{
+For \code{NResource()}: An array (time x resource x size) holding the
+resource number densities at all saved timesteps of the simulation.
+
 For \code{finalNResource()}: An array (resource x size) holding the
 resource number densities at the end of the simulation
 }

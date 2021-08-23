@@ -1,4 +1,8 @@
 #' Access resource abundances in simulation result
+#'
+#' @param sim A MizerSim object
+#' @return For `NResource()`: An array (time x resource x size) holding the
+#'   resource number densities at all saved timesteps of the simulation.
 #' @export
 NResource <- function(sim) {
     if (!"MR" %in% names(sim@params@initial_n_other)) {

@@ -29,3 +29,18 @@ navbar:
        icon: "fab fa-twitter fa-lg"
        href: https://twitter.com/mizer_model
 
+reference:
+- title: Setting multiple resources
+- contents:
+  - resource_params
+  - setMultipleResources
+  - newMRParams
+- title: Accessing results of simulations
+- contents:
+  - NResource
+  - plotSpectra
+  - animateSpectra
+- title: Internal helper functions
+- contents:
+  - starts_with("valid")
+  - ends_with("default")
