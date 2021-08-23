@@ -8,7 +8,6 @@ plotSpectra(
   object,
   species = NULL,
   resources = NULL,
-  time_range,
   wlim = c(NA, NA),
   ylim = c(NA, NA),
   power = 1,
@@ -32,11 +31,6 @@ each species whether it is to be selected (TRUE) or not.}
 resources are selected. A vector of resource names, or a numeric vector
 with the resource indices, or a logical vector indicating for each resource
 whether it is to be selected (TRUE) or not.}
-
-\item{time_range}{The time range (either a vector of values, a vector of min
-and max time, or a single value) to average the abundances over. Default is
-the final time step. Ignored when called with a \linkS4class{MizerParams}
-object.}
 
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}

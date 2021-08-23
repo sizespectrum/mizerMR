@@ -9,6 +9,11 @@
 #' * `w_min`    Smallest size of the resource
 #' * `w_max`    Largest size of the resource
 #' * `dynamics` Name of the resource dynamics function
+#' * `colour`   Colour with which to plot the resource
+#' * `linetype` Linetype with which to plot the resource
+#'
+#' Except for `resource`, all of these get default value if you do not
+#' supply them, see [validResourceParams()]
 #'
 #' @param params A MizerParams object
 #' @export
@@ -51,6 +56,8 @@ resource_params <- function(params) {
 #' * `w_min` is set to `min_w`
 #' * `w_max` is set to `10`
 #' * `dynamics` is set to `semichemostat`
+#' * `colour` is drawn from a colour-blind-friendly palette
+#' * `linetype` is set to "solid"
 #'
 #' If `resource_params` was provided as a tibble it is converted back to an
 #' ordinary data frame.
@@ -83,6 +90,11 @@ validResourceParams <- function(resource_params, min_w) {
     rp <- set_resource_param_default(rp, "w_max", 10)
     rp <- set_resource_param_default(rp, "dynamics",
                                      "resource_semichemostat")
+    cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442",
+                   "#0072B2", "#D55E00", "#CC79A7")
+    rp <- set_resource_param_default(rp, "colour",
+                                     cbPalette[1:no_res])
+    rp <- set_resource_param_default(rp, "linetype", "solid")
 
     # Check values ----
     wrong <- rp$w_min >= rp$w_max

@@ -51,6 +51,14 @@ setMultipleResources <- function(params,
     resource_interaction <- valid_resource_interaction(params,
                                                        resource_interaction)
     initial_resource <- valid_initial_resource(params, initial_resource)
+
+    colours <- rp$colour
+    names(colours) <- rp$resource
+    params <- setColours(params, colours)
+    linetypes <- rep("solid", no_res)
+    names(linetypes) <- rp$resource
+    params <- setLinetypes(params, linetypes)
+
     params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,

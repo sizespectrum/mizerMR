@@ -136,7 +136,6 @@ specified by the <code>power</code> argument.</p>
   <span class='va'>object</span>,
   species <span class='op'>=</span> <span class='cn'>NULL</span>,
   resources <span class='op'>=</span> <span class='cn'>NULL</span>,
-  <span class='va'>time_range</span>,
   wlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
   ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
   power <span class='op'>=</span> <span class='fl'>1</span>,
@@ -168,13 +167,6 @@ each species whether it is to be selected (TRUE) or not.</p></td>
 resources are selected. A vector of resource names, or a numeric vector
 with the resource indices, or a logical vector indicating for each resource
 whether it is to be selected (TRUE) or not.</p></td>
-    </tr>
-    <tr>
-      <th>time_range</th>
-      <td><p>The time range (either a vector of values, a vector of min
-and max time, or a single value) to average the abundances over. Default is
-the final time step. Ignored when called with a MizerParams
-object.</p></td>
     </tr>
     <tr>
       <th>wlim</th>

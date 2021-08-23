@@ -15,10 +15,6 @@
 #'   numeric vector with the species indices, or a logical vector indicating for
 #'   each species whether it is to be selected (TRUE) or not.
 #' @inheritParams valid_resources_arg
-#' @param time_range The time range (either a vector of values, a vector of min
-#'   and max time, or a single value) to average the abundances over. Default is
-#'   the final time step. Ignored when called with a \linkS4class{MizerParams}
-#'   object.
 #' @param wlim A numeric vector of length two providing lower and upper limits
 #'   for the w axis. Use NA to refer to the existing minimum or maximum.
 #' @param ylim A numeric vector of length two providing lower and upper limits
@@ -47,23 +43,55 @@
 #' @family plotting functions
 #' @seealso [plotting_functions]
 plotSpectra <- function(object, species = NULL, resources = NULL,
-                        time_range,
                         wlim = c(NA, NA), ylim = c(NA, NA),
                         power = 1,
                         total = FALSE,
                         background = TRUE,
                         highlight = NULL, return_data = FALSE, ...) {
-    df <- mizer::plotSpectra(object, species = species,
+    # If called with MizerSim, we want to use the final time step
+    if (is(object, "MizerSim")) {
+        params <- setInitialValues(object@params, object)
+    } else if (is(object, "MizerParams")) {
+        params <- object
+    } else {
+        stop("The first argument must be either a MizerSim or a MizerParams object")
+    }
+    # set n_pp to total plankton abundance so that the total in mizer's
+    # plotSpectra() gives the right curve
+    params@initial_n_pp <- colSums(params@initial_n_other[["MR"]])
+
+    df <- mizer::plotSpectra(params, species = species,
                         time_range = time_range,
                         wlim = wlim, ylim - ylim,
                         power = power, total = total,
                         background = background,
                         highlight = highlight,
                         resource = FALSE,
-                        return_data = TRUE)
-    if (is(object, "MizerSim")) {
-        params <- object@params
+                        return_data = TRUE) |>
+        dplyr::rename(Spectra = Species)
+
+    resources <- valid_resources_arg(params, resources)
+
+    if (is.na(wlim[1])) {
+        wlim[1] <- min(params@w) / 100
     }
+    if (is.na(wlim[2])) {
+        wlim[2] <- max(params@w_full)
+    }
+    rf <- melt(initialNResource(params)) |>
+        dplyr::filter(value > 0,
+                      w >= wlim[[1]], w <= wlim[[2]]) |>
+        dplyr::mutate(Legend = resource) |>
+        dplyr::rename(Spectra = resource)
+    # Impose ylim
+    if (!is.na(ylim[2])) {
+        rf <- rf[rf$value <= ylim[2], ]
+    }
+    if (is.na(ylim[1])) {
+        ylim[1] <- 1e-20
+    }
+    rf <- rf[rf$value > ylim[1], ]
+    df <- rbind(df, rf)
     plotDataFrame(df, params, xtrans = "log10", ytrans = "log10")
 }
 

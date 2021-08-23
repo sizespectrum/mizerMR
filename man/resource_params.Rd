@@ -25,7 +25,13 @@ variables are:
 \item \code{w_min}    Smallest size of the resource
 \item \code{w_max}    Largest size of the resource
 \item \code{dynamics} Name of the resource dynamics function
+\item \code{colour}   Colour with which to plot the resource
+\item \code{linetype} Linetype with which to plot the resource
 }
+}
+\details{
+Except for \code{resource}, all of these get default value if you do not
+supply them, see \code{\link[=validResourceParams]{validResourceParams()}}
 }
 \seealso{
 \code{\link[=validResourceParams]{validResourceParams()}}
