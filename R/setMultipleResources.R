@@ -166,7 +166,8 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
     rp <- params@resource_params
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- params@w_full >= rp$w_min & params@w_full <= rp$w_max
+        w_sel <- params@w_full >= rp$w_min[[i]] &
+            params@w_full <= rp$w_max[[i]]
         resource_capacity[i, w_sel] <- rp$kappa[[i]] *
             params@w_full[w_sel] ^ -rp$lambda[[i]]
     }
@@ -222,7 +223,8 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
     rp <- params@resource_params
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- params@w_full >= rp$w_min & params@w_full <= rp$w_max
+        w_sel <- params@w_full >= rp$w_min[[i]] &
+            params@w_full <= rp$w_max[[i]]
         resource_rate[i, w_sel] <- rp$r_pp[[i]] *
             params@w_full[w_sel] ^ (params@species_params$n[[i]] - 1)
     }
@@ -293,7 +295,7 @@ valid_initial_resource <- function(params, initial_resource = NULL) {
         }
         dimnames(initial_resource) <- dimnames(mr$initial_value)
         if (any(initial_resource < 0)) {
-            stop("The resource interaction should be everywhere positive.")
+            stop("The initial resource should be everywhere positive.")
         }
         return(initial_resource)
     }
