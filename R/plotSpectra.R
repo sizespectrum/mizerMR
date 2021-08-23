@@ -91,8 +91,19 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
         ylim[1] <- 1e-20
     }
     rf <- rf[rf$value > ylim[1], ]
+
+    # Deal with power argument ----
+    if (power %in% c(0, 1, 2)) {
+        y_label <- c("Number density [1/g]", "Biomass density",
+                     "Biomass density [g]")[power + 1]
+    } else {
+        y_label <- paste0("Number density * w^", power)
+    }
+    rf <- dplyr::mutate(rf, value = value * w^power)
+
     df <- rbind(df, rf)
-    plotDataFrame(df, params, xtrans = "log10", ytrans = "log10")
+    plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
+                  ylab = y_label, xlab = "Size [g]")
 }
 
 #' Helper function to assure validity of resources argument
