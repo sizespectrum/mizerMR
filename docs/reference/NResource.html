@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • mizerMR</title>
+<title>Access resource abundances in simulation result — NResource • mizerMR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Access resource abundances in simulation result — NResource" />
+<meta property="og:description" content="Access resource abundances in simulation result" />
 
 
 
@@ -65,7 +66,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -118,108 +119,28 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Access resource abundances in simulation result</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/NResource.R'><code>R/NResource.R</code></a></small>
+    <div class="hidden name"><code>NResource.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p>Access resource abundances in simulation result</p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>NResource</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="NResource.html">NResource()</a></code> <code><a href="NResource.html">finalNResource()</a></code> </p>
-        </td>
-        <td><p>Access resource abundances in simulation result</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="newMRParams.html">newMRParams()</a></code> </p>
-        </td>
-        <td><p>Create a new multi-resource, multi-species model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plotSpectra.html">plotSpectra()</a></code> </p>
-        </td>
-        <td><p>Plot the abundance spectra</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="resource_params.html">resource_params()</a></code> <code><a href="resource_params.html">`resource_params&lt;-`()</a></code> </p>
-        </td>
-        <td><p>Resource parameters</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="setMultipleResources.html">setMultipleResources()</a></code> <code><a href="setMultipleResources.html">resource_capacity()</a></code> <code><a href="setMultipleResources.html">`resource_capacity&lt;-`()</a></code> <code><a href="setMultipleResources.html">resource_rate()</a></code> <code><a href="setMultipleResources.html">`resource_rate&lt;-`()</a></code> <code><a href="setMultipleResources.html">resource_interaction()</a></code> <code><a href="setMultipleResources.html">`resource_interaction&lt;-`()</a></code> <code><a href="setMultipleResources.html">initialNResource()</a></code> <code><a href="setMultipleResources.html">`initialNResource&lt;-`()</a></code> </p>
-        </td>
-        <td><p>Set up multiple resources</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_resource_param_default.html">set_resource_param_default()</a></code> </p>
-        </td>
-        <td><p>Set a resource parameter to a default value</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="validResourceParams.html">validResourceParams()</a></code> </p>
-        </td>
-        <td><p>Validate resource parameter data frame</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_initial_resource.html">valid_initial_resource()</a></code> </p>
-        </td>
-        <td><p>Return valid initial resource array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resource_capacity.html">valid_resource_capacity()</a></code> </p>
-        </td>
-        <td><p>Return valid resource capacity array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resource_interaction.html">valid_resource_interaction()</a></code> </p>
-        </td>
-        <td><p>Return valid resource interaction array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resource_rate.html">valid_resource_rate()</a></code> </p>
-        </td>
-        <td><p>Return valid resource rate array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resources_arg.html">valid_resources_arg()</a></code> </p>
-        </td>
-        <td><p>Helper function to assure validity of resources argument</p></td>
-      </tr>
-    </tbody>
-    </table>
+<span class='fu'>finalNResource</span><span class='op'>(</span><span class='va'>sim</span><span class='op'>)</span></pre>
+
+
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>For <code>finalNResource()</code>: An array (resource x size) holding the
+resource number densities at the end of the simulation</p>
+
   </div>
-
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>
