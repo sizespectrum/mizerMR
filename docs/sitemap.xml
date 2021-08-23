@@ -7,7 +7,7 @@
     <loc>https://sizespectrum.org/mizerMR/reference/mizerMR-package.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizerMR/reference/newMRparams.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/newMRParams.html</loc>
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/plotSpectra.html</loc>
@@ -25,7 +25,7 @@
     <loc>https://sizespectrum.org/mizerMR/reference/validResourceParams.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_arg.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_initial_resource.html</loc>
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_capacity.html</loc>
@@ -35,5 +35,8 @@
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_rate.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_resources_arg.html</loc>
   </url>
 </urlset>

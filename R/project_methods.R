@@ -1,5 +1,5 @@
 #' @export
-mizerMR_encounter <- function(params, n, n_pp, n_other, ...) {
+mizerMREncounter <- function(params, n, n_pp, n_other, ...) {
     idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)
     prey <- params@other_params[["MR"]]$interaction %*% n_other[["MR"]]
     prey[, idx_sp] <- prey[, idx_sp] + params@interaction %*% n

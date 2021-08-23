@@ -140,7 +140,6 @@ specified by the <code>power</code> argument.</p>
   wlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
   ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
   power <span class='op'>=</span> <span class='fl'>1</span>,
-  biomass <span class='op'>=</span> <span class='cn'>TRUE</span>,
   total <span class='op'>=</span> <span class='cn'>FALSE</span>,
   background <span class='op'>=</span> <span class='cn'>TRUE</span>,
   highlight <span class='op'>=</span> <span class='cn'>NULL</span>,
@@ -194,13 +193,6 @@ values below 1e-20 are always cut off.</p></td>
 raised to <code>power</code>. The default <code>power = 1</code> gives the biomass
 density, whereas <code>power = 2</code> gives the biomass density with respect
 to logarithmic size bins.</p></td>
-    </tr>
-    <tr>
-      <th>biomass</th>
-      <td><p><a href='https://lifecycle.r-lib.org/articles/stages.html#deprecated'><img src='figures/lifecycle-deprecated.svg' alt='[Deprecated]' /></a>
-Only used if <code>power</code> argument is missing. Then
-<code>biomass = TRUE</code> is equivalent to <code>power=1</code> and
-<code>biomass = FALSE</code> is equivalent to <code>power=0</code></p></td>
     </tr>
     <tr>
       <th>total</th>

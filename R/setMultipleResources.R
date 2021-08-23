@@ -22,7 +22,9 @@ setMultipleResources <- function(params,
 
     if (!"MR" %in% names(params@initial_n_other)) {
         # Still need to set this up
-        params <- setRateFunction(params, "Encounter", "mizerMR_encounter")
+        params@resource_dynamics <- "resource_constant"
+        params <- setRateFunction(params, "Encounter", "mizerMREncounter")
+        params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
         # make empty parameters
         no_sp <- nrow(params@species_params)
         no_res <- nrow(rp)
@@ -129,7 +131,7 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
         if (!identical(dim(resource_capacity),
                        dim(mr$component_params$capacity))) {
             stop("`resource_capacity` should be an array with dim ",
-                 dim(resource_capacity))
+                 paste(dim(mr$component_params$capacity), collapse = ", "))
         }
         if (!is.null(dimnames(resource_capacity)) &&
             !identical(dimnames(resource_capacity),
@@ -185,7 +187,7 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
         if (!identical(dim(resource_rate),
                        dim(mr$component_params$rate))) {
             stop("`resource_rate` should be an array with dim ",
-                 dim(resource_rate))
+                 paste(dim(mr$component_params$rate), collapse = ", "))
         }
         if (!is.null(dimnames(resource_rate)) &&
             !identical(dimnames(resource_rate),
@@ -239,7 +241,7 @@ valid_resource_interaction <- function(params, resource_interaction = NULL) {
         if (!identical(dim(resource_interaction),
                        dim(mr$component_params$interaction))) {
             stop("`resource_interaction` should be an array with dim ",
-                 dim(resource_interaction))
+                 paste(dim(mr$component_params$interaction), collapse = ", "))
         }
         if (!is.null(dimnames(resource_interaction)) &&
             !identical(dimnames(resource_interaction),
@@ -274,7 +276,7 @@ valid_initial_resource <- function(params, initial_resource = NULL) {
         if (!identical(dim(initial_resource),
                        dim(mr$initial_value))) {
             stop("`initial_resource` should be an array with dim ",
-                 dim(initial_resource))
+                 paste(dim(mr$initial_value), collapse = ", "))
         }
         if (!is.null(dimnames(initial_resource)) &&
             !identical(dimnames(initial_resource),

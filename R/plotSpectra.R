@@ -61,6 +61,9 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
                         highlight = highlight,
                         resource = FALSE,
                         return_data = TRUE)
+    if (is(object, "MizerSim")) {
+        params <- object@params
+    }
     plotDataFrame(df, params, xtrans = "log10", ytrans = "log10")
 }
 
@@ -96,14 +99,14 @@ valid_resources_arg <- function(object, resources = NULL, return.logical = FALSE
         stop("The first argument must be a MizerSim or MizerParams object.")
     }
     assert_that(is.logical(return.logical))
-    all_resources <- dimnames(params@initial_n)$sp
+    all_resources <- params@resource_params$resource
     no_res <- nrow(params@resource_params)
     # Set resources if missing to list of all resources
     if (is.null(resources)) {
         resources <- params@resource_params$resource
         if (length(resources) == 0) {  # There are no resources.
             if (return.logical) {
-                return(rep(FALSE, no_sp))
+                return(rep(FALSE, no_res))
             } else {
                 return(NULL)
             }

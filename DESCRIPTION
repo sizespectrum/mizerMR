@@ -34,3 +34,6 @@ Collate:
 URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
