@@ -22,7 +22,7 @@ resource_params <- function(params) {
 #' @param value A data frame with the resource parameters
 #' @export
 `resource_params<-` <- function(params, value) {
-    value <- validResourceParams(value)
+    value <- validResourceParams(value, min_w = params@w_full[[1]])
     params@resource_params <- value
     setMultipleResources(params)
 }

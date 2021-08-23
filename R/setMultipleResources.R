@@ -100,7 +100,7 @@ setMultipleResources <- function(params,
 #' @rdname setMultipleResources
 #' @export
 `initialNResource` <- function(params) {
-    getComponent(params, "MR")$component_params$initial_value
+    getComponent(params, "MR")$initial_value
 }
 
 #' @rdname setMultipleResources
