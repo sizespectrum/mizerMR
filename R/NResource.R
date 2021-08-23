@@ -4,7 +4,10 @@ NResource <- function(sim) {
     if (!"MR" %in% names(sim@params@initial_n_other)) {
         mizer::NResource(sim)
     }
-    aperm(simplify2array(sim@n_other[, "MR"]), c(3, 1, 2))
+    n_res <- aperm(simplify2array(sim@n_other[, "MR"]), c(3, 1, 2))
+    dimnames(n_res)[[1]] <- dimnames(sim@n_other)[[1]]
+    names(dimnames(n_res))[[1]] <- names(dimnames(sim@n_other))[[1]]
+    n_res
 }
 
 #' @rdname NResource
