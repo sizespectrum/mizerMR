@@ -19,6 +19,9 @@ setMultipleResources <- function(params,
     params <- validParams(params)
     rp <- validResourceParams(resource_params, params@w_full[[1]])
     params@resource_params <- rp
+    no_sp <- nrow(params@species_params)
+    no_res <- nrow(rp)
+    no_w_full <- length(params@w_full)
 
     if (!"MR" %in% names(params@initial_n_other)) {
         # Still need to set this up
@@ -26,9 +29,6 @@ setMultipleResources <- function(params,
         params <- setRateFunction(params, "Encounter", "mizerMREncounter")
         params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
         # make empty parameters
-        no_sp <- nrow(params@species_params)
-        no_res <- nrow(rp)
-        no_w_full <- length(params@w_full)
         w_names <- names(params@initial_n_pp)
         r_names <- as.list(rp$resource)
         sp_names <- dimnames(params@initial_n)[[1]]
@@ -59,7 +59,7 @@ setMultipleResources <- function(params,
     names(linetypes) <- rp$resource
     params <- setLinetypes(params, linetypes)
 
-    params <- setComponent(
+    setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
         dynamics_fun =  "mizerMR_dynamics",
