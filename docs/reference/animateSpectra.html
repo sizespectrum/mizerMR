@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Function reference • mizerMR</title>
+<title>Animation of the abundance spectra — animateSpectra • mizerMR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,8 @@
 
 
 
-<meta property="og:title" content="Function reference" />
+<meta property="og:title" content="Animation of the abundance spectra — animateSpectra" />
+<meta property="og:description" content="" />
 
 
 
@@ -65,7 +66,7 @@
   </head>
 
   <body data-spy="scroll" data-target="#toc">
-    <div class="container template-reference-index">
+    <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -118,114 +119,91 @@
       </header>
 
 <div class="row">
-  <div class="contents col-md-9">
+  <div class="col-md-9 contents">
     <div class="page-header">
-      <h1>Reference</h1>
+    <h1>Animation of the abundance spectra</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/animateSpectra.R'><code>R/animateSpectra.R</code></a></small>
+    <div class="hidden name"><code>animateSpectra.Rd</code></div>
     </div>
 
-    <table class="ref-index">
+    <div class="ref-description">
+    <p><a href='https://lifecycle.r-lib.org/articles/stages.html#experimental'><img src='figures/lifecycle-experimental.svg' alt='[Experimental]' /></a></p>
+    </div>
 
-    <colgroup>
-      
-      <col class="alias" />
-      <col class="title" />
-    </colgroup>
+    <pre class="usage"><span class='fu'>animateSpectra</span><span class='op'>(</span>
+  <span class='va'>sim</span>,
+  species <span class='op'>=</span> <span class='cn'>NULL</span>,
+  resources <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>time_range</span>,
+  wlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
+  ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
+  power <span class='op'>=</span> <span class='fl'>1</span>,
+  total <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  resource <span class='op'>=</span> <span class='cn'>TRUE</span>
+<span class='op'>)</span></pre>
 
-    <tbody>
-      <tr>
-        <th colspan="2">
-          <h2 id="section-all-functions" class="hasAnchor"><a href="#section-all-functions" class="anchor"></a>All functions</h2>
-          <p class="section-desc"></p>
-        </th>
-      </tr>
-      
-      
-    </tbody><tbody>
-      
-      
-      <tr>
-        
-        <td>
-          <p><code><a href="NResource.html">NResource()</a></code> <code><a href="NResource.html">finalNResource()</a></code> </p>
-        </td>
-        <td><p>Access resource abundances in simulation result</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="animateSpectra.html">animateSpectra()</a></code> </p>
-        </td>
-        <td><p>Animation of the abundance spectra</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="newMRParams.html">newMRParams()</a></code> </p>
-        </td>
-        <td><p>Create a new multi-resource, multi-species model</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="plotSpectra.html">plotSpectra()</a></code> </p>
-        </td>
-        <td><p>Plot the abundance spectra</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="resource_params.html">resource_params()</a></code> <code><a href="resource_params.html">`resource_params&lt;-`()</a></code> </p>
-        </td>
-        <td><p>Resource parameters</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="setMultipleResources.html">setMultipleResources()</a></code> <code><a href="setMultipleResources.html">resource_capacity()</a></code> <code><a href="setMultipleResources.html">`resource_capacity&lt;-`()</a></code> <code><a href="setMultipleResources.html">resource_rate()</a></code> <code><a href="setMultipleResources.html">`resource_rate&lt;-`()</a></code> <code><a href="setMultipleResources.html">resource_interaction()</a></code> <code><a href="setMultipleResources.html">`resource_interaction&lt;-`()</a></code> <code><a href="setMultipleResources.html">initialNResource()</a></code> <code><a href="setMultipleResources.html">`initialNResource&lt;-`()</a></code> </p>
-        </td>
-        <td><p>Set up multiple resources</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="set_resource_param_default.html">set_resource_param_default()</a></code> </p>
-        </td>
-        <td><p>Set a resource parameter to a default value</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="validResourceParams.html">validResourceParams()</a></code> </p>
-        </td>
-        <td><p>Validate resource parameter data frame</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_initial_resource.html">valid_initial_resource()</a></code> </p>
-        </td>
-        <td><p>Return valid initial resource array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resource_capacity.html">valid_resource_capacity()</a></code> </p>
-        </td>
-        <td><p>Return valid resource capacity array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resource_interaction.html">valid_resource_interaction()</a></code> </p>
-        </td>
-        <td><p>Return valid resource interaction array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resource_rate.html">valid_resource_rate()</a></code> </p>
-        </td>
-        <td><p>Return valid resource rate array</p></td>
-      </tr><tr>
-        
-        <td>
-          <p><code><a href="valid_resources_arg.html">valid_resources_arg()</a></code> </p>
-        </td>
-        <td><p>Helper function to assure validity of resources argument</p></td>
-      </tr>
-    </tbody>
+    <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
+    <table class="ref-arguments">
+    <colgroup><col class="name" /><col class="desc" /></colgroup>
+    <tr>
+      <th>sim</th>
+      <td><p>A MizerSim object</p></td>
+    </tr>
+    <tr>
+      <th>species</th>
+      <td><p>Name or vector of names of the species to be plotted. By
+default all species are plotted.</p></td>
+    </tr>
+    <tr>
+      <th>time_range</th>
+      <td><p>The time range to animate over. Either a vector of values
+or a vector of min and max time. Default is the entire time range of the
+simulation.</p></td>
+    </tr>
+    <tr>
+      <th>wlim</th>
+      <td><p>A numeric vector of length two providing lower and upper limits
+for the w axis. Use NA to refer to the existing minimum or maximum.</p></td>
+    </tr>
+    <tr>
+      <th>ylim</th>
+      <td><p>A numeric vector of length two providing lower and upper limits
+for the y axis. Use NA to refer to the existing minimum or maximum. Any
+values below 1e-20 are always cut off.</p></td>
+    </tr>
+    <tr>
+      <th>power</th>
+      <td><p>The abundance is plotted as the number density times the weight
+raised to <code>power</code>. The default <code>power = 1</code> gives the biomass
+density, whereas <code>power = 2</code> gives the biomass density with respect
+to logarithmic size bins.</p></td>
+    </tr>
+    <tr>
+      <th>total</th>
+      <td><p>A boolean value that determines whether the total over all
+species in the system is plotted as well. Default is FALSE.</p></td>
+    </tr>
+    <tr>
+      <th>resource</th>
+      <td><p>A boolean value that determines whether resource is included.
+Default is TRUE.</p></td>
+    </tr>
     </table>
-  </div>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
+
+    <p>A plotly object</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>Other plotting functions: 
+<code><a href='plotSpectra.html'>plotSpectra</a>()</code></p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'>animateSpectra</span><span class='op'>(</span><span class='va'>NS_sim</span>, power <span class='op'>=</span> <span class='fl'>2</span>, wlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.1</span>, <span class='cn'>NA</span><span class='op'>)</span>, time_range <span class='op'>=</span> <span class='fl'>1997</span><span class='op'>:</span><span class='fl'>2007</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; <span class='error'>Error in sim@n_other[, "MR"]: subscript out of bounds</span></div><div class='input'><span class='co'># }</span>
+</div></pre>
+  </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
       <h2 data-toc-skip>Contents</h2>

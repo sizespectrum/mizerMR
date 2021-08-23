@@ -77,5 +77,8 @@ object the initial abundance is plotted.
 }
 \seealso{
 \link{plotting_functions}
+
+Other plotting functions: 
+\code{\link{animateSpectra}()}
 }
 \concept{plotting functions}

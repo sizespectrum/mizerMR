@@ -25,6 +25,7 @@ Imports:
     plotly,
     rlang
 Collate:
+    animateSpectra.R
     mizerMR-package.R
     newMRParams.R
     NResource.R
