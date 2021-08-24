@@ -22,11 +22,11 @@ library(mizerMR)
 
 # Setting up a model with multiple resources
 
-Multiple species are set up in a very similar manner to multiple
-species. Just as for multiple species we need a `species_params` data
-frame with the information about the species, for multiple resources we
-need a `resource_params` data frame, with one row for each resource.
-Here is an artificial example with two resources:
+Multiple size-structured resources are set up in a very similar manner
+to multiple species. Just as for multiple species we need a
+`species_params` data frame with the information about the species, for
+multiple resources we need a `resource_params` data frame, with one row
+for each resource. Here is an artificial example with two resources:
 
 ``` r
 library(tibble)

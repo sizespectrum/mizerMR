@@ -1,7 +1,7 @@
 # This is the configuration for the mizer website using the pkgdown package.
 
 home:
-  title: Multiple resources in a mizer sizespectrum model
+  title: Multiple size-structured resources in mizer
   description: An add-on to the mizer package which allows multiple resource spectra to be added to any mizer model.
 
 url: https://sizespectrum.org/mizerMR
@@ -13,6 +13,13 @@ authors:
 template:
   params:
     bootswatch: cerulean
+  opengraph:
+    image:
+      src: man/figures/logo.png
+      alt: "mizerMR: Multiple size-structured resources in mizer"
+    twitter:
+      site: "@mizer_model"
+      card: summary
 toc:
   depth: 3
 
