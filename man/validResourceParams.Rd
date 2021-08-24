@@ -29,6 +29,7 @@ It sets default values if any of the following are missing or NA
 \item \code{r_pp} is set to \code{4}
 \item \code{w_min} is set to \code{min_w}
 \item \code{w_max} is set to \code{10}
+\item \code{n} is set to 2/3
 \item \code{dynamics} is set to \code{semichemostat}
 \item \code{colour} is drawn from a colour-blind-friendly palette
 \item \code{linetype} is set to "solid"

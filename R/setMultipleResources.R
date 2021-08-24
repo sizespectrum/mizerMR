@@ -226,7 +226,7 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
         w_sel <- params@w_full >= rp$w_min[[i]] &
             params@w_full <= rp$w_max[[i]]
         resource_rate[i, w_sel] <- rp$r_pp[[i]] *
-            params@w_full[w_sel] ^ (params@species_params$n[[i]] - 1)
+            params@w_full[w_sel] ^ (rp$n[[i]] - 1)
     }
 
     resource_rate

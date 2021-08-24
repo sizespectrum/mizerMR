@@ -8,6 +8,7 @@
 #' * `r_pp`     Coefficient in the allometric replenishment rate
 #' * `w_min`    Smallest size of the resource
 #' * `w_max`    Largest size of the resource
+#' * `n`        Exponent for allometric scaling of replenishment rate
 #' * `dynamics` Name of the resource dynamics function
 #' * `colour`   Colour with which to plot the resource
 #' * `linetype` Linetype with which to plot the resource
@@ -55,6 +56,7 @@ resource_params <- function(params) {
 #' * `r_pp` is set to `4`
 #' * `w_min` is set to `min_w`
 #' * `w_max` is set to `10`
+#' * `n` is set to 2/3
 #' * `dynamics` is set to `semichemostat`
 #' * `colour` is drawn from a colour-blind-friendly palette
 #' * `linetype` is set to "solid"
@@ -88,6 +90,7 @@ validResourceParams <- function(resource_params, min_w) {
     rp <- set_resource_param_default(rp, "r_pp", 4)
     rp <- set_resource_param_default(rp, "w_min", min_w)
     rp <- set_resource_param_default(rp, "w_max", 10)
+    rp <- set_resource_param_default(rp, "n", 2/3)
     rp <- set_resource_param_default(rp, "dynamics",
                                      "resource_semichemostat")
     cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442",

@@ -24,6 +24,7 @@ variables are:
 \item \code{r_pp}     Coefficient in the allometric replenishment rate
 \item \code{w_min}    Smallest size of the resource
 \item \code{w_max}    Largest size of the resource
+\item \code{n}        Exponent for allometric scaling of replenishment rate
 \item \code{dynamics} Name of the resource dynamics function
 \item \code{colour}   Colour with which to plot the resource
 \item \code{linetype} Linetype with which to plot the resource
