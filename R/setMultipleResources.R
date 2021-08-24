@@ -17,7 +17,7 @@ setMultipleResources <- function(params,
                                  resource_rate = NULL,
                                  initial_resource = resource_capacity) {
     params <- validParams(params)
-    rp <- validResourceParams(resource_params, params@w_full[[1]])
+    rp <- validResourceParams(resource_params, params)
     params@resource_params <- rp
     no_sp <- nrow(params@species_params)
     no_res <- nrow(rp)

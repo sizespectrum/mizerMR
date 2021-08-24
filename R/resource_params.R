@@ -28,7 +28,7 @@ resource_params <- function(params) {
 #' @param value A data frame with the resource parameters
 #' @export
 `resource_params<-` <- function(params, value) {
-    value <- validResourceParams(value, min_w = params@w_full[[1]])
+    value <- validResourceParams(value, params)
     params@resource_params <- value
     setMultipleResources(params)
 }
@@ -50,15 +50,21 @@ resource_params <- function(params) {
 # TODO: Implement:
 # #' * `dynamics` is not a valid resource dynamics function
 #'
-#' It sets default values if any of the following are missing or NA
+#' Any missing values are set to the values that were previously set for the
+#' first resource (which would be the standard single resource when you set up
+#' multiple resources for the first time). The exception is the `colour` which
+#' of course should be different for each resource. It is chosen from a
+#' colour-blind-friendly palette.
+#'
+#' Where no values are available for the previous first resource either,
+#' the following defaults are used:
 #' * `kappa` is set to `0.1`
 #' * `lambda` is set to `2.05`
 #' * `r_pp` is set to `4`
 #' * `w_min` is set to `min_w`
 #' * `w_max` is set to `10`
 #' * `n` is set to 2/3
-#' * `dynamics` is set to `semichemostat`
-#' * `colour` is drawn from a colour-blind-friendly palette
+#' * `dynamics` is set to `resource_semichemostat`
 #' * `linetype` is set to "solid"
 #'
 #' If `resource_params` was provided as a tibble it is converted back to an
@@ -66,8 +72,10 @@ resource_params <- function(params) {
 #'
 #' @concept helper
 #' @export
-validResourceParams <- function(resource_params, min_w) {
-    assert_that(is.data.frame(resource_params))
+validResourceParams <- function(resource_params, params) {
+    assert_that(is.data.frame(resource_params),
+                is(params, "MizerParams"))
+    min_w <- params@w_full[[1]]
     # Convert a tibble back to an ordinary data frame
     rp <- as.data.frame(resource_params,
                         stringsAsFactors = FALSE) # for old versions of R
@@ -84,20 +92,34 @@ validResourceParams <- function(resource_params, min_w) {
         stop("The resource parameter data frame has multiple rows for the same resource")
     }
 
-    # Set defaults ----
-    rp <- set_resource_param_default(rp, "kappa", 0.1)
-    rp <- set_resource_param_default(rp, "lambda", 2.05)
-    rp <- set_resource_param_default(rp, "r_pp", 4)
-    rp <- set_resource_param_default(rp, "w_min", min_w)
-    rp <- set_resource_param_default(rp, "w_max", 10)
-    rp <- set_resource_param_default(rp, "n", 2/3)
-    rp <- set_resource_param_default(rp, "dynamics",
-                                     "resource_semichemostat")
+    # previous values
+    # This code works also when no multiple resources are set up yet,
+    # so that resource_params is just a list).
+    pv <- as.data.frame(params@resource_params)[1, ]
+    pv$w_max <- pv$w_pp_cutoff # deal with strange name used in standard mizer
+
+    rp <- set_resource_param_default(
+        rp, "kappa", ifelse(is.numeric(pv$kappa), pv$kappa, 0.1))
+    rp <- set_resource_param_default(
+        rp, "lambda", ifelse(is.numeric(pv$lambda), pv$lambda, 2.05))
+    rp <- set_resource_param_default(
+        rp, "r_pp", ifelse(is.numeric(pv$r_pp), pv$r_pp, 4))
+    rp <- set_resource_param_default(
+        rp, "n", ifelse(is.numeric(pv$n), pv$n, 2/3))
+    rp <- set_resource_param_default(
+        rp, "w_min", ifelse(is.numeric(pv$w_min), pv$w_min, min_w))
+    rp <- set_resource_param_default(
+        rp, "w_max", ifelse(is.numeric(pv$w_max), pv$w_max, 10))
+    rp <- set_resource_param_default(
+        rp, "dynamics", ifelse(is.numeric(pv$dynamics), pv$dynamics,
+                               "resource_semichemostat"))
+    rp <- set_resource_param_default(
+        rp, "linetype", ifelse(is.numeric(pv$linetype), pv$linetype, "solid"))
+
     cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442",
                    "#0072B2", "#D55E00", "#CC79A7")
     rp <- set_resource_param_default(rp, "colour",
                                      cbPalette[1:no_res])
-    rp <- set_resource_param_default(rp, "linetype", "solid")
 
     # Check values ----
     wrong <- rp$w_min >= rp$w_max

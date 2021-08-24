@@ -4,7 +4,7 @@
 \alias{validResourceParams}
 \title{Validate resource parameter data frame}
 \usage{
-validResourceParams(resource_params, min_w)
+validResourceParams(resource_params, params)
 }
 \arguments{
 \item{resource_params}{The user-supplied resource parameter data frame}
@@ -22,7 +22,14 @@ This function throws an error if
 \item any parameter is negative
 }
 
-It sets default values if any of the following are missing or NA
+Any missing values are set to the values that were previously set for the
+first resource (which would be the standard single resource when you set up
+multiple resources for the first time). The exception is the \code{colour} which
+of course should be different for each resource. It is chosen from a
+colour-blind-friendly palette.
+
+Where no values are available for the previous first resource either,
+the following defaults are used:
 \itemize{
 \item \code{kappa} is set to \code{0.1}
 \item \code{lambda} is set to \code{2.05}
@@ -30,8 +37,7 @@ It sets default values if any of the following are missing or NA
 \item \code{w_min} is set to \code{min_w}
 \item \code{w_max} is set to \code{10}
 \item \code{n} is set to 2/3
-\item \code{dynamics} is set to \code{semichemostat}
-\item \code{colour} is drawn from a colour-blind-friendly palette
+\item \code{dynamics} is set to \code{resource_semichemostat}
 \item \code{linetype} is set to "solid"
 }
 
