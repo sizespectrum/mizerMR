@@ -47,12 +47,12 @@ animateSpectra <- function(sim,
     time_elements <- get_time_elements(sim, time_range)
     nf <- melt(sim@n[time_elements,
                      as.character(dimnames(sim@n)$sp) %in% species,
-                     , drop = FALSE]) |>
+                     , drop = FALSE]) %>%
         dplyr::rename(Spectra = sp)
     # Add resource ----
     nf_res <- melt(NResource(sim)[time_elements,
                      sim@params@resource_params$resource %in% resources,
-                     , drop = FALSE]) |>
+                     , drop = FALSE]) %>%
         dplyr::rename(Spectra = resource)
     nf <- rbind(nf, nf_res)
     # Add total ----

@@ -67,7 +67,7 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
                         background = background,
                         highlight = highlight,
                         resource = FALSE,
-                        return_data = TRUE) |>
+                        return_data = TRUE) %>%
         dplyr::rename(Spectra = Species)
 
     resources <- valid_resources_arg(params, resources)
@@ -78,10 +78,10 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
     if (is.na(wlim[2])) {
         wlim[2] <- max(params@w_full)
     }
-    rf <- melt(initialNResource(params)) |>
+    rf <- melt(initialNResource(params)) %>%
         dplyr::filter(value > 0,
-                      w >= wlim[[1]], w <= wlim[[2]]) |>
-        dplyr::mutate(Legend = resource) |>
+                      w >= wlim[[1]], w <= wlim[[2]]) %>%
+        dplyr::mutate(Legend = resource) %>%
         dplyr::rename(Spectra = resource)
     # Impose ylim
     if (!is.na(ylim[2])) {
