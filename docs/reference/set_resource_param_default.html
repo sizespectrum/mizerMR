@@ -51,6 +51,13 @@
 frame, then create it and fill it with the default. Otherwise use the default
 only to fill in any NAs. Optionally gives a message if the parameter
 did not already exist." />
+<meta property="og:image" content="https://sizespectrum.org/mizerMR/reference/figures/logo.png" />
+<meta property="og:image:alt" content="mizerMR: Multiple size-structured resources in mizer" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="@mizer_model" />
+<meta name="twitter:site" content="@mizer_model" />
+
+
 
 
 
@@ -66,9 +73,15 @@ did not already exist." />
 
 
 
+  
+
+  
+
   </head>
 
   <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-reference-topic">
       <header>
       <div class="navbar navbar-default navbar-fixed-top" role="navigation">
@@ -136,14 +149,14 @@ only to fill in any NAs. Optionally gives a message if the parameter
 did not already exist.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>set_resource_param_default</span><span class='op'>(</span><span class='va'>object</span>, <span class='va'>parname</span>, <span class='va'>default</span>, message <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <div class="ref-usage sourceCode"><pre class='sourceCode r'><code><span class='fu'>set_resource_param_default</span><span class='op'>(</span><span class='va'>resource_params</span>, <span class='va'>parname</span>, <span class='va'>default</span>, message <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></code></pre></div>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>Either a MizerParams object or a resource parameter data frame</p></td>
+      <th>resource_params</th>
+      <td><p>A resource parameter data frame</p></td>
     </tr>
     <tr>
       <th>parname</th>
@@ -163,7 +176,7 @@ not already exist</p></td>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>The <code>object</code> with an updated column in the resource params data frame.</p>
+    <p>The resource params data frame with an updated column.</p>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -176,11 +189,11 @@ not already exist</p></td>
 
       <footer>
       <div class="copyright">
-  <p>Developed by <a href='https://www.york.ac.uk/maths/staff/gustav-delius/'>Gustav Delius</a>.</p>
+  <p><p>Developed by <a href="https://www.york.ac.uk/maths/staff/gustav-delius/" class="external-link">Gustav Delius</a>.</p></p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 1.6.1.</p></p>
 </div>
 
       </footer>
@@ -188,6 +201,8 @@ not already exist</p></td>
 
   
 
+
+  
 
   </body>
 </html>

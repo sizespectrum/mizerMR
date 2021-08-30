@@ -14,7 +14,7 @@
 \usage{
 setMultipleResources(
   params,
-  resource_params = params@resource_params,
+  resource_params = NULL,
   resource_interaction = NULL,
   resource_capacity = NULL,
   resource_rate = NULL,

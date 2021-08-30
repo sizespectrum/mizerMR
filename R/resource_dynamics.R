@@ -2,7 +2,9 @@
 mizerMR_dynamics <- function(params, n_other, n_pp, rates, ...) {
     n_res <- n_other[["MR"]]
     no_res <- dim(n_res)[[1]]
-    rp <- params@resource_params
+    rp <- resource_params(params)
+    rate <- params@other_params[["MR"]]$rate
+    capacity <- params@other_params[["MR"]]$capacity
     new_n_res <- n_res
     rates_mod <- rates
     for (i in seq_len(no_res)) {
@@ -11,8 +13,8 @@ mizerMR_dynamics <- function(params, n_other, n_pp, rates, ...) {
         new_n_res[i, ] <-
             fn(params, n_pp = n_res[i, ], n_other = n_other,
                rates = rates_mod,
-               resource_rate = params@other_params[["MR"]]$rate[i, ],
-               resource_capacity = params@other_params[["MR"]]$capacity[i, ],
+               resource_rate = rate[i, ],
+               resource_capacity = capacity[i, ],
                ...)
     }
     new_n_res

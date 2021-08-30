@@ -51,7 +51,7 @@ animateSpectra <- function(sim,
         dplyr::rename(Spectra = sp)
     # Add resource ----
     nf_res <- melt(NResource(sim)[time_elements,
-                     sim@params@resource_params$resource %in% resources,
+                     resource_params(sim@params)$resource %in% resources,
                      , drop = FALSE]) %>%
         dplyr::rename(Spectra = resource)
     nf <- rbind(nf, nf_res)

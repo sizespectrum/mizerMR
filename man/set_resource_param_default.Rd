@@ -4,10 +4,10 @@
 \alias{set_resource_param_default}
 \title{Set a resource parameter to a default value}
 \usage{
-set_resource_param_default(object, parname, default, message = NULL)
+set_resource_param_default(resource_params, parname, default, message = NULL)
 }
 \arguments{
-\item{object}{Either a MizerParams object or a resource parameter data frame}
+\item{resource_params}{A resource parameter data frame}
 
 \item{parname}{A string with the name of the resource parameter to set}
 
@@ -18,7 +18,7 @@ each resource}
 not already exist}
 }
 \value{
-The \code{object} with an updated column in the resource params data frame.
+The resource params data frame with an updated column.
 }
 \description{
 If the resource parameter does not yet exist in the resource parameter data

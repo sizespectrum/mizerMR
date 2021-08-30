@@ -138,11 +138,11 @@ valid_resources_arg <- function(object, resources = NULL, return.logical = FALSE
         stop("The first argument must be a MizerSim or MizerParams object.")
     }
     assert_that(is.logical(return.logical))
-    all_resources <- params@resource_params$resource
-    no_res <- nrow(params@resource_params)
+    all_resources <- resource_params(params)$resource
+    no_res <- nrow(resource_params(params))
     # Set resources if missing to list of all resources
     if (is.null(resources)) {
-        resources <- params@resource_params$resource
+        resources <- resource_params(params)$resource
         if (length(resources) == 0) {  # There are no resources.
             if (return.logical) {
                 return(rep(FALSE, no_res))

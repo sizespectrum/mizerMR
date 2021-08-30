@@ -21,7 +21,7 @@
 #' @seealso [validResourceParams()]
 #' @family functions for setting parameters
 resource_params <- function(params) {
-    params@resource_params
+    other_params(params)[["MR"]]$resource_params
 }
 
 #' @rdname resource_params
@@ -29,8 +29,7 @@ resource_params <- function(params) {
 #' @export
 `resource_params<-` <- function(params, value) {
     value <- validResourceParams(value, min_w = params@w_full[[1]])
-    params@resource_params <- value
-    setMultipleResources(params)
+    setMultipleResources(params, resource_params = value)
 }
 
 #' Validate resource parameter data frame
@@ -126,24 +125,19 @@ validResourceParams <- function(resource_params, min_w) {
 #' frame, then create it and fill it with the default. Otherwise use the default
 #' only to fill in any NAs. Optionally gives a message if the parameter
 #' did not already exist.
-#' @param object Either a MizerParams object or a resource parameter data frame
+#' @param resource_params A resource parameter data frame
 #' @param parname A string with the name of the resource parameter to set
 #' @param default A single default value or a vector with one default value for
 #'   each resource
 #' @param message A string with a message to be issued when the parameter did
 #'   not already exist
-#' @return The `object` with an updated column in the resource params data frame.
+#' @return The resource params data frame with an updated column.
 #' @export
 #' @concept helper
-set_resource_param_default <- function(object, parname, default,
+set_resource_param_default <- function(resource_params, parname, default,
                                       message = NULL) {
-    # This is a copy of `set_species_params_default()` in core mizer, just with
-    # species replaced by resource.
-    if (is(object, "MizerParams")) {
-        resource_params <- object@resource_params
-    } else {
-        resource_params <- object
-    }
+    # This is based on `set_species_params_default()` in core mizer
+
     assert_that(is.data.frame(resource_params))
     assert_that(is.string(parname))
     no_res <- nrow(resource_params)
@@ -169,10 +163,5 @@ set_resource_param_default <- function(object, parname, default,
             resource_params[missing, parname] <- default[missing]
         }
     }
-    if  (is(object, "MizerParams")) {
-        object@resource_params <- resource_params
-        return(object)
-    } else {
-        return(resource_params)
-    }
+    resource_params
 }

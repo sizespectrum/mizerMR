@@ -11,14 +11,16 @@
 #' @param initial_resource Optional. Array (resource x size) of initial values
 #' @export
 setMultipleResources <- function(params,
-                                 resource_params = params@resource_params,
+                                 resource_params = NULL,
                                  resource_interaction = NULL,
                                  resource_capacity = NULL,
                                  resource_rate = NULL,
                                  initial_resource = resource_capacity) {
     params <- validParams(params)
+    if (is.null(resource_params)) {
+        resource_params <- resource_params(params)
+    }
     rp <- validResourceParams(resource_params, params@w_full[[1]])
-    params@resource_params <- rp
     no_sp <- nrow(params@species_params)
     no_res <- nrow(rp)
     no_w_full <- length(params@w_full)
@@ -37,6 +39,7 @@ setMultipleResources <- function(params,
         interaction_default <-
             array(1, dim = c(no_sp, no_res),
                   dimnames = list(sp = sp_names, resource = r_names))
+        other_params(params)[["MR"]]$resource_params <- rp
         params <- setComponent(
             params = params, component = "MR",
             initial_value = template,
@@ -59,6 +62,7 @@ setMultipleResources <- function(params,
     names(linetypes) <- rp$resource
     params <- setLinetypes(params, linetypes)
 
+    other_params(params)[["MR"]]$resource_params <- rp
     setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
@@ -163,7 +167,7 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
     resource_capacity <- mr$component_params$capacity
     resource_capacity[] <- 0
     # TODO: vectorise this
-    rp <- params@resource_params
+    rp <- resource_params(params)
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
         w_sel <- params@w_full >= rp$w_min[[i]] &
@@ -220,7 +224,7 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
     resource_rate <- mr$component_params$rate
     resource_rate[] <- 0
     # TODO: vectorise this
-    rp <- params@resource_params
+    rp <- resource_params(params)
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
         w_sel <- params@w_full >= rp$w_min[[i]] &

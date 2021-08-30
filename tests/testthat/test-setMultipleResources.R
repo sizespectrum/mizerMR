@@ -93,3 +93,13 @@ test_that("Test setting of two resources", {
                                           initial_resource = initial),
                      params)
 })
+
+test_that("We can set species_params and gear_params", {
+    rp <- as.data.frame(NS_params@resource_params)
+    rp$resource <- "main"
+    params <- setMultipleResources(NS_params, resource_params = rp)
+    species_params(params)$h <- 1
+    expect_identical(species_params(params)$h[[1]], 1)
+    gear_params(params)$catchability <- 2
+    expect_identical(gear_params(params)$catchability[[1]], 2)
+})
