@@ -56,6 +56,15 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
     } else {
         stop("The first argument must be either a MizerSim or a MizerParams object")
     }
+    if (is.null(getComponent(params, "MR"))) {
+        return(mizer::animateSpectra(params, species = species,
+                                     wlim = wlim, ylim = ylim,
+                                     power = power, total = total,
+                                     background = background,
+                                     highlight = highlight,
+                                     resource = TRUE))
+    }
+
     # set n_pp to total plankton abundance so that the total in mizer's
     # plotSpectra() gives the right curve
     params@initial_n_pp <- colSums(params@initial_n_other[["MR"]])

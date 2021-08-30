@@ -5,12 +5,12 @@
 #'   resource number densities at all saved timesteps of the simulation.
 #' @export
 NResource <- function(sim) {
-    if (!"MR" %in% names(sim@params@initial_n_other)) {
-        mizer::NResource(sim)
+    if (is.null(getComponent(getParams(sim), "MR"))) {
+        return(mizer::NResource(sim))
     }
-    n_res <- aperm(simplify2array(sim@n_other[, "MR"]), c(3, 1, 2))
-    dimnames(n_res)[[1]] <- dimnames(sim@n_other)[[1]]
-    names(dimnames(n_res))[[1]] <- names(dimnames(sim@n_other))[[1]]
+    n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
+    dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
+    names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
     n_res
 }
 
@@ -19,8 +19,8 @@ NResource <- function(sim) {
 #'   resource number densities at the end of the simulation
 #' @export
 finalNResource <- function(sim) {
-    if (!"MR" %in% names(sim@params@initial_n_other)) {
-        mizer::FinalNResource(sim)
+    if (is.null(getComponent(getParams(sim), "MR"))) {
+        return(mizer::finalNResource(sim))
     }
-    sim@n_other[[dim(sim@n_other)[[1]], "MR"]]
+    NOther(sim)[[idxFinalT(sim), "MR"]]
 }

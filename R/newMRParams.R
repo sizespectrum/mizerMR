@@ -32,7 +32,7 @@ newMRParams <- function(species_params,
         no_w = no_w, min_w = min_w, max_w = max_w)
 
     resource_params <- validResourceParams(resource_params,
-                                           params@w_full[[1]])
+                                           w_full(params)[[1]])
     params <- setMultipleResources(params, resource_params = resource_params,
                                    resource_interaction = resource_interaction)
 

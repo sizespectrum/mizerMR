@@ -5,6 +5,8 @@
 #' @param sim A MizerSim object
 #' @param species Name or vector of names of the species to be plotted. By
 #'   default all species are plotted.
+#' @param resources Name or vector of names of the resources to be plotted. By
+#'   default all resources are plotted.
 #' @param time_range The time range to animate over. Either a vector of values
 #'   or a vector of min and max time. Default is the entire time range of the
 #'   simulation.
@@ -19,16 +21,10 @@
 #' to logarithmic size bins.
 #' @param total A boolean value that determines whether the total over all
 #'   species in the system is plotted as well. Default is FALSE.
-#' @param resource A boolean value that determines whether resource is included.
-#'   Default is TRUE.
 #'
 #' @return A plotly object
 #' @export
 #' @family plotting functions
-#' @examples
-#' \donttest{
-#' animateSpectra(NS_sim, power = 2, wlim = c(0.1, NA), time_range = 1997:2007)
-#' }
 animateSpectra <- function(sim,
                            species = NULL,
                            resources = NULL,
@@ -36,9 +32,14 @@ animateSpectra <- function(sim,
                            wlim = c(NA, NA),
                            ylim = c(NA, NA),
                            power = 1,
-                           total = FALSE,
-                           resource = TRUE) {
-
+                           total = FALSE) {
+    if (is.null(getComponent(getParams(sim), "MR"))) {
+        return(mizer::animateSpectra(sim = sim, species = species,
+                                     time_range = time_range,
+                                     wlim = wlim, ylim = ylim,
+                                     power = power, total = total,
+                                     resource = TRUE))
+    }
     species <- valid_species_arg(sim, species)
     resources <- valid_resources_arg(sim, resources)
     if (missing(time_range)) {

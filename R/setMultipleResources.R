@@ -20,20 +20,20 @@ setMultipleResources <- function(params,
     if (is.null(resource_params)) {
         resource_params <- resource_params(params)
     }
-    rp <- validResourceParams(resource_params, params@w_full[[1]])
-    no_sp <- nrow(params@species_params)
+    rp <- validResourceParams(resource_params, w_full(params)[[1]])
+    no_sp <- nrow(species_params(params))
     no_res <- nrow(rp)
-    no_w_full <- length(params@w_full)
+    no_w_full <- length(w_full(params))
 
-    if (!"MR" %in% names(params@initial_n_other)) {
+    if (is.null(getComponent(params, "MR"))) {
         # Still need to set this up
-        params@resource_dynamics <- "resource_constant"
+        resource_dynamics(params) <- "resource_constant"
         params <- setRateFunction(params, "Encounter", "mizerMREncounter")
         params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
         # make empty parameters
-        w_names <- names(params@initial_n_pp)
+        w_names <- names(mizer::initialNResource(params))
         r_names <- as.list(rp$resource)
-        sp_names <- dimnames(params@initial_n)[[1]]
+        sp_names <- dimnames(initialN(params))[[1]]
         template <- array(dim = c(no_res, no_w_full),
                           dimnames = list(resource = r_names, w = w_names))
         interaction_default <-
@@ -135,10 +135,10 @@ setMultipleResources <- function(params,
 #'
 #' @return An array (resource x size) with the resource capacities
 valid_resource_capacity <- function(params, resource_capacity = NULL) {
-    if (!"MR" %in% names(params@initial_n_other)) {
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
         stop("params does not have multiple resources set up.")
     }
-    mr <- getComponent(params, "MR")
     if (!is.null(resource_capacity)) {
         if (!identical(dim(resource_capacity),
                        dim(mr$component_params$capacity))) {
@@ -170,10 +170,10 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
     rp <- resource_params(params)
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- params@w_full >= rp$w_min[[i]] &
-            params@w_full <= rp$w_max[[i]]
+        w_sel <- w_full(params) >= rp$w_min[[i]] &
+            w_full(params) <= rp$w_max[[i]]
         resource_capacity[i, w_sel] <- rp$kappa[[i]] *
-            params@w_full[w_sel] ^ -rp$lambda[[i]]
+            w_full(params)[w_sel] ^ -rp$lambda[[i]]
     }
 
     resource_capacity
@@ -192,10 +192,10 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
 #'
 #' @return An array (resource x size) with the resource capacities
 valid_resource_rate <- function(params, resource_rate = NULL) {
-    if (!"MR" %in% names(params@initial_n_other)) {
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
         stop("params does not have multiple resources set up.")
     }
-    mr <- getComponent(params, "MR")
     if (!is.null(resource_rate)) {
         if (!identical(dim(resource_rate),
                        dim(mr$component_params$rate))) {
@@ -227,10 +227,10 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
     rp <- resource_params(params)
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- params@w_full >= rp$w_min[[i]] &
-            params@w_full <= rp$w_max[[i]]
+        w_sel <- w_full(params) >= rp$w_min[[i]] &
+            w_full(params) <= rp$w_max[[i]]
         resource_rate[i, w_sel] <- rp$r_pp[[i]] *
-            params@w_full[w_sel] ^ (rp$n[[i]] - 1)
+            w_full(params)[w_sel] ^ (rp$n[[i]] - 1)
     }
 
     resource_rate
@@ -247,10 +247,10 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
 #'
 #' @return An array (resource x size)
 valid_resource_interaction <- function(params, resource_interaction = NULL) {
-    if (!"MR" %in% names(params@initial_n_other)) {
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
         stop("params does not have multiple resources set up.")
     }
-    mr <- getComponent(params, "MR")
     if (!is.null(resource_interaction)) {
         if (!identical(dim(resource_interaction),
                        dim(mr$component_params$interaction))) {
@@ -282,10 +282,10 @@ valid_resource_interaction <- function(params, resource_interaction = NULL) {
 #'
 #' @return An array (resource x size)
 valid_initial_resource <- function(params, initial_resource = NULL) {
-    if (!"MR" %in% names(params@initial_n_other)) {
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
         stop("params does not have multiple resources set up.")
     }
-    mr <- getComponent(params, "MR")
     if (!is.null(initial_resource)) {
         if (!identical(dim(initial_resource),
                        dim(mr$initial_value))) {

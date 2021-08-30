@@ -12,8 +12,7 @@ animateSpectra(
   wlim = c(NA, NA),
   ylim = c(NA, NA),
   power = 1,
-  total = FALSE,
-  resource = TRUE
+  total = FALSE
 )
 }
 \arguments{
@@ -21,6 +20,9 @@ animateSpectra(
 
 \item{species}{Name or vector of names of the species to be plotted. By
 default all species are plotted.}
+
+\item{resources}{Name or vector of names of the resources to be plotted. By
+default all resources are plotted.}
 
 \item{time_range}{The time range to animate over. Either a vector of values
 or a vector of min and max time. Default is the entire time range of the
@@ -40,20 +42,12 @@ to logarithmic size bins.}
 
 \item{total}{A boolean value that determines whether the total over all
 species in the system is plotted as well. Default is FALSE.}
-
-\item{resource}{A boolean value that determines whether resource is included.
-Default is TRUE.}
 }
 \value{
 A plotly object
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
-}
-\examples{
-\donttest{
-animateSpectra(NS_sim, power = 2, wlim = c(0.1, NA), time_range = 1997:2007)
-}
 }
 \seealso{
 Other plotting functions: 
