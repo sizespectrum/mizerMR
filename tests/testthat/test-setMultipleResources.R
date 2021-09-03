@@ -103,3 +103,14 @@ test_that("We can set species_params and gear_params", {
     gear_params(params)$catchability <- 2
     expect_identical(gear_params(params)$catchability[[1]], 2)
 })
+
+test_that("Work with non-MR objects", {
+    expect_identical(resource_params(NS_params),
+                     mizer::resource_params(NS_params))
+    expect_identical(initialNResource(NS_params),
+                     mizer::initialNResource(NS_params))
+    expect_identical(resource_capacity(NS_params),
+                     mizer::resource_capacity(NS_params))
+    expect_identical(resource_rate(NS_params),
+                     mizer::resource_rate(NS_params))
+})

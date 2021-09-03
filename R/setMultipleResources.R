@@ -75,7 +75,11 @@ setMultipleResources <- function(params,
 #' @rdname setMultipleResources
 #' @export
 `resource_capacity` <- function(params) {
-    getComponent(params, "MR")$component_params$capacity
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
+        return(mizer::resource_capacity(params))
+    }
+    mr$component_params$capacity
 }
 
 #' @rdname setMultipleResources
@@ -88,7 +92,11 @@ setMultipleResources <- function(params,
 #' @rdname setMultipleResources
 #' @export
 `resource_rate` <- function(params) {
-    getComponent(params, "MR")$component_params$rate
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
+        return(mizer::resource_rate(params))
+    }
+    mr$component_params$rate
 }
 
 #' @rdname setMultipleResources
@@ -112,7 +120,11 @@ setMultipleResources <- function(params,
 #' @rdname setMultipleResources
 #' @export
 `initialNResource` <- function(params) {
-    getComponent(params, "MR")$initial_value
+    mr <- getComponent(params, "MR")
+    if (is.null(mr)) {
+        return(mizer::initialNResource(params))
+    }
+    mr$initial_value
 }
 
 #' @rdname setMultipleResources
