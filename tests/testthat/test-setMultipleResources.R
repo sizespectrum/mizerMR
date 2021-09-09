@@ -38,7 +38,7 @@ test_that("Test setting of single resource", {
     rp <- as.data.frame(params@resource_params)
     rp$resource <- "main"
     resource_params(params) <- rp
-    expect_identical(params,
+    expect_unchanged(params,
                      setMultipleResources(params, resource_params = rp))
     rate <- resource_rate(params) / 2
     comment(rate) <- "set manually"
@@ -54,7 +54,7 @@ test_that("Test setting of single resource", {
     initial <- initialNResource(params) / 2
     initialNResource(params) <- initial
     expect_identical(initialNResource(params), initial)
-    expect_identical(setMultipleResources(NS_params,
+    expect_unchanged(setMultipleResources(NS_params,
                                           resource_params = rp,
                                           resource_interaction = interaction,
                                           resource_capacity = capacity,
@@ -69,7 +69,7 @@ test_that("Test setting of two resources", {
     rp <- rbind(rp, rp)
     rp$resource <- c("res1", "res2")
     resource_params(params) <- rp
-    expect_identical(params,
+    expect_unchanged(params,
                      setMultipleResources(NS_params, resource_params = rp))
     rate <- resource_rate(params) / 2
     comment(rate) <- "set manually"
@@ -85,7 +85,7 @@ test_that("Test setting of two resources", {
     initial <- initialNResource(params) / 2
     initialNResource(params) <- initial
     expect_identical(initialNResource(params), initial)
-    expect_identical(setMultipleResources(NS_params,
+    expect_unchanged(setMultipleResources(NS_params,
                                           resource_params = rp,
                                           resource_interaction = interaction,
                                           resource_capacity = capacity,

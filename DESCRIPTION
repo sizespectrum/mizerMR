@@ -38,6 +38,7 @@ Collate:
     resource_dynamics.R
     resource_params.R
     setMultipleResources.R
+    test-helpers.R
 URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB
