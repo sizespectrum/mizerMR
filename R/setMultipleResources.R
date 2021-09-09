@@ -26,8 +26,12 @@ setMultipleResources <- function(params,
     no_w_full <- length(w_full(params))
 
     if (is.null(getComponent(params, "MR"))) {
-        # Still need to set this up
+        # Set up multiple resources
+        # Set built-in mizer resource to 0
+        mizer::initialNResource(params) <- 0
+        # and keep it zero
         resource_dynamics(params) <- "resource_constant"
+        # Encounter and mortality will now come from "MR" slot in n_other
         params <- setRateFunction(params, "Encounter", "mizerMREncounter")
         params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
         # make empty parameters
