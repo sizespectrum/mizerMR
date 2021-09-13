@@ -79,6 +79,7 @@ object the initial abundance is plotted.
 \link{plotting_functions}
 
 Other plotting functions: 
-\code{\link{animateSpectra}()}
+\code{\link{animateSpectra}()},
+\code{\link{plotDietMR}()}
 }
 \concept{plotting functions}

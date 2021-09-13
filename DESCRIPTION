@@ -39,6 +39,7 @@ Collate:
     resource_params.R
     setMultipleResources.R
     test-helpers.R
+    diet.R
 URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB

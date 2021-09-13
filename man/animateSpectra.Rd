@@ -51,6 +51,7 @@ A plotly object
 }
 \seealso{
 Other plotting functions: 
+\code{\link{plotDietMR}()},
 \code{\link{plotSpectra}()}
 }
 \concept{plotting functions}
