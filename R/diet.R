@@ -14,7 +14,7 @@
 #' D_{ij}(w, w_p) = (1-f_i(w)) \gamma_i(w) \theta_{ij}
 #' \int N_j(w_p) \phi_i(w, w_p) w_p dw_p.
 #' }
-#' The prey index \eqn{j} runs over all species and the resource. It also runs
+#' The prey index \eqn{j} runs over all species and the resources. It also runs
 #' over any extra ecosystem components in your model for which you have
 #' defined an encounter rate function. This encounter rate is multiplied by
 #' \eqn{1-f_i(w)} to give the rate of consumption of biomass from these extra
@@ -26,7 +26,10 @@
 #' available biomass. Outside the range of sizes for a predator species the
 #' returned rate is zero.
 #'
-#' @inheritParams getEncounter
+#' @param params A \linkS4class{MizerParams} object
+#' @param n A matrix of species abundances (species x size).
+#' @param n_other A list of abundances for other dynamical components of the
+#'   ecosystem
 #' @param proportion If TRUE (default) the function returns the diet as a
 #'   proportion of the total consumption rate. If FALSE it returns the
 #'   consumption rate in grams per year.
@@ -57,14 +60,17 @@ getDietMR <- function (params, n = initialN(params),
                                   prey = c(as.character(species), other_names)))
     idx_sp <- (no_w_full - no_w + 1):no_w_full
 
-    if (length(params@ft_pred_kernel_e) == 1) {
+    if(!is.null(comment(params@pred_kernel))) {
         ae <- matrix(params@pred_kernel[, , idx_sp, drop = FALSE],
                      ncol = no_w) %*% t(sweep(n, 2, params@w * params@dw,
                                               "*"))
         diet[, , 1:no_sp] <- ae
-        # just need an example before editing this line, usually the if condition is not fulfilled
-        diet[, , no_sp + 1] <- rowSums(sweep(params@pred_kernel, 3,
-                                             params@dw_full * params@w_full * n_pp, "*"), dims = 2)
+
+        for(iRes in 1:no_other)
+        {
+            diet[, , no_sp + iRes] <- rowSums(sweep(params@pred_kernel, 3,
+                                                    params@dw_full * params@w_full * n_other$MR[iRes,], "*"), dims = 2)
+        }
     }
     else {
         prey <- matrix(0, nrow = no_sp + no_other, ncol = no_w_full)
@@ -117,36 +123,41 @@ getDietMR <- function (params, n = initialN(params),
 #' @seealso [getDietMR()]
 #' @family plotting functions
 
-
-plotDietMR <- function (sim, species = NULL, time_range, xlim = c(1, NA), returnData = F)
+plotDietMR <- function (object, species = NULL, time_range, wlim = c(1, NA), return_data = FALSE)
 {
-    if (missing(time_range)) time_range <- max(as.numeric(dimnames(sim@n)$time))
-    time_elements <- get_time_elements(sim, time_range)
-
-    n <- apply(sim@n[time_elements, , , drop = FALSE],
-               2:3, mean)
-n_other <- list()
-    n_other$MR <- apply(simplify2array(sim@n_other[time_elements, ]),
-                          1:2, mean)
-    params <- sim@params
-    diet <- getDietMR(params,n = n, n_other = n_other)
+    if (is(object, "MizerSim")) {
+        if (missing(time_range)) time_range <- max(as.numeric(dimnames(object@n)$time))
+        time_elements <- get_time_elements(object, time_range)
+        n <- apply(object@n[time_elements, , , drop = FALSE], 2:3, mean)
+        n_other <- list()
+        n_other$MR <- apply(simplify2array(object@n_other[time_elements, ]), 1:2, mean)
+        params <- object@params
+        diet <- getDietMR(params, n = n, n_other = n_other)
+    } else if (is(object, "MizerParams")) {
+        params <- object
+        diet <- getDietMR(params)
+    } else {
+        stop("The first argument must be either a MizerSim or a MizerParams object")
+    }
 
     plot_dat <- melt(diet)
-    plot_dat <- plot_dat[plot_dat$value > 0, ]
+    plot_dat <- plot_dat[plot_dat$value > 0.001, ]
     colnames(plot_dat) <- c("Predator", "size", "Prey", "Proportion")
+    plot_dat$Prey <- factor(plot_dat$Prey, levels = rev(unique(plot_dat$Prey)))
 
     if (is.null(species))
         p <- ggplot(plot_dat) + facet_wrap(. ~ Predator, scales = "free")
     else p <- ggplot(dplyr::filter(plot_dat, Predator == species))
 
+    legend_levels <- intersect(names(params@linecolour), plot_dat$Prey)
     p <- p + geom_area(aes(x = size, y = Proportion, fill = Prey)) +
-        scale_x_continuous(limits = c(1, NA), name = "Size [g]",
-                           trans = "log10") + scale_fill_manual(values = sim@params@linecolour) +
+        scale_x_continuous(limits = wlim, name = "Size [g]", trans = "log10") +
+        scale_fill_manual(values = params@linecolour[legend_levels]) +
         theme(legend.position = "right", legend.key = element_rect(fill = "black"),
               panel.background = element_blank(), panel.grid.minor = element_line(color = "gray"),
               strip.background = element_blank())
 
-    if (returnData)
+    if (return_data)
         return(plot_dat)
     else return(p)
 }

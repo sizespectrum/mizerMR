@@ -4,10 +4,25 @@
 \alias{plotDietMR}
 \title{Plot diet, resolved by prey species, as function of predator at size.}
 \usage{
-plotDietMR(sim, species = NULL, time_range, xlim = c(1, NA), returnData = F)
+plotDietMR(
+  object,
+  species = NULL,
+  time_range,
+  wlim = c(1, NA),
+  return_data = FALSE
+)
 }
 \arguments{
+\item{object}{An object of class \linkS4class{MizerSim} or
+\linkS4class{MizerParams}.}
+
 \item{species}{The name of the predator species for which to plot the diet.}
+
+\item{wlim}{A numeric vector of length two providing lower and upper limits
+for the w axis. Use NA to refer to the existing minimum or maximum.}
+
+\item{return_data}{A boolean value that determines whether the formatted data
+used for the plot is returned instead of the plot itself. Default value is FALSE}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data

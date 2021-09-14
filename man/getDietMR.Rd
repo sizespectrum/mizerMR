@@ -12,6 +12,13 @@ getDietMR(
 )
 }
 \arguments{
+\item{params}{A \linkS4class{MizerParams} object}
+
+\item{n}{A matrix of species abundances (species x size).}
+
+\item{n_other}{A list of abundances for other dynamical components of the
+ecosystem}
+
 \item{proportion}{If TRUE (default) the function returns the diet as a
 proportion of the total consumption rate. If FALSE it returns the
 consumption rate in grams per year.}
@@ -36,7 +43,7 @@ species interaction matrix \eqn{\theta_{ij}} and the prey abundance density
 D_{ij}(w, w_p) = (1-f_i(w)) \gamma_i(w) \theta_{ij}
 \int N_j(w_p) \phi_i(w, w_p) w_p dw_p.
 }
-The prey index \eqn{j} runs over all species and the resource. It also runs
+The prey index \eqn{j} runs over all species and the resources. It also runs
 over any extra ecosystem components in your model for which you have
 defined an encounter rate function. This encounter rate is multiplied by
 \eqn{1-f_i(w)} to give the rate of consumption of biomass from these extra
