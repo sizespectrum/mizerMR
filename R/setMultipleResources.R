@@ -26,6 +26,9 @@ setMultipleResources <- function(params,
     no_w_full <- length(w_full(params))
 
     if (is.null(getComponent(params, "MR"))) {
+        extensions <- c(mizerMR = "sizespectrum/mizerMR",
+                        params@extensions)
+        params@extensions <- extensions
         # Set up multiple resources
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0

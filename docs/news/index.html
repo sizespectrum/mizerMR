@@ -47,6 +47,11 @@
 
 
 <meta property="og:title" content="Changelog" />
+<meta property="og:image" content="https://sizespectrum.org/mizerMR/reference/figures/logo.png" />
+<meta property="og:image:alt" content="mizerMR: Multiple size-structured resources in mizer" />
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:creator" content="@mizer_model" />
+<meta name="twitter:site" content="@mizer_model" />
 
 
 
@@ -78,7 +83,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
       </span>
     </div>
 
@@ -124,6 +129,20 @@
       <small>Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/NEWS.md'><code>NEWS.md</code></a></small>
     </div>
 
+    <div id="mizermr-002" class="section level1">
+<h1 class="page-header" data-toc-text="0.0.2">
+<a href="#mizermr-002" class="anchor"></a>mizerMR 0.0.2</h1>
+<ul>
+<li>
+<code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> now adds to the <code>extensions</code> field in params metadata.</li>
+<li>
+<code><a href="../reference/plotDietMR.html">plotDietMR()</a></code> is a replacement for <code>plotDiet()</code> that works with multiple resources.</li>
+<li>
+<code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code>now sets the <code>inital_n_pp</code>slot to zero so that there are no spurious contributions to <code>getDiet()</code> for example.</li>
+<li>The functions extracting information from MizerParams or MizerSim objects now all fall back onto core mizer functions when called with objects for which no multiple resources have been set up.</li>
+<li>The resource params are now saved in the <code>@other_params</code> slot instead of the <code>resource_params</code> slot to avoid breaking core mizer code.</li>
+</ul>
+</div>
     <div id="mizermr-001" class="section level1">
 <h1 class="page-header" data-toc-text="0.0.1">
 <a href="#mizermr-001" class="anchor"></a>mizerMR 0.0.1</h1>

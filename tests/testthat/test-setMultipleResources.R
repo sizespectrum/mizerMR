@@ -11,6 +11,10 @@ test_that("Can reproduce single resource behaviour", {
     simo <- project(NS_params, t_max = 10)
     expect_equal(sim@n_other[[1, "MR"]][1, ], simo@n_pp[1, ])
     expect_equal(sim@n_other[[11, "MR"]][1, ], simo@n_pp[11, ])
+
+    # test that extension field in metadata is set
+    expect_equal(getMetadata(params)$extensions[["mizerMR"]],
+                 "sizespectrum/mizerMR")
 })
 
 test_that("Works with two identical resources", {

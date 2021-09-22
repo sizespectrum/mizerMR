@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Plot the abundance spectra — plotSpectra • mizerMR</title>
+<title>Get diet of predator at size, resolved by prey species — getDietMR • mizerMR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,9 +46,10 @@
 
 
 
-<meta property="og:title" content="Plot the abundance spectra — plotSpectra" />
-<meta property="og:description" content="Plots the number density multiplied by a power of the weight, with the power
-specified by the power argument." />
+<meta property="og:title" content="Get diet of predator at size, resolved by prey species — getDietMR" />
+<meta property="og:description" content="Calculates the rate at which a predator of a particular species and size
+consumes biomass of each prey species and resource.
+The diet has units of grams/year." />
 <meta property="og:image" content="https://sizespectrum.org/mizerMR/reference/figures/logo.png" />
 <meta property="og:image:alt" content="mizerMR: Multiple size-structured resources in mizer" />
 <meta name="twitter:card" content="summary" />
@@ -127,115 +128,77 @@ specified by the power argument." />
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Plot the abundance spectra</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/plotSpectra.R'><code>R/plotSpectra.R</code></a></small>
-    <div class="hidden name"><code>plotSpectra.Rd</code></div>
+    <h1>Get diet of predator at size, resolved by prey species</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/diet.R'><code>R/diet.R</code></a></small>
+    <div class="hidden name"><code>getDietMR.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Plots the number density multiplied by a power of the weight, with the power
-specified by the <code>power</code> argument.</p>
+    <p>Calculates the rate at which a predator of a particular species and size
+consumes biomass of each prey species and resource.
+The diet has units of grams/year.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>plotSpectra</span><span class='op'>(</span>
-  <span class='va'>object</span>,
-  species <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resources <span class='op'>=</span> <span class='cn'>NULL</span>,
-  wlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
-  ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
-  power <span class='op'>=</span> <span class='fl'>1</span>,
-  total <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  background <span class='op'>=</span> <span class='cn'>TRUE</span>,
-  highlight <span class='op'>=</span> <span class='cn'>NULL</span>,
-  return_data <span class='op'>=</span> <span class='cn'>FALSE</span>,
-  <span class='va'>...</span>
+    <pre class="usage"><span class='fu'>getDietMR</span><span class='op'>(</span>
+  <span class='va'>params</span>,
+  n <span class='op'>=</span> <span class='fu'>initialN</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>,
+  n_other <span class='op'>=</span> <span class='fu'>initialNOther</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>,
+  proportion <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>object</th>
-      <td><p>An object of class MizerSim or
-MizerParams.</p></td>
+      <th>params</th>
+      <td><p>A MizerParams object</p></td>
     </tr>
     <tr>
-      <th>species</th>
-      <td><p>The species to be selected. Optional. By default all target
-species are selected. A vector of species names, or a
-numeric vector with the species indices, or a logical vector indicating for
-each species whether it is to be selected (TRUE) or not.</p></td>
+      <th>n</th>
+      <td><p>A matrix of species abundances (species x size).</p></td>
     </tr>
     <tr>
-      <th>resources</th>
-      <td><p>The resources to be selected. Optional. By default all
-resources are selected. A vector of resource names, or a numeric vector
-with the resource indices, or a logical vector indicating for each resource
-whether it is to be selected (TRUE) or not.</p></td>
+      <th>n_other</th>
+      <td><p>A list of abundances for other dynamical components of the
+ecosystem</p></td>
     </tr>
     <tr>
-      <th>wlim</th>
-      <td><p>A numeric vector of length two providing lower and upper limits
-for the w axis. Use NA to refer to the existing minimum or maximum.</p></td>
-    </tr>
-    <tr>
-      <th>ylim</th>
-      <td><p>A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or maximum. Any
-values below 1e-20 are always cut off.</p></td>
-    </tr>
-    <tr>
-      <th>power</th>
-      <td><p>The abundance is plotted as the number density times the weight
-raised to <code>power</code>. The default <code>power = 1</code> gives the biomass
-density, whereas <code>power = 2</code> gives the biomass density with respect
-to logarithmic size bins.</p></td>
-    </tr>
-    <tr>
-      <th>total</th>
-      <td><p>A boolean value that determines whether the total over all
-species and resources in the system is plotted as well. Note that even if
-the plot only shows a selection of species, the total is including all
-species. Default is FALSE.</p></td>
-    </tr>
-    <tr>
-      <th>background</th>
-      <td><p>A boolean value that determines whether background species
-are included. Ignored if the model does not contain background species.
-Default is TRUE.</p></td>
-    </tr>
-    <tr>
-      <th>highlight</th>
-      <td><p>Name or vector of names of the species to be highlighted.</p></td>
-    </tr>
-    <tr>
-      <th>return_data</th>
-      <td><p>A boolean value that determines whether the formatted data
-used for the plot is returned instead of the plot itself. Default value is FALSE</p></td>
-    </tr>
-    <tr>
-      <th>...</th>
-      <td><p>Other arguments (currently unused)</p></td>
+      <th>proportion</th>
+      <td><p>If TRUE (default) the function returns the diet as a
+proportion of the total consumption rate. If FALSE it returns the
+consumption rate in grams per year.</p></td>
     </tr>
     </table>
 
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
-    <p>A ggplot2 object, unless <code>return_data = TRUE</code>, in which case a data
-frame with the four variables 'w', 'value', 'Species', 'Legend' is
-returned.</p>
+    <p>An array (predator species  x predator size x
+(prey species + resources) )</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
-    <p>When called with a MizerSim object, the abundance is averaged
-over the specified time range (a single value for the time range can be used
-to plot a single time step). When called with a MizerParams
-object the initial abundance is plotted.</p>
+    <p>Returns the rates \(D_{ij}(w)\) at which a predator of species \(i\)
+and size \(w\) consumes biomass from prey species \(j\). This is
+calculated from the predation kernel \(\phi_i(w, w_p)\),
+the search volume \(\gamma_i(w)\), the feeding level \(f_i(w)\), the
+species interaction matrix \(\theta_{ij}\) and the prey abundance density
+\(N_j(w_p)\):
+$$
+D_{ij}(w, w_p) = (1-f_i(w)) \gamma_i(w) \theta_{ij}
+\int N_j(w_p) \phi_i(w, w_p) w_p dw_p.
+$$
+The prey index \(j\) runs over all species and the resources. It also runs
+over any extra ecosystem components in your model for which you have
+defined an encounter rate function. This encounter rate is multiplied by
+\(1-f_i(w)\) to give the rate of consumption of biomass from these extra
+components.</p>
+<p>This function performs the same integration as
+<code>getEncounter()</code> but does not aggregate over prey species, and
+multiplies by \(1-f_i(w)\) to get the consumed biomass rather than the
+available biomass. Outside the range of sizes for a predator species the
+returned rate is zero.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p>plotting_functions</p>
-<p>Other plotting functions: 
-<code><a href='animateSpectra.html'>animateSpectra</a>()</code>,
-<code><a href='plotDietMR.html'>plotDietMR</a>()</code></p></div>
+    <div class='dont-index'><p><code><a href='plotDietMR.html'>plotDietMR()</a></code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
