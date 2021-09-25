@@ -4,7 +4,11 @@
 \alias{valid_resource_capacity}
 \title{Return valid resource capacity array}
 \usage{
-valid_resource_capacity(params, resource_capacity = NULL)
+valid_resource_capacity(
+  params,
+  resource_params = NULL,
+  resource_capacity = NULL
+)
 }
 \arguments{
 \item{params}{A MizerParams object}
@@ -20,5 +24,6 @@ If \verb{resource capacity} is given it is checked for validity. If it does not
 have a comment, then it is given the comment "set manually". This is then
 returned. If \verb{resource capacity} is missing or NULL, but one was set by the
 user and stored in \code{params} with a comment, then this is returned. Otherwise
-a resource capacity is calculated from the resource params in \code{params}.
+a resource capacity is calculated from \code{resource_params}. If this is NULL to
+it is taken from \code{params}.
 }

@@ -51,7 +51,8 @@
 have a comment, then it is given the comment &quot;set manually&quot;. This is then
 returned. If resource capacity is missing or NULL, but one was set by the
 user and stored in params with a comment, then this is returned. Otherwise
-a resource capacity is calculated from the resource params in params." />
+a resource capacity is calculated from resource_params. If this is NULL to
+it is taken from params." />
 <meta property="og:image" content="https://sizespectrum.org/mizerMR/reference/figures/logo.png" />
 <meta property="og:image:alt" content="mizerMR: Multiple size-structured resources in mizer" />
 <meta name="twitter:card" content="summary" />
@@ -140,10 +141,15 @@ a resource capacity is calculated from the resource params in params." />
 have a comment, then it is given the comment "set manually". This is then
 returned. If <code>resource capacity</code> is missing or NULL, but one was set by the
 user and stored in <code>params</code> with a comment, then this is returned. Otherwise
-a resource capacity is calculated from the resource params in <code>params</code>.</p>
+a resource capacity is calculated from <code>resource_params</code>. If this is NULL to
+it is taken from <code>params</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>valid_resource_capacity</span><span class='op'>(</span><span class='va'>params</span>, resource_capacity <span class='op'>=</span> <span class='cn'>NULL</span><span class='op'>)</span></pre>
+    <pre class="usage"><span class='fu'>valid_resource_capacity</span><span class='op'>(</span>
+  <span class='va'>params</span>,
+  resource_params <span class='op'>=</span> <span class='cn'>NULL</span>,
+  resource_capacity <span class='op'>=</span> <span class='cn'>NULL</span>
+<span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">

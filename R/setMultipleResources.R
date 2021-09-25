@@ -25,18 +25,23 @@ setMultipleResources <- function(params,
     no_res <- nrow(rp)
     no_w_full <- length(w_full(params))
 
+    # If there is no MR component yet then we need to create it. We'll
+    # fill it in properly later
     if (is.null(getComponent(params, "MR"))) {
+        # register MR in the extensions slot
         extensions <- c(mizerMR = "sizespectrum/mizerMR",
                         params@extensions)
         params@extensions <- extensions
-        # Set up multiple resources
+
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0
         # and keep it zero
         resource_dynamics(params) <- "resource_constant"
+
         # Encounter and mortality will now come from "MR" slot in n_other
         params <- setRateFunction(params, "Encounter", "mizerMREncounter")
         params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
+
         # make empty parameters
         w_names <- names(mizer::initialNResource(params))
         r_names <- as.list(rp$resource)
@@ -46,6 +51,7 @@ setMultipleResources <- function(params,
         interaction_default <-
             array(1, dim = c(no_sp, no_res),
                   dimnames = list(sp = sp_names, resource = r_names))
+
         other_params(params)[["MR"]]$resource_params <- rp
         params <- setComponent(
             params = params, component = "MR",
@@ -56,8 +62,12 @@ setMultipleResources <- function(params,
                                     interaction = interaction_default))
     }
 
-    resource_capacity <- valid_resource_capacity(params, resource_capacity)
-    resource_rate <- valid_resource_rate(params, resource_rate)
+    resource_capacity <-
+        valid_resource_capacity(params, resource_params = rp,
+                                resource_capacity = resource_capacity)
+    resource_rate <-
+        valid_resource_rate(params, resource_params = rp,
+                            resource_rate = resource_rate)
     resource_interaction <- valid_resource_interaction(params,
                                                        resource_interaction)
     initial_resource <- valid_initial_resource(params, initial_resource)
@@ -147,13 +157,15 @@ setMultipleResources <- function(params,
 #' have a comment, then it is given the comment "set manually". This is then
 #' returned. If `resource capacity` is missing or NULL, but one was set by the
 #' user and stored in `params` with a comment, then this is returned. Otherwise
-#' a resource capacity is calculated from the resource params in `params`.
+#' a resource capacity is calculated from `resource_params`. If this is NULL to
+#' it is taken from `params`.
 #' @param params A MizerParams object
 #' @param resource_capacity Array (resource x size) of the
 #'   intrinsic resource carrying capacities
 #'
 #' @return An array (resource x size) with the resource capacities
-valid_resource_capacity <- function(params, resource_capacity = NULL) {
+valid_resource_capacity <- function(params, resource_params = NULL,
+                                    resource_capacity = NULL) {
     mr <- getComponent(params, "MR")
     if (is.null(mr)) {
         stop("params does not have multiple resources set up.")
@@ -183,10 +195,14 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
         return(mr$component_params$capacity)
     }
 
+    # We need to calculate capacity from resource_params
+    if (is.null(resource_params)) {
+        resource_params <- resource_params(params)
+    }
+    rp <- resource_params
     resource_capacity <- mr$component_params$capacity
     resource_capacity[] <- 0
     # TODO: vectorise this
-    rp <- resource_params(params)
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
         w_sel <- w_full(params) >= rp$w_min[[i]] &
@@ -204,13 +220,15 @@ valid_resource_capacity <- function(params, resource_capacity = NULL) {
 #' have a comment, then it is given the comment "set manually". This is then
 #' returned. If `resource rate` is missing or NULL, but one was set by the
 #' user and stored in `params` with a comment, then this is returned. Otherwise
-#' a resource rate is calculated from the resource params in `params`.
+#' a resource rate is calculated from `resource_params`. If this is NULL to
+#' it is taken from `params`.
 #' @param params A MizerParams object
 #' @param resource_rate Array (resource x size) of the
 #'   intrinsic resource replenishment rate
 #'
 #' @return An array (resource x size) with the resource capacities
-valid_resource_rate <- function(params, resource_rate = NULL) {
+valid_resource_rate <- function(params, resource_params = NULL,
+                                resource_rate = NULL) {
     mr <- getComponent(params, "MR")
     if (is.null(mr)) {
         stop("params does not have multiple resources set up.")
@@ -240,10 +258,14 @@ valid_resource_rate <- function(params, resource_rate = NULL) {
         return(mr$component_params$rate)
     }
 
+    # We need to calculate capacity from resource_params
+    if (is.null(resource_params)) {
+        resource_params <- resource_params(params)
+    }
+    rp <- resource_params
     resource_rate <- mr$component_params$rate
     resource_rate[] <- 0
     # TODO: vectorise this
-    rp <- resource_params(params)
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
         w_sel <- w_full(params) >= rp$w_min[[i]] &
