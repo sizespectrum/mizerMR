@@ -7,8 +7,8 @@ test_that("Can reproduce single resource behaviour", {
                                    initial_resource = initial)
     expect_identical(getEncounter(params), getEncounter(NS_params))
     expect_identical(getResourceMort(params)[1, ], getResourceMort(NS_params))
-    sim <- project(params, t_max = 10)
-    simo <- project(NS_params, t_max = 10)
+    sim <- project(params, t_max = 10, dt = 1)
+    simo <- project(NS_params, t_max = 10, dt = 1)
     expect_equal(sim@n_other[[1, "MR"]][1, ], simo@n_pp[1, ])
     expect_equal(sim@n_other[[11, "MR"]][1, ], simo@n_pp[11, ])
 
