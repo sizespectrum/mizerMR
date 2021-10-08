@@ -18,7 +18,7 @@ setMultipleResources(
   resource_interaction = NULL,
   resource_capacity = NULL,
   resource_rate = NULL,
-  initial_resource = resource_capacity
+  initial_resource = NULL
 )
 
 resource_capacity(params)

@@ -15,7 +15,7 @@ setMultipleResources <- function(params,
                                  resource_interaction = NULL,
                                  resource_capacity = NULL,
                                  resource_rate = NULL,
-                                 initial_resource = resource_capacity) {
+                                 initial_resource = NULL) {
     params <- validParams(params)
     if (is.null(resource_params)) {
         resource_params <- resource_params(params)
@@ -71,6 +71,10 @@ setMultipleResources <- function(params,
     resource_interaction <- valid_resource_interaction(params,
                                                        resource_interaction)
     initial_resource <- valid_initial_resource(params, initial_resource)
+    # If no initial resource set yet then set to resource capacity
+    if (anyNA(initial_resource)) {
+        initial_resource <- resource_capacity
+    }
 
     colours <- rp$colour
     names(colours) <- rp$resource
@@ -345,5 +349,6 @@ valid_initial_resource <- function(params, initial_resource = NULL) {
         return(initial_resource)
     }
 
+    # Return the current initial value
     mr$initial_value
 }

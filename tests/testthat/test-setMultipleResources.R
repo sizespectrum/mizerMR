@@ -42,8 +42,16 @@ test_that("Test setting of single resource", {
     rp <- as.data.frame(params@resource_params)
     rp$resource <- "main"
     resource_params(params) <- rp
+    # The above should do the same as a call to setMultipleResources
     expect_unchanged(params,
                      setMultipleResources(params, resource_params = rp))
+    # The initial resource should be at carrying capacity
+    expect_identical(initialNResource(params),
+                     resource_capacity(params))
+    # The initial values, once set, should not be changed
+    initialNResource(params) <- initialNResource(params) / 2
+    expect_unchanged(params,
+                     setMultipleResources(params))
     rate <- resource_rate(params) / 2
     comment(rate) <- "set manually"
     resource_rate(params) <- rate
