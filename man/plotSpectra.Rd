@@ -80,6 +80,8 @@ object the initial abundance is plotted.
 
 Other plotting functions: 
 \code{\link{animateSpectra}()},
-\code{\link{plotDietMR}()}
+\code{\link{plotDiet}()},
+\code{\link{plotResourcePred}()},
+\code{\link{plotResource}()}
 }
 \concept{plotting functions}
