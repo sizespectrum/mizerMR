@@ -1,9 +1,10 @@
 #' @keywords internal
 #' @import mizer ggplot2 methods assertthat
+#' @importFrom plotly ggplotly
 #' @importFrom stats mvfft
 #' @importFrom utils globalVariables
 #' @importFrom rlang signal
-#' @importFrom dplyr %>%
+#' @importFrom dplyr %>% filter
 "_PACKAGE"
 
 # The following block is used by usethis to automatically manage

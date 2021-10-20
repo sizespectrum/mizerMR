@@ -11,25 +11,29 @@ initial[2, ] <- NS_params@initial_n_pp / 2
 params <- setMultipleResources(NS_params, resource_params = rp,
                                initial_resource = initial)
 
-# getDiet ----
-test_that("getDiet() returns the right dimensions", {
-    expect_equal(dim(getDiet(params)), c(12, 100, 14))
-})
-
-# plotDiet ----
 # Need to use vdiffr conditionally
 expect_doppelganger <- function(title, fig, ...) {
     testthat::skip_if_not_installed("vdiffr")
     vdiffr::expect_doppelganger(title, fig, ...)
 }
 
-test_that("plotDiet plot has not changed", {
-    p <- plotDiet(params, species = "Cod")
-    expect_doppelganger("Plot Diet", p)
+# plots have not changed ----
+test_that("plots have not changed", {
+p <- plotResourcePred(params)
+expect_doppelganger("Plot Resource Pred", p)
+p <- plotResource(params)
+expect_doppelganger("Plot Resource", p)
 })
 
-test_that("plotDiet returns the right dimensions", {
-    expect_equal(dim(plotDiet(params, return_data = TRUE)), c(6080, 4))
-    sim <- project(params, t_max = 0.1)
-    expect_equal(dim(plotDiet(sim, return_data = TRUE)), c(6080, 4))
+
+# plotly functions do not throw error
+test_that("plotly functions do not throw error", {
+    expect_error(plotlyResourcePred(params), NA)
 })
+
+# testing the plot outputs
+test_that("return_data is identical",{
+    expect_equal(dim(plotResourcePred(params, return_data = TRUE)), c(4296,4))
+    expect_equal(dim(plotResource(params, return_data = TRUE)), c(358,3))
+}
+)
