@@ -10,5 +10,15 @@ mizerMREncounter <- function(params, n, n_pp, n_other, ...) {
     avail_energy <- avail_energy[, idx_sp, drop = FALSE]
     avail_energy[avail_energy < 1e-18] <- 0
 
-    params@search_vol * avail_energy
+    encounter <- params@search_vol * avail_energy
+
+    # Add contributions from other components
+    for (i in seq_along(params@other_encounter)) {
+        encounter <- encounter +
+            do.call(params@other_encounter[[i]],
+                    list(params = params,
+                         n = n, n_pp = n_pp, n_other = n_other,
+                         component = names(params@other_encounter)[[i]], ...))
+    }
+    return(encounter)
 }
