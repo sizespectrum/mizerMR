@@ -57,7 +57,7 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
         stop("The first argument must be either a MizerSim or a MizerParams object")
     }
     if (is.null(getComponent(params, "MR"))) {
-        return(mizer::animateSpectra(params, species = species,
+        return(mizer::plotSpectra(params, species = species,
                                      wlim = wlim, ylim = ylim,
                                      power = power, total = total,
                                      background = background,
