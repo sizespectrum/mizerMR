@@ -8,8 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
 
-An add-on to the mizer package which allows multiple 
-    size-structured resource spectra to be added to any mizer model.
+An add-on to the mizer package which allows multiple size-structured resource spectra to be added to any mizer model.
 }
 \seealso{
 Useful links:

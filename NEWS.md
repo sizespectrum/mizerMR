@@ -1,3 +1,12 @@
+# mizerMR 0.0.3
+
+* `plotSpectra()` and `plotlySpectra()` work with multiple resources.
+* New plotting functions `plotResource()` and `plotResourcePred()`.
+* `setMultipleResources()` no longer changes the initial resource abundances 
+  unless supplied via `initial_resource`.
+* Fix bug preventing `resource_params()` from changing the resource arrays.
+* `plotDietMR()` renamed to `plotDiet()`.
+
 # mizerMR 0.0.2
 
 * `setMultipleResources()` now adds to the `extensions` field in params metadata.

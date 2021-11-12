@@ -1,5 +1,5 @@
 #' @keywords internal
-#' @import mizer ggplot2 methods assertthat
+#' @import mizerExperimental ggplot2 methods assertthat
 #' @importFrom plotly ggplotly
 #' @importFrom stats mvfft
 #' @importFrom utils globalVariables

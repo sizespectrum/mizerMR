@@ -6,7 +6,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Get diet of predator at size, resolved by prey species — getDietMR • mizerMR</title>
+<title>Get diet of predator at size, resolved by prey species — getDiet • mizerMR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,7 +46,7 @@
 
 
 
-<meta property="og:title" content="Get diet of predator at size, resolved by prey species — getDietMR" />
+<meta property="og:title" content="Get diet of predator at size, resolved by prey species — getDiet" />
 <meta property="og:description" content="Calculates the rate at which a predator of a particular species and size
 consumes biomass of each prey species and resource.
 The diet has units of grams/year." />
@@ -86,7 +86,7 @@ The diet has units of grams/year." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -130,7 +130,7 @@ The diet has units of grams/year." />
     <div class="page-header">
     <h1>Get diet of predator at size, resolved by prey species</h1>
     <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/diet.R'><code>R/diet.R</code></a></small>
-    <div class="hidden name"><code>getDietMR.Rd</code></div>
+    <div class="hidden name"><code>getDiet.Rd</code></div>
     </div>
 
     <div class="ref-description">
@@ -139,9 +139,10 @@ consumes biomass of each prey species and resource.
 The diet has units of grams/year.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>getDietMR</span><span class='op'>(</span>
+    <pre class="usage"><span class='fu'>getDiet</span><span class='op'>(</span>
   <span class='va'>params</span>,
   n <span class='op'>=</span> <span class='fu'>initialN</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>,
+  n_pp <span class='op'>=</span> <span class='fu'><a href='setMultipleResources.html'>initialNResource</a></span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>,
   n_other <span class='op'>=</span> <span class='fu'>initialNOther</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>,
   proportion <span class='op'>=</span> <span class='cn'>TRUE</span>
 <span class='op'>)</span></pre>
@@ -158,9 +159,12 @@ The diet has units of grams/year.</p>
       <td><p>A matrix of species abundances (species x size).</p></td>
     </tr>
     <tr>
+      <th>n_pp</th>
+      <td><p>A vector of the resource abundance by size</p></td>
+    </tr>
+    <tr>
       <th>n_other</th>
-      <td><p>A list of abundances for other dynamical components of the
-ecosystem</p></td>
+      <td><p>A list of abundances for other dynamical components of the</p></td>
     </tr>
     <tr>
       <th>proportion</th>
@@ -173,7 +177,7 @@ consumption rate in grams per year.</p></td>
     <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
     <p>An array (predator species  x predator size x
-(prey species + resources) )</p>
+(prey species + resource + other components) )</p>
     <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
 
     <p>Returns the rates \(D_{ij}(w)\) at which a predator of species \(i\)
@@ -186,7 +190,7 @@ $$
 D_{ij}(w, w_p) = (1-f_i(w)) \gamma_i(w) \theta_{ij}
 \int N_j(w_p) \phi_i(w, w_p) w_p dw_p.
 $$
-The prey index \(j\) runs over all species and the resources. It also runs
+The prey index \(j\) runs over all species and the resource. It also runs
 over any extra ecosystem components in your model for which you have
 defined an encounter rate function. This encounter rate is multiplied by
 \(1-f_i(w)\) to give the rate of consumption of biomass from these extra
@@ -198,8 +202,16 @@ available biomass. Outside the range of sizes for a predator species the
 returned rate is zero.</p>
     <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
 
-    <div class='dont-index'><p><code><a href='plotDietMR.html'>plotDietMR()</a></code></p></div>
+    <div class='dont-index'><p><code><a href='plotDiet.html'>plotDiet()</a></code></p></div>
 
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='va'>diet</span> <span class='op'>&lt;-</span> <span class='fu'>getDiet</span><span class='op'>(</span><span class='va'>NS_params</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>diet</span><span class='op'>)</span>
+</div><div class='output co'>#&gt;  num [1:12, 1:100, 1:13] 8.94e-18 6.86e-19 3.46e-18 1.75e-09 1.12e-17 ...
+#&gt;  - attr(*, "dimnames")=List of 3
+#&gt;   ..$ predator: chr [1:12] "Sprat" "Sandeel" "N.pout" "Herring" ...
+#&gt;   ..$ w       : chr [1:100] "0.001" "0.00119" "0.00142" "0.0017" ...
+#&gt;   ..$ prey    : chr [1:13] "Sprat" "Sandeel" "N.pout" "Herring" ...</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">

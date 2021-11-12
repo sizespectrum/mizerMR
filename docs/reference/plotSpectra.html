@@ -85,7 +85,7 @@ specified by the power argument." />
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
       </span>
     </div>
 
@@ -148,6 +148,22 @@ specified by the <code>power</code> argument.</p>
   background <span class='op'>=</span> <span class='cn'>TRUE</span>,
   highlight <span class='op'>=</span> <span class='cn'>NULL</span>,
   return_data <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  <span class='va'>...</span>
+<span class='op'>)</span>
+
+<span class='fu'>plotlySpectra</span><span class='op'>(</span>
+  <span class='va'>object</span>,
+  species <span class='op'>=</span> <span class='cn'>NULL</span>,
+  resources <span class='op'>=</span> <span class='cn'>NULL</span>,
+  <span class='va'>time_range</span>,
+  wlim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
+  ylim <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='cn'>NA</span>, <span class='cn'>NA</span><span class='op'>)</span>,
+  power <span class='op'>=</span> <span class='fl'>1</span>,
+  biomass <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  total <span class='op'>=</span> <span class='cn'>FALSE</span>,
+  resource <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  background <span class='op'>=</span> <span class='cn'>TRUE</span>,
+  highlight <span class='op'>=</span> <span class='cn'>NULL</span>,
   <span class='va'>...</span>
 <span class='op'>)</span></pre>
 
@@ -235,7 +251,9 @@ object the initial abundance is plotted.</p>
     <div class='dont-index'><p>plotting_functions</p>
 <p>Other plotting functions: 
 <code><a href='animateSpectra.html'>animateSpectra</a>()</code>,
-<code><a href='plotDietMR.html'>plotDietMR</a>()</code></p></div>
+<code><a href='plotDiet.html'>plotDiet</a>()</code>,
+<code><a href='plotResourcePred.html'>plotResourcePred</a>()</code>,
+<code><a href='plotResource.html'>plotResource</a>()</code></p></div>
 
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">

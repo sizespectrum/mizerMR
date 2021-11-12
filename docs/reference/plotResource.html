@@ -6,7 +6,8 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Set up multiple resources — setMultipleResources • mizerMR</title>
+<title>Plot the proportion of the resource spectrum(s) compared to
+their carrying capacity — plotResource • mizerMR</title>
 
 <!-- favicons -->
 <link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
@@ -46,8 +47,10 @@
 
 
 
-<meta property="og:title" content="Set up multiple resources — setMultipleResources" />
-<meta property="og:description" content="Set up multiple resources" />
+<meta property="og:title" content="Plot the proportion of the resource spectrum(s) compared to
+their carrying capacity — plotResource" />
+<meta property="og:description" content="Plot the proportion of the resource spectrum(s) compared to
+their carrying capacity" />
 <meta property="og:image" content="https://sizespectrum.org/mizerMR/reference/figures/logo.png" />
 <meta property="og:image:alt" content="mizerMR: Multiple size-structured resources in mizer" />
 <meta name="twitter:card" content="summary" />
@@ -126,77 +129,59 @@
 <div class="row">
   <div class="col-md-9 contents">
     <div class="page-header">
-    <h1>Set up multiple resources</h1>
-    <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/setMultipleResources.R'><code>R/setMultipleResources.R</code></a></small>
-    <div class="hidden name"><code>setMultipleResources.Rd</code></div>
+    <h1>Plot the proportion of the resource spectrum(s) compared to
+their carrying capacity</h1>
+    <small class="dont-index">Source: <a href='https://github.com/sizespectrum/mizerMR/blob/master/R/plotResource.R'><code>R/plotResource.R</code></a></small>
+    <div class="hidden name"><code>plotResource.Rd</code></div>
     </div>
 
     <div class="ref-description">
-    <p>Set up multiple resources</p>
+    <p>Plot the proportion of the resource spectrum(s) compared to
+their carrying capacity</p>
     </div>
 
-    <pre class="usage"><span class='fu'>setMultipleResources</span><span class='op'>(</span>
-  <span class='va'>params</span>,
-  resource_params <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resource_interaction <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resource_capacity <span class='op'>=</span> <span class='cn'>NULL</span>,
-  resource_rate <span class='op'>=</span> <span class='cn'>NULL</span>,
-  initial_resource <span class='op'>=</span> <span class='cn'>NULL</span>
-<span class='op'>)</span>
-
-<span class='fu'>resource_capacity</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>
-
-<span class='fu'>resource_capacity</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>resource_rate</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>
-
-<span class='fu'>resource_rate</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>resource_interaction</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>
-
-<span class='fu'>resource_interaction</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span>
-
-<span class='fu'>initialNResource</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span>
-
-<span class='fu'>initialNResource</span><span class='op'>(</span><span class='va'>params</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='va'>value</span></pre>
+    <pre class="usage"><span class='fu'>plotResource</span><span class='op'>(</span><span class='va'>object</span>, return_data <span class='op'>=</span> <span class='cn'>FALSE</span><span class='op'>)</span></pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
     <colgroup><col class="name" /><col class="desc" /></colgroup>
     <tr>
-      <th>params</th>
-      <td><p>A MizerParams object</p></td>
+      <th>object</th>
+      <td><p>An object of class MizerSim or
+MizerParams.</p></td>
     </tr>
     <tr>
-      <th>resource_params</th>
-      <td><p>A data frame with the resource parameters</p></td>
-    </tr>
-    <tr>
-      <th>resource_interaction</th>
-      <td><p>Optional interaction matrix between species and
-resources (predator species x prey resource). By default all entries are 1.</p></td>
-    </tr>
-    <tr>
-      <th>resource_capacity</th>
-      <td><p>Optional. Array (resource x size) of the
-intrinsic resource carrying capacities</p></td>
-    </tr>
-    <tr>
-      <th>resource_rate</th>
-      <td><p>Optional. Array (resource x size) of intrinsic
-resource growth rates</p></td>
-    </tr>
-    <tr>
-      <th>initial_resource</th>
-      <td><p>Optional. Array (resource x size) of initial values</p></td>
-    </tr>
-    <tr>
-      <th>value</th>
-      <td><p>Value to assign</p></td>
+      <th>return_data</th>
+      <td><p>A boolean value that determines whether the formatted data
+used for the plot is returned instead of the plot itself. Default value is FALSE</p></td>
     </tr>
     </table>
 
+    <h2 class="hasAnchor" id="value"><a class="anchor" href="#value"></a>Value</h2>
 
+    <p>A ggplot2 object, unless <code>return_data = TRUE</code>, in which case a data
+frame with the three variables 'w', 'value', 'Resource' is returned.</p>
+    <h2 class="hasAnchor" id="see-also"><a class="anchor" href="#see-also"></a>See also</h2>
+
+    <div class='dont-index'><p>plotting_functions</p>
+<p>Other plotting functions: 
+<code><a href='animateSpectra.html'>animateSpectra</a>()</code>,
+<code><a href='plotDiet.html'>plotDiet</a>()</code>,
+<code><a href='plotResourcePred.html'>plotResourcePred</a>()</code>,
+<code><a href='plotSpectra.html'>plotSpectra</a>()</code></p></div>
+
+    <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
+    <pre class="examples"><div class='input'><span class='co'># \donttest{</span>
+<span class='fu'>plotResource</span><span class='op'>(</span><span class='va'>NS_params</span><span class='op'>)</span>
+</div><div class='img'><img src='plotResource-1.png' alt='' width='700' height='433' /></div><div class='input'>
+<span class='co'># Returning the data frame</span>
+<span class='va'>fr</span> <span class='op'>&lt;-</span> <span class='fu'>plotResource</span><span class='op'>(</span><span class='va'>NS_params</span>, return_data <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/utils/str.html'>str</a></span><span class='op'>(</span><span class='va'>fr</span><span class='op'>)</span>
+</div><div class='output co'>#&gt; 'data.frame':	179 obs. of  3 variables:
+#&gt;  $ w       : num  2.12e-13 2.53e-13 3.02e-13 3.61e-13 4.30e-13 ...
+#&gt;  $ value   : num  1 1 1 1 1 ...
+#&gt;  $ Resource: chr  "Resource" "Resource" "Resource" "Resource" ...</div><div class='input'><span class='co'># }</span>
+</div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <nav id="toc" data-toggle="toc" class="sticky-top">
