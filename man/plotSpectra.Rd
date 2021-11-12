@@ -2,6 +2,7 @@
 % Please edit documentation in R/plotSpectra.R
 \name{plotSpectra}
 \alias{plotSpectra}
+\alias{plotlySpectra}
 \title{Plot the abundance spectra}
 \usage{
 plotSpectra(
@@ -15,6 +16,22 @@ plotSpectra(
   background = TRUE,
   highlight = NULL,
   return_data = FALSE,
+  ...
+)
+
+plotlySpectra(
+  object,
+  species = NULL,
+  resources = NULL,
+  time_range,
+  wlim = c(NA, NA),
+  ylim = c(NA, NA),
+  power = 1,
+  biomass = TRUE,
+  total = FALSE,
+  resource = TRUE,
+  background = TRUE,
+  highlight = NULL,
   ...
 )
 }

@@ -115,6 +115,20 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
                   ylab = y_label, xlab = "Size [g]")
 }
 
+#' @rdname plotSpectra
+#' @export
+plotlySpectra <- function(object, species = NULL, resources = NULL,
+                          time_range,
+                          wlim = c(NA, NA), ylim = c(NA, NA),
+                          power = 1, biomass = TRUE,
+                          total = FALSE, resource = TRUE,
+                          background = TRUE,
+                          highlight = NULL, ...) {
+    argg <- as.list(environment())
+    ggplotly(do.call("plotSpectra", argg),
+             tooltip = c("Species", "w", "value"))
+}
+
 #' Helper function to assure validity of resources argument
 #'
 #' If the resources argument contains invalid resources, then these are
