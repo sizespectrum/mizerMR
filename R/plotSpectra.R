@@ -42,41 +42,18 @@
 #' @export
 #' @family plotting functions
 #' @seealso [plotting_functions]
-plotSpectra <- function(object, species = NULL, resources = NULL,
+setMethod("plotSpectra", "MRParams",
+          function(object, species = NULL, resources = NULL,
                         wlim = c(NA, NA), ylim = c(NA, NA),
                         power = 1,
                         total = FALSE,
                         background = TRUE,
                         highlight = NULL, return_data = FALSE, ...) {
-    # If called with MizerSim, we want to use the final time step
-    if (is(object, "MizerSim")) {
-        params <- setInitialValues(object@params, object)
-    } else if (is(object, "MizerParams")) {
-        params <- object
-    } else {
-        stop("The first argument must be either a MizerSim or a MizerParams object")
-    }
-    if (is.null(getComponent(params, "MR"))) {
-        return(mizer::plotSpectra(params, species = species,
-                                     wlim = wlim, ylim = ylim,
-                                     power = power, total = total,
-                                     background = background,
-                                     highlight = highlight,
-                                     resource = TRUE))
-    }
-
     # set n_pp to total plankton abundance so that the total in mizer's
     # plotSpectra() gives the right curve
     params@initial_n_pp <- colSums(params@initial_n_other[["MR"]])
 
-    df <- mizer::plotSpectra(params, species = species,
-                        time_range = time_range,
-                        wlim = wlim, ylim - ylim,
-                        power = power, total = total,
-                        background = background,
-                        highlight = highlight,
-                        resource = FALSE,
-                        return_data = TRUE) %>%
+    df <- callNextMethod() %>%
         dplyr::rename(Spectra = Species)
 
     resources <- valid_resources_arg(params, resources)
@@ -113,21 +90,7 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
     df <- rbind(df, rf)
     plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
                   ylab = y_label, xlab = "Size [g]")
-}
-
-#' @rdname plotSpectra
-#' @export
-plotlySpectra <- function(object, species = NULL, resources = NULL,
-                          time_range,
-                          wlim = c(NA, NA), ylim = c(NA, NA),
-                          power = 1, biomass = TRUE,
-                          total = FALSE, resource = TRUE,
-                          background = TRUE,
-                          highlight = NULL, ...) {
-    argg <- as.list(environment())
-    ggplotly(do.call("plotSpectra", argg),
-             tooltip = c("Species", "w", "value"))
-}
+})
 
 #' Helper function to assure validity of resources argument
 #'
