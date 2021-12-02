@@ -1,3 +1,5 @@
+setClass("MRParams", contains = "MizerParams")
+
 #' Create a new multi-resource, multi-species model
 #'
 #' @param species_params A data frame with the species parameters, with one

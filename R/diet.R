@@ -43,30 +43,19 @@
 #' @examples
 #' diet <- getDiet(NS_params)
 #' str(diet)
-getDiet <- function (params, n = initialN(params), n_pp = initialNResource(params),
-                     n_other = initialNOther(params), proportion = TRUE)
-{
-    params <- validParams(params)
+setMethod("getDiet", "MRParams",
+          function(object, n = initialN(object),
+                   n_pp = initialNResource(object),
+                   n_other = initialNOther(object), proportion = TRUE) {
+    params <- validParams(object)
     species <- params@species_params$species
     no_sp <- length(species)
     no_w <- length(params@w)
     no_w_full <- length(params@w_full)
-
-    if(is.null(getComponent(params, "MR"))) # in this case there are no additional background so should have npp only
-    {# using n_other as place holder for n_pp
-        no_other = 1
-        other_names = "Resource"
-        no_w_other <- length(n_pp)
-        n_other_inter <- matrix(params@species_params$interaction_resource, ncol = 1,
-                                dimnames = list("sp" = params@species_params$species, "resource" = other_names))
-        names(n_other_inter) <- other_names
-    } else {
-        no_other <- dim(n_other$MR)[1]
-        other_names <- rownames(n_other$MR)
-        no_w_other <- dim(n_other$MR)[2]
-        n_other_inter <- resource_interaction(params)
-    }
-
+    no_other <- dim(n_other$MR)[1]
+    other_names <- rownames(n_other$MR)
+    no_w_other <- dim(n_other$MR)[2]
+    n_other_inter <- resource_interaction(params)
     assert_that(identical(dim(n), c(no_sp, no_w)), no_w_other == no_w_full)
 
     diet <- array(0, dim = c(no_sp, no_w, no_sp + no_other),
@@ -112,9 +101,7 @@ getDiet <- function (params, n = initialN(params), n_pp = initialNResource(param
     inter <- cbind(params@interaction,n_other_inter)
     diet[, , 1:(no_sp+no_other)] <- sweep(sweep(diet[, , 1:(no_sp+no_other), drop = FALSE],
                                                 c(1, 3), inter, "*"), c(1, 2), params@search_vol, "*")
-    if(is.null(getComponent(params, "MR")))
-        f <- getFeedingLevel(object = params, n = n, n_pp = n_pp) else
-            f <- getFeedingLevel(object = params, n = n, n_other = n_other)
+    f <- getFeedingLevel(object = params, n = n, n_other = n_other)
     fish_mask <- n > 0
     diet <- sweep(diet, c(1, 2), (1 - f) * fish_mask, "*")
     if (proportion) {
@@ -123,7 +110,7 @@ getDiet <- function (params, n = initialN(params), n_pp = initialNResource(param
         diet[is.nan(diet)] <- 0
     }
     return(diet)
-}
+})
 
 
 #' Plot diet, resolved by prey species, as function of predator at size.
@@ -154,37 +141,18 @@ getDiet <- function (params, n = initialN(params), n_pp = initialNResource(param
 #' @export
 #' @seealso [getDiet()]
 #' @family plotting functions
-
-plotDiet <- function (object, species = NULL, time_range, wlim = c(1, NA), return_data = FALSE)
-{
+setMethod("plotDiet", "MRParams",
+          function(object, species = NULL, time_range,
+                   wlim = c(1, NA), return_data = FALSE) {
     assert_that(is.flag(return_data))
     # species <- valid_species_arg(object, species, return.logical = TRUE)
 
-
-    if (is(object, "MizerSim")) {
-        if (missing(time_range)) time_range <- max(as.numeric(dimnames(object@n)$time))
-        time_elements <- get_time_elements(object, time_range)
-        params <- validParams(object@params)
-        n <- apply(object@n[time_elements, , , drop = FALSE], 2:3, mean)
-        if(is.null(getComponent(params, "MR")))
-        {
-            n_pp <- apply(object@n_pp[time_elements, , drop = FALSE], 2, mean)
-            diet <- getDiet(params, n = n, n_other = n_other)
-        } else {
-            n_other <- list()
-            n_other$MR <- apply(simplify2array(object@n_other[time_elements, ]), 1:2, mean)
-            diet <- getDiet(params, n = n, n_other = n_other)
-        }
-    } else if (is(object, "MizerParams")) {
-        params <- validParams(object)
-        diet <- getDiet(params)
-    } else {
-        stop("The first argument must be either a MizerSim or a MizerParams object")
-    }
+    params <- validParams(object)
+    diet <- getDiet(params)
 
     SpIdx <- factor(params@species_params$species,
                     levels = params@species_params$species)
-    if(is.null(species)) species <- SpIdx
+    if (is.null(species)) species <- SpIdx
 
     plot_dat <- melt(diet)
     plot_dat <- plot_dat[plot_dat$value > 0.001, ]
@@ -195,19 +163,8 @@ plotDiet <- function (object, species = NULL, time_range, wlim = c(1, NA), retur
 
     if (return_data)  return(plot_dat)
 
-    mizerExperimental::plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator", xtrans = "log10",
+    plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator",
+                  xtrans = "log10",
                   xlab = "Size [g]",
                   wrap_scale = "free")
-}
-
-#' @rdname plotDiet
-#' @export
-plotlyDiet <- function(object,
-                       species = NULL,
-                       time_range,
-                       wlim = c(1, NA),
-                        ...) {
-    argg <- c(as.list(environment()), list(...))
-    ggplotly(do.call("plotDiet", argg),
-             tooltip = c("size","Proportion","Prey"))
-}
+})

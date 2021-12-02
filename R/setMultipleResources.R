@@ -60,6 +60,7 @@ setMultipleResources <- function(params,
             component_params = list(rate = template,
                                     capacity = template,
                                     interaction = interaction_default))
+        params <- new("MRParams", params)
     }
 
     resource_capacity <-

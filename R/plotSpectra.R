@@ -41,7 +41,7 @@
 #'   returned.
 #' @export
 #' @family plotting functions
-#' @seealso [plotting_functions]
+#' @name plotSpectra
 setMethod("plotSpectra", "MRParams",
           function(object, species = NULL, resources = NULL,
                         wlim = c(NA, NA), ylim = c(NA, NA),
@@ -51,10 +51,13 @@ setMethod("plotSpectra", "MRParams",
                         highlight = NULL, return_data = FALSE, ...) {
     # set n_pp to total plankton abundance so that the total in mizer's
     # plotSpectra() gives the right curve
-    params@initial_n_pp <- colSums(params@initial_n_other[["MR"]])
+    object@initial_n_pp <- colSums(object@initial_n_other[["MR"]])
 
-    df <- callNextMethod() %>%
-        dplyr::rename(Spectra = Species)
+    df <- callNextMethod(object = object, resource = FALSE,
+                         wlim = wlim, ylim = ylim, power = power,
+                         total = total, background = background,
+                         highlight = highlight, return_data = TRUE)
+    df <- dplyr::rename(df, Spectra = Species)
 
     resources <- valid_resources_arg(params, resources)
 
@@ -64,7 +67,7 @@ setMethod("plotSpectra", "MRParams",
     if (is.na(wlim[2])) {
         wlim[2] <- max(params@w_full)
     }
-    rf <- melt(initialNResource(params)) %>%
+    rf <- melt(initialNResource(params)[resources, , drop = FALSE]) %>%
         dplyr::filter(value > 0,
                       w >= wlim[[1]], w <= wlim[[2]]) %>%
         dplyr::mutate(Legend = resource) %>%
@@ -91,6 +94,20 @@ setMethod("plotSpectra", "MRParams",
     plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
                   ylab = y_label, xlab = "Size [g]")
 })
+
+#' @rdname plotSpectra
+#' @export
+setMethod("plotlySpectra", "MRParams",
+          function(object, species = NULL, resources = NULL,
+                   time_range,
+                   wlim = c(NA, NA), ylim = c(NA, NA),
+                   power = 1, biomass = TRUE,
+                   total = TRUE, background = TRUE,
+                   highlight = NULL, ...) {
+              argg <- as.list(environment())
+              ggplotly(do.call("plotSpectra", argg),
+                       tooltip = c("Species", "w", "value"))
+          })
 
 #' Helper function to assure validity of resources argument
 #'

@@ -45,7 +45,7 @@ reference:
 - title: Accessing results of simulations
 - contents:
   - NResource
-  - plotSpectra
+  - starts_with("plot")
   - animateSpectra
 - title: Internal helper functions
 - contents:

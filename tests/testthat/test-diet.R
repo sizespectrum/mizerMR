@@ -1,5 +1,5 @@
 # Initialise ----
-# Create an example oarans object with two identical resources, each at half
+# Create an example params object with two identical resources, each at half
 # abundance in the North sea model.
 rp <- as.data.frame(NS_params@resource_params)
 rp$kappa <- rp$kappa / 2
@@ -30,6 +30,4 @@ test_that("plotDiet plot has not changed", {
 
 test_that("plotDiet returns the right dimensions", {
     expect_equal(dim(plotDiet(params, return_data = TRUE)), c(6080, 4))
-    sim <- project(params, t_max = 0.1)
-    expect_equal(dim(plotDiet(sim, return_data = TRUE)), c(6080, 4))
 })
