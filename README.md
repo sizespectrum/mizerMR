@@ -10,8 +10,15 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 This extension package for mizer allows you to work with multiple
-size-structured resources in the same way in which you work with
-multiple species in mizer.
+size-structured background resources in the same way in which you work with
+multiple species in mizer. Modelled species can have different preferences 
+for different resources, defined though maximum availability of resource 
+available to species, in a similar way as setting species interaction matrix. 
+    Each background resource can have different minimum and maximum sizes, and 
+    different size spectrum slopes (lambda) or abundances (kappa). This allows 
+    the user to reproduce emergent onto-genetic dietary shifts, where a species feed 
+    in a plankton spectrum when it is small, then switches to benthic spectrum, and 
+    later to other fish species. 
 
 # Installation
 
