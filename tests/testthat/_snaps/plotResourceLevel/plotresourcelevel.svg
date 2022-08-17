@@ -54,6 +54,6 @@
 <line x1='676.37' y1='300.25' x2='690.19' y2='300.25' style='stroke-width: 1.71; stroke: #56B4E9; stroke-linecap: butt;' />
 <text x='697.40' y='286.00' style='font-size: 8.80px; font-family: sans;' textLength='17.12px' lengthAdjust='spacingAndGlyphs'>res1</text>
 <text x='697.40' y='303.28' style='font-size: 8.80px; font-family: sans;' textLength='17.12px' lengthAdjust='spacingAndGlyphs'>res2</text>
-<text x='35.24' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='82.92px' lengthAdjust='spacingAndGlyphs'>Plot Resource</text>
+<text x='35.24' y='14.56' style='font-size: 13.20px; font-family: sans;' textLength='109.35px' lengthAdjust='spacingAndGlyphs'>plotResourceLevel</text>
 </g>
 </svg>

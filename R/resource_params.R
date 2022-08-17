@@ -60,7 +60,7 @@ resource_params <- function(params) {
 #' * `w_min` is set to `min_w`
 #' * `w_max` is set to `10`
 #' * `n` is set to 2/3
-#' * `dynamics` is set to `semichemostat`
+#' * `dynamics` is set to "resource_semichemostat"
 #' * `colour` is drawn from a colour-blind-friendly palette
 #' * `linetype` is set to "solid"
 #'

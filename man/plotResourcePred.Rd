@@ -45,7 +45,7 @@ str(fr)
 Other plotting functions: 
 \code{\link{animateSpectra}()},
 \code{\link{plotDiet}()},
-\code{\link{plotResource}()},
+\code{\link{plotResourceLevel}()},
 \code{\link{plotSpectra}()}
 }
 \concept{plotting functions}

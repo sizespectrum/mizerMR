@@ -52,8 +52,8 @@ A plotly object
 \seealso{
 Other plotting functions: 
 \code{\link{plotDiet}()},
+\code{\link{plotResourceLevel}()},
 \code{\link{plotResourcePred}()},
-\code{\link{plotResource}()},
 \code{\link{plotSpectra}()}
 }
 \concept{plotting functions}

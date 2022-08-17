@@ -6,7 +6,7 @@
 \alias{mizerMR-package}
 \title{mizerMR: Add multiple size-structured resources to a mizer model}
 \description{
-\if{html}{\figure{logo.png}{options: align='right' alt='logo' width='120'}}
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
 An add-on to the mizer package which allows multiple size-structured resource spectra to be added to any mizer model.
 }

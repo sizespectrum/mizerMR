@@ -53,8 +53,8 @@ in the plot.
 
 Other plotting functions: 
 \code{\link{animateSpectra}()},
+\code{\link{plotResourceLevel}()},
 \code{\link{plotResourcePred}()},
-\code{\link{plotResource}()},
 \code{\link{plotSpectra}()}
 }
 \concept{plotting functions}

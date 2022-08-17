@@ -1,5 +1,5 @@
 # Initialise ----
-# Create an example oarans object with two identical resources, each at half
+# Create an example params object with two identical resources, each at half
 # abundance in the North sea model.
 rp <- as.data.frame(NS_params@resource_params)
 rp$kappa <- rp$kappa / 2
@@ -20,9 +20,9 @@ expect_doppelganger <- function(title, fig, ...) {
 # plots have not changed ----
 test_that("plots have not changed", {
 p <- plotResourcePred(params)
-expect_doppelganger("Plot Resource Pred", p)
-p <- plotResource(params)
-expect_doppelganger("Plot Resource", p)
+expect_doppelganger("plotResourcePred", p)
+p <- plotResourceLevel(params)
+expect_doppelganger("plotResourceLevel", p)
 })
 
 
@@ -34,6 +34,6 @@ test_that("plotly functions do not throw error", {
 # testing the plot outputs
 test_that("return_data is identical",{
     expect_equal(dim(plotResourcePred(params, return_data = TRUE)), c(4296,4))
-    expect_equal(dim(plotResource(params, return_data = TRUE)), c(358,3))
+    expect_equal(dim(plotResourceLevel(params, return_data = TRUE)), c(358,3))
 }
 )
