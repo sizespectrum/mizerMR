@@ -58,11 +58,12 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
     }
     if (is.null(getComponent(params, "MR"))) {
         return(mizer::plotSpectra(params, species = species,
-                                     wlim = wlim, ylim = ylim,
-                                     power = power, total = total,
-                                     background = background,
-                                     highlight = highlight,
-                                     resource = TRUE))
+                                  wlim = wlim, ylim = ylim,
+                                  power = power, total = total,
+                                  background = background,
+                                  highlight = highlight,
+                                  resource = TRUE,
+                                  return_data = return_data))
     }
 
     # set n_pp to total plankton abundance so that the total in mizer's
@@ -111,6 +112,9 @@ plotSpectra <- function(object, species = NULL, resources = NULL,
     rf <- dplyr::mutate(rf, value = value * w^power)
 
     df <- rbind(df, rf)
+    if (return_data) {
+        return(df)
+    }
     plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
                   ylab = y_label, xlab = "Size [g]")
 }
