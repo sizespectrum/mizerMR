@@ -195,7 +195,7 @@ plotDiet <- function (object, species = NULL, time_range, wlim = c(1, NA), retur
 
     if (return_data)  return(plot_dat)
 
-    mizerExperimental::plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator", xtrans = "log10",
+    plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator", xtrans = "log10",
                   xlab = "Size [g]",
                   wrap_scale = "free")
 }
