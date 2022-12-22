@@ -1,10 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>https://sizespectrum.org/mizerMR/404.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizerMR/authors.html</loc>
+  </url>
+  <url>
     <loc>https://sizespectrum.org/mizerMR/index.html</loc>
   </url>
   <url>
-    <loc>https://sizespectrum.org/mizerMR/reference/NResource.html</loc>
+    <loc>https://sizespectrum.org/mizerMR/LICENSE.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizerMR/news/index.html</loc>
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/animateSpectra.html</loc>
@@ -13,16 +22,25 @@
     <loc>https://sizespectrum.org/mizerMR/reference/getDiet.html</loc>
   </url>
   <url>
+    <loc>https://sizespectrum.org/mizerMR/reference/index.html</loc>
+  </url>
+  <url>
     <loc>https://sizespectrum.org/mizerMR/reference/mizerMR-package.html</loc>
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/newMRParams.html</loc>
   </url>
   <url>
+    <loc>https://sizespectrum.org/mizerMR/reference/NResource.html</loc>
+  </url>
+  <url>
     <loc>https://sizespectrum.org/mizerMR/reference/plotDiet.html</loc>
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/plotResource.html</loc>
+  </url>
+  <url>
+    <loc>https://sizespectrum.org/mizerMR/reference/plotResourceLevel.html</loc>
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/plotResourcePred.html</loc>
@@ -46,6 +64,9 @@
     <loc>https://sizespectrum.org/mizerMR/reference/valid_initial_resource.html</loc>
   </url>
   <url>
+    <loc>https://sizespectrum.org/mizerMR/reference/valid_resources_arg.html</loc>
+  </url>
+  <url>
     <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_capacity.html</loc>
   </url>
   <url>
@@ -53,8 +74,5 @@
   </url>
   <url>
     <loc>https://sizespectrum.org/mizerMR/reference/valid_resource_rate.html</loc>
-  </url>
-  <url>
-    <loc>https://sizespectrum.org/mizerMR/reference/valid_resources_arg.html</loc>
   </url>
 </urlset>
