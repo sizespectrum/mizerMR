@@ -46,6 +46,10 @@ reference:
 - contents:
   - NResource
   - plotSpectra
+  - getDiet
+  - plotDiet
+  - plotResourceLevel
+  - plotResourcePred
   - animateSpectra
 - title: Internal helper functions
 - contents:

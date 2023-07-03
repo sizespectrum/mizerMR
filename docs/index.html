@@ -30,6 +30,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -42,7 +44,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.0.3</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
       </span>
     </div>
 
@@ -57,16 +59,16 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://blog.mizer.sizespectrum.org">Blog</a>
+  <a href="https://blog.mizer.sizespectrum.org" class="external-link">Blog</a>
 </li>
 <li>
-  <a href="https://twitter.com/mizer_model">
+  <a href="https://twitter.com/mizer_model" class="external-link">
     <span class="fab fa-twitter fa-lg"></span>
      
   </a>
 </li>
 <li>
-  <a href="https://github.com/sizespectrum/mizerMR/">
+  <a href="https://github.com/sizespectrum/mizerMR/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -84,133 +86,144 @@
       </header><div class="row">
   <div class="contents col-md-9">
 
-<div id="mizermr-" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#mizermr-" class="anchor"></a>mizerMR <a href="https://sizespectrum.org/mizerMR"><img src="reference/figures/logo.png" align="right" height="120"></a>
+<div class="section level1">
+<div class="page-header"><h1 id="mizermr-">mizerMR <a href="https://sizespectrum.org/mizerMR"><img src="reference/figures/logo.png" align="right" height="120"></a>
+<a class="anchor" aria-label="anchor" href="#mizermr-"></a>
 </h1></div>
 <!-- badges: start -->
 
-<p>This extension package for mizer allows you to work with multiple size-structured resources in the same way in which you work with multiple species in mizer.</p>
+<p>This extension package for mizer allows you to work with multiple size-structured background resources in the same way in which you work with multiple species in mizer. Modelled species can have different preferences for different resources, defined though maximum availability of resource available to species, in a similar way as setting species interaction matrix. Each background resource can have different minimum and maximum sizes, and different size spectrum slopes (lambda) or abundances (kappa). This allows the user to reproduce emergent onto-genetic dietary shifts, where a species feed in a plankton spectrum when it is small, then switches to benthic spectrum, and later to other fish species.</p>
 </div>
-<div id="installation" class="section level1">
-<h1 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h1>
+<div class="section level1">
+<h1 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h1>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"sizespectrum/mizerMR"</span><span class="op">)</span>
-<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="http://sizespectrum.org/mizerMR/">mizerMR</a></span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"sizespectrum/mizerMR"</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://sizespectrum.org/mizerMR/" class="external-link">mizerMR</a></span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="setting-up-a-model-with-multiple-resources" class="section level1">
-<h1 class="hasAnchor">
-<a href="#setting-up-a-model-with-multiple-resources" class="anchor"></a>Setting up a model with multiple resources</h1>
+<div class="section level1">
+<h1 id="setting-up-a-model-with-multiple-resources">Setting up a model with multiple resources<a class="anchor" aria-label="anchor" href="#setting-up-a-model-with-multiple-resources"></a>
+</h1>
 <p>Multiple size-structured resources are set up in a very similar manner to multiple species. Just as for multiple species we need a <code>species_params</code> data frame with the information about the species, for multiple resources we need a <code>resource_params</code> data frame, with one row for each resource. Here is an artificial example with two resources:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/">tibble</a></span><span class="op">)</span>
-<span class="va">resource_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html">tribble</a></span><span class="op">(</span>
-    <span class="op">~</span><span class="va">resource</span>,  <span class="op">~</span><span class="va">kappa</span>, <span class="op">~</span><span class="va">lambda</span>, <span class="op">~</span><span class="va">r_pp</span>, <span class="op">~</span><span class="va">w_min</span>, <span class="op">~</span><span class="va">w_max</span>,
- <span class="st">"Resource 1"</span>,    <span class="fl">1e11</span>,    <span class="fl">2.13</span>,     <span class="fl">4</span>,    <span class="cn">NA</span> ,   <span class="fl">0.01</span>,
- <span class="st">"Resource 2"</span>,    <span class="fl">1e11</span>,    <span class="fl">2.05</span>,    <span class="fl">10</span>,   <span class="fl">1e-4</span>,     <span class="cn">NA</span>
-<span class="op">)</span></code></pre></div>
-<p>Similarly to how we can set resource parameters for a single resource in standard mizer with <code>setResource()</code>, you can now set multiple resources with <code><a href="reference/setMultipleResources.html">setMultipleResources()</a></code>. So if for example we wanted to add these resources to the North Sea model described by the <code>NS_params</code> MizerParams object, we would do</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tibble.tidyverse.org/" class="external-link">tibble</a></span><span class="op">)</span></span>
+<span><span class="va">resource_params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tribble.html" class="external-link">tribble</a></span><span class="op">(</span></span>
+<span>    <span class="op">~</span><span class="va">resource</span>,  <span class="op">~</span><span class="va">kappa</span>, <span class="op">~</span><span class="va">lambda</span>, <span class="op">~</span><span class="va">r_pp</span>, <span class="op">~</span><span class="va">w_min</span>, <span class="op">~</span><span class="va">w_max</span>,</span>
+<span> <span class="st">"Resource 1"</span>,    <span class="fl">1e11</span>,    <span class="fl">2.13</span>,     <span class="fl">4</span>,    <span class="cn">NA</span> ,   <span class="fl">0.01</span>,</span>
+<span> <span class="st">"Resource 2"</span>,    <span class="fl">1e11</span>,    <span class="fl">2.05</span>,    <span class="fl">10</span>,   <span class="fl">1e-4</span>,     <span class="cn">NA</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Similarly to how we can set resource parameters for a single resource in standard mizer with <code><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">setResource()</a></code>, you can now set multiple resources with <code><a href="reference/setMultipleResources.html">setMultipleResources()</a></code>. So if for example we wanted to add these resources to the North Sea model described by the <code>NS_params</code> MizerParams object, we would do</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setMultipleResources.html">setMultipleResources</a></span><span class="op">(</span><span class="va">NS_params</span>, <span class="va">resource_params</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setMultipleResources.html">setMultipleResources</a></span><span class="op">(</span><span class="va">NS_params</span>, <span class="va">resource_params</span><span class="op">)</span></span></code></pre></div>
 <p>This has given us a new MizerParams object in which the original resource has been replaced by our two resources. We can then work with this MizerParams object as usual. For example we can project it forward in time:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu">project</span><span class="op">(</span><span class="va">params</span>, t_max <span class="op">=</span> <span class="fl">2</span>, t_save <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">params</span>, t_max <span class="op">=</span> <span class="fl">2</span>, t_save <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
 <p>and plot the resulting spectra:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/plotSpectra.html">plotSpectra</a></span><span class="op">(</span><span class="va">sim</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/plotSpectra.html">plotSpectra</a></span><span class="op">(</span><span class="va">sim</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
-<p>We can also animate the spectra with <code><a href="reference/animateSpectra.html">animateSpectra(sim)</a></code>. Most mizer functions will work as usual.</p>
+<p>We can also animate the spectra with <code>animateSpectra(sim)</code>. Most mizer functions will work as usual.</p>
 <p>We can access the simulation results for the resource with <code><a href="reference/NResource.html">NResource()</a></code>. This gives a three-dimensional array:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/str.html">str</a></span><span class="op">(</span><span class="fu"><a href="reference/NResource.html">NResource</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span>
-<span class="co">#&gt;  num [1:11, 1:2, 1:226] 9.87e+37 9.87e+37 9.87e+37 9.87e+37 9.87e+37 ...</span>
-<span class="co">#&gt;  - attr(*, "dimnames")=List of 3</span>
-<span class="co">#&gt;   ..$ time    : chr [1:11] "0" "0.2" "0.4" "0.6" ...</span>
-<span class="co">#&gt;   ..$ resource: chr [1:2] "Resource 1" "Resource 2"</span>
-<span class="co">#&gt;   ..$ w       : chr [1:226] "2.12e-13" "2.53e-13" "3.02e-13" "3.61e-13" ...</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="fu"><a href="reference/NResource.html">NResource</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  num [1:11, 1:2, 1:226] 9.87e+37 9.87e+37 9.87e+37 9.87e+37 9.87e+37 ...</span></span>
+<span><span class="co">#&gt;  - attr(*, "dimnames")=List of 3</span></span>
+<span><span class="co">#&gt;   ..$ time    : chr [1:11] "0" "0.2" "0.4" "0.6" ...</span></span>
+<span><span class="co">#&gt;   ..$ resource: chr [1:2] "Resource 1" "Resource 2"</span></span>
+<span><span class="co">#&gt;   ..$ w       : chr [1:226] "2.12e-13" "2.53e-13" "3.02e-13" "3.61e-13" ...</span></span></code></pre></div>
 <p>So the first dimension is the time, the second the resource and the third the size. Thus to get the abundance density of Resource 2 at time 0.6 at sizes between 0.1g and 5g we could do</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">select_w</span> <span class="op">&lt;-</span> <span class="fu">w_full</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu">w_full</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">5</span>
-<span class="fu"><a href="reference/NResource.html">NResource</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[</span><span class="st">"0.6"</span>, <span class="st">"Resource 2"</span>, <span class="va">select_w</span><span class="op">]</span>
-<span class="co">#&gt;        1.18         1.4        1.68           2        2.39        2.85 </span>
-<span class="co">#&gt; 29171099375 20197414266 14020889066  9759285393  6811166565  4765970415 </span>
-<span class="co">#&gt;         3.4        4.06        4.84 </span>
-<span class="co">#&gt;  3342985300  2349927216  1654807045</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">select_w</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/w.html" class="external-link">w_full</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">1</span> <span class="op">&amp;</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/w.html" class="external-link">w_full</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;=</span> <span class="fl">5</span></span>
+<span><span class="fu"><a href="reference/NResource.html">NResource</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[</span><span class="st">"0.6"</span>, <span class="st">"Resource 2"</span>, <span class="va">select_w</span><span class="op">]</span></span>
+<span><span class="co">#&gt;        1.18         1.4        1.68           2        2.39        2.85 </span></span>
+<span><span class="co">#&gt; 29171099375 20197414266 14020889066  9759285393  6811166565  4765970415 </span></span>
+<span><span class="co">#&gt;         3.4        4.06        4.84 </span></span>
+<span><span class="co">#&gt;  3342985300  2349927216  1654807045</span></span></code></pre></div>
 <p>This is perfectly analogous to how we would access the abundance density of fish species, except that the range of sizes is given by <code>w_full</code> rather than by <code>w</code>.</p>
 </div>
-<div id="more-details" class="section level1">
-<h1 class="hasAnchor">
-<a href="#more-details" class="anchor"></a>More details</h1>
+<div class="section level1">
+<h1 id="more-details">More details<a class="anchor" aria-label="anchor" href="#more-details"></a>
+</h1>
 <p>Just as we are able to specify how strongly a predator species interacts with a prey species via the <code>interaction</code> matrix, we can also specify how strongly a predator species interacts with each resource via the <code>resource_interaction</code>, which is a matrix with one row for each species and one column for each resource. For example</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">resource_interaction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html">runif</a></span><span class="op">(</span><span class="fl">24</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">12</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span>
-<span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setMultipleResources.html">setMultipleResources</a></span><span class="op">(</span><span class="va">NS_params</span>, <span class="va">resource_params</span>, <span class="va">resource_interaction</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">resource_interaction</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/Uniform.html" class="external-link">runif</a></span><span class="op">(</span><span class="fl">24</span><span class="op">)</span>, nrow <span class="op">=</span> <span class="fl">12</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setMultipleResources.html">setMultipleResources</a></span><span class="op">(</span><span class="va">NS_params</span>, <span class="va">resource_params</span>, <span class="va">resource_interaction</span><span class="op">)</span></span></code></pre></div>
 <p>Resource parameters can be changed at any time. For example we can double the carrying capacity of the first resource with</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">$</span><span class="va">kappa</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">$</span><span class="va">kappa</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">$</span><span class="va">kappa</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">2</span> <span class="op">*</span> <span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span><span class="op">$</span><span class="va">kappa</span><span class="op">[</span><span class="fl">1</span><span class="op">]</span></span></code></pre></div>
 <p>We can also use this kind of notation as an alternative to <code>setMultispeciesParams()</code>. For example</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">NS_params</span>
-<span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_params</span>
-<span class="fu"><a href="reference/setMultipleResources.html">resource_interaction</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_interaction</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="va">NS_params</span></span>
+<span><span class="fu"><a href="reference/resource_params.html">resource_params</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_params</span></span>
+<span><span class="fu"><a href="reference/setMultipleResources.html">resource_interaction</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_interaction</span></span></code></pre></div>
 <p>By default the initial values for the resources will be equal to the carrying capacities. But if a user has their own array (resource x size) of resource number densities <code>my_n_resource</code> they can set these as the initial values with</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/setMultipleResources.html">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_n_resource</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/setMultipleResources.html">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_n_resource</span></span></code></pre></div>
 <p>Users who are not happy with the allometric expressions for the resource carrying capacities or the replenishment rates but have created their own matrices <code>my_capacity</code> and <code>my_rate</code> with one row for each resource and one column for each size can set these with</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="reference/setMultipleResources.html">resource_capacity</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_capacity</span>
-<span class="fu"><a href="reference/setMultipleResources.html">resource_rate</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_rate</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="reference/setMultipleResources.html">resource_capacity</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_capacity</span></span>
+<span><span class="fu"><a href="reference/setMultipleResources.html">resource_rate</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_rate</span></span></code></pre></div>
 <p>Rather than adding the multiple resources to an existing model, the user can also create a new model with multiple resources with</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/newMRParams.html">newMRParams</a></span><span class="op">(</span><span class="va">species_params</span>, <span class="va">interaction</span>, <span class="va">resource_params</span>,
-                      <span class="va">resource_interaction</span>, <span class="va">gear_params</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/newMRParams.html">newMRParams</a></span><span class="op">(</span><span class="va">species_params</span>, <span class="va">interaction</span>, <span class="va">resource_params</span>,</span>
+<span>                      <span class="va">resource_interaction</span>, <span class="va">gear_params</span><span class="op">)</span></span></code></pre></div>
 </div>
 
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Browse source code at <br><a href="https://github.com/sizespectrum/mizerMR/">https://​github.com/​sizespectrum/​mizerMR/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/sizespectrum/mizerMR/issues">https://​github.com/​sizespectrum/​mizerMR/​issues</a>
-</li>
+<li><a href="https://github.com/sizespectrum/mizerMR/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/sizespectrum/mizerMR/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li><a href="LICENSE.html">Full license</a></li>
 <li><small>GPL (&gt;= 3)</small></li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing mizerMR</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://www.york.ac.uk/maths/staff/gustav-delius/">Gustav Delius</a> <br><small class="roles"> Maintainer, author </small> <a href="https://orcid.org/0000-0003-4092-8228" target="orcid.widget" aria-label="ORCID"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<a href="https://www.york.ac.uk/maths/staff/gustav-delius/" class="external-link">Gustav Delius</a> <br><small class="roles"> Maintainer, author </small> <a href="https://orcid.org/0000-0003-4092-8228" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 <li>Romain Forestier <br><small class="roles"> Author </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
+<li><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: experimental"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by <a href="https://www.york.ac.uk/maths/staff/gustav-delius/">Gustav Delius</a>, Romain Forestier.</p>
+  <p></p>
+<p>Developed by <a href="https://www.york.ac.uk/maths/staff/gustav-delius/" class="external-link">Gustav Delius</a>, Romain Forestier.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
@@ -218,6 +231,8 @@
 
   
 
+
+  
 
   </body>
 </html>

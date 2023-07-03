@@ -12,7 +12,7 @@
 #' @param min_w Sets the size of the eggs of all species for which this is not
 #'   given in the `w_min` column of the `species_params` dataframe.
 #' @param max_w The largest size of the consumer spectrum. By default this is
-#'   set to the largest `w_inf` specified in the `species_params` data
+#'   set to the largest `w_max specified in the `species_params` data
 #'   frame.
 #'
 #' @return An object of class MizerMRParams

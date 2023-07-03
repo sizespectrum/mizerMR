@@ -1,3 +1,7 @@
+# mizerMR 0.2.4.0
+
+* Compatible with mizer version 2.4.0
+
 # mizerMR 0.0.3
 
 * `plotSpectra()` and `plotlySpectra()` work with multiple resources.
