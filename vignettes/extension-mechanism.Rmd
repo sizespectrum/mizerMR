@@ -219,39 +219,59 @@ The full set of S3 methods defined by mizerMR is:
 | `plotResourceLevel` | `MRMizerParams`, `MizerParams` | `plotResource.R` |
 | `plotResourcePred` | `MRMizerParams`, `MizerParams` | `plotResource.R` |
 
-## Avoiding dispatch loops when calling mizer's own functions
+## Calling mizer's method as a subroutine from `plotSpectra.MRMizerParams`
 
-Several mizerMR methods (e.g. `plotSpectra.MRMizerParams`) need to call mizer's
-version of the same generic to get species-only data. Calling
-`mizer::plotSpectra(params, ...)` with `params` still being an `MRMizerParams`
-would loop back to our method because `mizer::plotSpectra` is itself just the
-S3 generic. The solution is to downcast `params` before the call:
+`plotSpectra.MRMizerParams` calls mizer's method internally to obtain the
+species-only data frame, then augments it with per-resource rows. The internal
+call must pass two arguments that differ from the user's intent:
+
+- `resource = FALSE` — suppress mizer's single resource curve (we draw our own)
+- `return_data = TRUE` — always get the data frame, regardless of what the
+  user requested
+
+`NextMethod()` would work for `return_data`: because it is an explicit formal
+parameter, reassigning it before calling `NextMethod()` is seen by the next
+method. But `resource` is not a formal parameter of `plotSpectra.MRMizerParams`
+— it lives in `...` — and `NextMethod()` passes `...` from the original call
+unmodified, so there is no way to inject `resource = FALSE` that way.
+
+The solution is to call mizer's method as a plain subroutine, downcasting
+`params` to `MizerParams` so that S3 dispatch selects `plotSpectra.MizerParams`
+directly:
 
 ```r
 df <- mizer::plotSpectra(as(params, "MizerParams"),
                          resource = FALSE, return_data = TRUE, ...)
 ```
 
-`as(params, "MizerParams")` strips the subclass, so mizer's
-`plotSpectra.MizerParams` is dispatched rather than ours.
+An alternative would be to promote `resource` to an explicit formal parameter
+of `plotSpectra.MRMizerParams` (with the same default as mizer's method) and
+then override both `resource` and `return_data` before calling `NextMethod()`.
+The `as()` downcast was chosen because it makes the intent clearer: this is a
+subroutine call to mizer's implementation, not a delegation to the next method
+in the dispatch chain.
 
 ## `MRMizerSim` plot methods delegate to the params method
 
 When a plot function is called with a simulation object, it needs to collapse
-the time-averaged abundances back into an `MRMizerParams`. The `MRMizerSim`
-methods do this uniformly:
+the time-averaged abundances back into a params object and then dispatch to
+the params method. The `MRMizerSim` methods do this uniformly:
 
 ```r
 plotSpectra.MRMizerSim <- function(object, ...) {
-    params <- new("MRMizerParams", setInitialValues(object@params, object))
+    params <- setInitialValues(object@params, object)
     plotSpectra(params, ...)
 }
 ```
 
-`setInitialValues()` is a mizer function that copies the final (or
-time-averaged) abundances into the initial-value slots of the params. It
-returns a plain `MizerParams`, so we re-wrap with `new("MRMizerParams", ...)`
-before dispatching onward.
+`setInitialValues()` is a mizer S3 generic with a `setInitialValues.MizerParams`
+method. When called with `object@params` — which is an `MRMizerParams` — S3
+dispatch falls through to `setInitialValues.MizerParams` via inheritance.
+That method only modifies existing slots in-place via `params@slot[] <- ...`
+and returns `params`. Because S4 slot assignment preserves the class of the
+object, the returned value is still an `MRMizerParams`. The subsequent call to
+`plotSpectra(params, ...)` therefore dispatches correctly to
+`plotSpectra.MRMizerParams` without any manual re-wrapping.
 
 # Summary of benefits
 

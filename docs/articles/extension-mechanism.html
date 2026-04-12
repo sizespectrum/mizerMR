@@ -110,7 +110,7 @@ mechanism</h1>
 </h2>
 <p>This vignette is aimed at developers who want to understand how
 mizerMR is built on top of mizer’s extension machinery. It assumes you
-have read [vignette(“extensions”, package = “mizer”)].</p>
+have read <code>vignette("extensions", package = "mizer")</code>.</p>
 <p>mizerMR uses four of the five extension routes described there:</p>
 <ol style="list-style-type: decimal">
 <li>
@@ -398,21 +398,43 @@ cleanly separated.</p>
 </table>
 </div>
 <div class="section level3">
-<h3 id="avoiding-dispatch-loops-when-calling-mizers-own-functions">Avoiding dispatch loops when calling mizer’s own functions<a class="anchor" aria-label="anchor" href="#avoiding-dispatch-loops-when-calling-mizers-own-functions"></a>
+<h3 id="calling-mizers-method-as-a-subroutine-from-plotspectra-mrmizerparams">Calling mizer’s method as a subroutine from
+<code>plotSpectra.MRMizerParams</code><a class="anchor" aria-label="anchor" href="#calling-mizers-method-as-a-subroutine-from-plotspectra-mrmizerparams"></a>
 </h3>
-<p>Several mizerMR methods (e.g. <code>plotSpectra.MRMizerParams</code>)
-need to call mizer’s version of the same generic to get species-only
-data. Calling <code>mizer::plotSpectra(params, ...)</code> with
-<code>params</code> still being an <code>MRMizerParams</code> would loop
-back to our method because <code><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">mizer::plotSpectra</a></code> is itself
-just the S3 generic. The solution is to downcast <code>params</code>
-before the call:</p>
+<p><code>plotSpectra.MRMizerParams</code> calls mizer’s method
+internally to obtain the species-only data frame, then augments it with
+per-resource rows. The internal call must pass two arguments that differ
+from the user’s intent:</p>
+<ul>
+<li>
+<code>resource = FALSE</code> — suppress mizer’s single resource
+curve (we draw our own)</li>
+<li>
+<code>return_data = TRUE</code> — always get the data frame,
+regardless of what the user requested</li>
+</ul>
+<p><code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> would work for <code>return_data</code>:
+because it is an explicit formal parameter, reassigning it before
+calling <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> is seen by the next method. But
+<code>resource</code> is not a formal parameter of
+<code>plotSpectra.MRMizerParams</code> — it lives in <code>...</code> —
+and <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> passes <code>...</code> from the original
+call unmodified, so there is no way to inject
+<code>resource = FALSE</code> that way.</p>
+<p>The solution is to call mizer’s method as a plain subroutine,
+downcasting <code>params</code> to <code>MizerParams</code> so that S3
+dispatch selects <code>plotSpectra.MizerParams</code> directly:</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotSpectra</a></span><span class="op">(</span><span class="fu">as</span><span class="op">(</span><span class="va">params</span>, <span class="st">"MizerParams"</span><span class="op">)</span>,</span>
 <span>                         resource <span class="op">=</span> <span class="cn">FALSE</span>, return_data <span class="op">=</span> <span class="cn">TRUE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
-<p><code>as(params, "MizerParams")</code> strips the subclass, so
-mizer’s <code>plotSpectra.MizerParams</code> is dispatched rather than
-ours.</p>
+<p>An alternative would be to promote <code>resource</code> to an
+explicit formal parameter of <code>plotSpectra.MRMizerParams</code>
+(with the same default as mizer’s method) and then override both
+<code>resource</code> and <code>return_data</code> before calling
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>. The <code>as()</code> downcast was chosen
+because it makes the intent clearer: this is a subroutine call to
+mizer’s implementation, not a delegation to the next method in the
+dispatch chain.</p>
 </div>
 <div class="section level3">
 <h3 id="mrmizersim-plot-methods-delegate-to-the-params-method">
@@ -420,18 +442,25 @@ ours.</p>
 method<a class="anchor" aria-label="anchor" href="#mrmizersim-plot-methods-delegate-to-the-params-method"></a>
 </h3>
 <p>When a plot function is called with a simulation object, it needs to
-collapse the time-averaged abundances back into an
-<code>MRMizerParams</code>. The <code>MRMizerSim</code> methods do this
-uniformly:</p>
+collapse the time-averaged abundances back into a params object and then
+dispatch to the params method. The <code>MRMizerSim</code> methods do
+this uniformly:</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plotSpectra.MRMizerSim</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">new</span><span class="op">(</span><span class="st">"MRMizerParams"</span>, <span class="fu">setInitialValues</span><span class="op">(</span><span class="va">object</span><span class="op">@</span><span class="va">params</span>, <span class="va">object</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">setInitialValues</span><span class="op">(</span><span class="va">object</span><span class="op">@</span><span class="va">params</span>, <span class="va">object</span><span class="op">)</span></span>
 <span>    <span class="fu">plotSpectra</span><span class="op">(</span><span class="va">params</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><code>setInitialValues()</code> is a mizer function that copies the
-final (or time-averaged) abundances into the initial-value slots of the
-params. It returns a plain <code>MizerParams</code>, so we re-wrap with
-<code>new("MRMizerParams", ...)</code> before dispatching onward.</p>
+<p><code>setInitialValues()</code> is a mizer S3 generic with a
+<code>setInitialValues.MizerParams</code> method. When called with
+<code>object@params</code> — which is an <code>MRMizerParams</code> — S3
+dispatch falls through to <code>setInitialValues.MizerParams</code> via
+inheritance. That method only modifies existing slots in-place via
+<code>params@slot[] &lt;- ...</code> and returns <code>params</code>.
+Because S4 slot assignment preserves the class of the object, the
+returned value is still an <code>MRMizerParams</code>. The subsequent
+call to <code>plotSpectra(params, ...)</code> therefore dispatches
+correctly to <code>plotSpectra.MRMizerParams</code> without any manual
+re-wrapping.</p>
 </div>
 </div>
 <div class="section level2">

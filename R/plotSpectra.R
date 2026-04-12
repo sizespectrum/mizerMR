@@ -43,9 +43,9 @@
 #' @family plotting functions
 #' @seealso [plotting_functions]
 plotSpectra.MRMizerSim <- function(object, ...) {
-    # Set initial values from the final time step and dispatch to the params
-    # method, which contains all the MR-aware logic.
-    params <- new("MRMizerParams", setInitialValues(object@params, object))
+    # setInitialValues preserves the MRMizerParams subclass, so the result
+    # dispatches directly to plotSpectra.MRMizerParams.
+    params <- setInitialValues(object@params, object)
     plotSpectra(params, ...)
 }
 

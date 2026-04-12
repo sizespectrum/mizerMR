@@ -22,8 +22,8 @@
 #' }
 plotResourcePred <- function(object, proportion = TRUE, return_data = FALSE) {
     if (is(object, "MizerSim")) {
+        # setInitialValues preserves the MRMizerParams subclass on object@params
         params <- setInitialValues(object@params, object)
-        if (is(object, "MRMizerSim")) params <- new("MRMizerParams", params)
     } else if (is(object, "MizerParams")) {
         params <- validParams(object)
     }
@@ -123,8 +123,8 @@ plotlyResourcePred <- function(object, proportion = TRUE, ...) {
 #' }
 plotResourceLevel <- function(object, return_data = FALSE) {
     if (is(object, "MizerSim")) {
+        # setInitialValues preserves the MRMizerParams subclass on object@params
         params <- setInitialValues(object@params, object)
-        if (is(object, "MRMizerSim")) params <- new("MRMizerParams", params)
     } else if (is(object, "MizerParams")) {
         params <- validParams(object)
     }
