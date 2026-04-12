@@ -32,6 +32,12 @@ resource_params.MRMizerParams <- function(params) {
     setMultipleResources(params, resource_params = value)
 }
 
+#' @rdname resource_params.MRMizerParams
+#' @export
+`resource_params<-.MizerParams` <- function(params, value) {
+    setMultipleResources(params, resource_params = value)
+}
+
 #' Validate resource parameter data frame
 #'
 #' Check validity of resource parameters and set defaults for missing but

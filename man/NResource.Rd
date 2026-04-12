@@ -3,23 +3,12 @@
 \name{NResource}
 \alias{NResource}
 \alias{NResource.MRMizerSim}
-\alias{NResource.default}
-\alias{finalNResource}
 \alias{finalNResource.MRMizerSim}
-\alias{finalNResource.default}
 \title{Access resource abundances in simulation result}
 \usage{
-NResource(sim, ...)
-
 \method{NResource}{MRMizerSim}(sim, ...)
 
-\method{NResource}{default}(sim, ...)
-
-finalNResource(sim, ...)
-
 \method{finalNResource}{MRMizerSim}(sim, ...)
-
-\method{finalNResource}{default}(sim, ...)
 }
 \arguments{
 \item{sim}{A MizerSim object}

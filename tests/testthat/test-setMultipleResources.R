@@ -5,7 +5,9 @@ test_that("Can reproduce single resource behaviour", {
                      dim = c(1, length(NS_params@w_full)))
     params <- setMultipleResources(NS_params, resource_params = rp,
                                    initial_resource = initial)
-    expect_identical(getEncounter(params), getEncounter(NS_params))
+    enc1 <- getEncounter(params); attr(enc1, "params") <- NULL
+    enc2 <- getEncounter(NS_params); attr(enc2, "params") <- NULL
+    expect_equal(enc1, enc2)
     expect_identical(getResourceMort(params)[1, ], getResourceMort(NS_params))
     sim <- project(params, t_max = 10, dt = 1)
     simo <- project(NS_params, t_max = 10, dt = 1)
@@ -29,7 +31,9 @@ test_that("Works with two identical resources", {
                                    initial_resource = initial)
     expect_identical(params@initial_n_other[["MR"]][1, ],
                      NS_params@initial_n_pp / 2)
-    expect_identical(getEncounter(params), getEncounter(NS_params))
+    enc1 <- getEncounter(params); attr(enc1, "params") <- NULL
+    enc2 <- getEncounter(NS_params); attr(enc2, "params") <- NULL
+    expect_equal(enc1, enc2)
     expect_identical(getResourceMort(params)[1, ], getResourceMort(NS_params))
     sim <- project(params, t_max = 10)
     simo <- project(NS_params, t_max = 10)

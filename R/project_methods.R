@@ -14,6 +14,20 @@ project.MRMizerParams <- function(params, ...) {
     new("MRMizerSim", sim)
 }
 
+#' @rdname setMultipleResources
+#' @export
+getEncounter.MRMizerParams <- function(params, n = initialN(params),
+                                       n_pp = params@initial_n_pp,
+                                       n_other = initialNOther(params),
+                                       t = 0, ...) {
+    # Always pass params@initial_n_pp (the zeroed built-in resource) as n_pp,
+    # even if the caller passed initialNResource(params) (which for MRMizerParams
+    # returns the MR matrix and would fail mizer's length assertion).
+    getEncounter(as(params, "MizerParams"),
+                 n = n, n_pp = params@initial_n_pp,
+                 n_other = n_other, t = t, ...)
+}
+
 #' @export
 mizerMREncounter <- function(params, n, n_pp, n_other, ...) {
     idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)

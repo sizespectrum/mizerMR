@@ -103,25 +103,27 @@ entire encounter calculation has been replaced.
 
 ## `mizerMRResourceMort`
 
-Registered with:
+`mizerMRResourceMort` is **not** registered via `setRateFunction`. mizer now
+validates that a `ResourceMort` replacement returns a vector of exactly
+`no_w_full` values, but our function returns a matrix `(resource × size)` — one
+mortality row per resource. Registering it would therefore cause an error at
+startup.
+
+Instead, per-resource mortality is computed directly inside `mizerMR_dynamics()`
+from `rates$pred_rate` (which is in scope because it has already been calculated
+by the time the dynamics function runs):
 
 ```r
-params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
-```
-
-mizer's default `ResourceMort` returns a single vector (one value per size bin)
-representing mortality on `n_pp`. The replacement returns a matrix
-`(resource × size)` by multiplying the predation rate matrix by the
-species–resource interaction:
-
-```r
-mizerMRResourceMort <- function(params, n, n_pp, n_other, t, pred_rate, ...) {
-    t(params@other_params[["MR"]]$interaction) %*% pred_rate
+interaction <- params@other_params[["MR"]]$interaction  # (no_sp × no_res)
+resource_mort <- t(interaction) %*% rates$pred_rate     # (no_res × no_w_full)
+for (i in seq_len(no_res)) {
+    rates_mod$resource_mort <- resource_mort[i, ]
+    ...
 }
 ```
 
-This matrix is later passed row-by-row to each per-resource dynamics function
-inside `mizerMR_dynamics()`.
+`mizerMRResourceMort` is still exported and callable directly; it is used by
+`getResourceMort.MRMizerParams` to expose per-resource mortalities to users.
 
 ## The built-in single resource is silenced
 
@@ -205,7 +207,10 @@ The full set of S3 methods defined by mizerMR is:
 | Generic | Method class | Defined in |
 |---|---|---|
 | `project` | `MRMizerParams` | `project_methods.R` |
+| `getEncounter` | `MRMizerParams` | `project_methods.R` |
+| `getResourceMort` | `MRMizerParams` | `resource_dynamics.R` |
 | `resource_params`, `resource_params<-` | `MRMizerParams` | `resource_params.R` |
+| `resource_params<-` | `MizerParams` | `resource_params.R` |
 | `resource_capacity`, `resource_capacity<-` | `MRMizerParams` | `setMultipleResources.R` |
 | `resource_rate`, `resource_rate<-` | `MRMizerParams` | `setMultipleResources.R` |
 | `resource_interaction`, `resource_interaction<-` | `MRMizerParams` | `setMultipleResources.R` |
@@ -218,6 +223,46 @@ The full set of S3 methods defined by mizerMR is:
 | `animateSpectra` | `MRMizerSim` | `animateSpectra.R` |
 | `plotResourceLevel` | `MRMizerParams`, `MizerParams` | `plotResource.R` |
 | `plotResourcePred` | `MRMizerParams`, `MizerParams` | `plotResource.R` |
+
+## `getEncounter.MRMizerParams` and the `initialNResource` conflict
+
+`initialNResource.MRMizerParams` returns the MR resource array — the
+`(resource × size)` matrix stored in the `"MR"` component. This is the natural
+user-facing meaning: "what are the initial resource abundances?"
+
+However, mizer's internal functions (`getFeedingLevel`, `getPredRate`, …) all use
+`n_pp = initialNResource(params)` as their default for the built-in plankton
+resource. When `params` is an `MRMizerParams`, S3 dispatch gives them the MR
+matrix instead of the scalar `0` stored in `params@initial_n_pp`. mizer then
+asserts `length(n_pp) == length(params@initial_n_pp)`, which fails because the
+MR matrix has `no_res × no_w_full` elements rather than `no_w_full`.
+
+The fix is `getEncounter.MRMizerParams`, which sits at the top of the call chain
+and substitutes the correct value before dispatching to mizer's implementation:
+
+```r
+getEncounter.MRMizerParams <- function(params, n = initialN(params),
+                                       n_pp = params@initial_n_pp,
+                                       n_other = initialNOther(params),
+                                       t = 0, ...) {
+    getEncounter(as(params, "MizerParams"),
+                 n = n, n_pp = params@initial_n_pp,
+                 n_other = n_other, t = t, ...)
+}
+```
+
+Two details worth noting:
+
+- The body uses `params@initial_n_pp` directly rather than the `n_pp` formal.
+  This is intentional: mizer's `getFeedingLevel` calls
+  `getEncounter(params, n_pp = initialNResource(params), ...)`, which binds
+  `n_pp` to the MR matrix. By ignoring the formal and reading the slot directly,
+  we ensure the scalar `0` is always passed — regardless of what the caller
+  supplied.
+- We use `as(params, "MizerParams")` (not `NextMethod()`) for the same reason
+  described in the `plotSpectra` section below: the registered encounter function
+  is `mizerMREncounter`, not `mizerEncounter`, so `getEncounter.MizerParams`
+  already calls the MR-aware function automatically.
 
 ## Calling mizer's method as a subroutine from `plotSpectra.MRMizerParams`
 
@@ -282,4 +327,4 @@ object, the returned value is still an `MRMizerParams`. The subsequent call to
 | Fallback to mizer | Explicit `mizer::foo()` call inside the guard | Automatic — non-MR objects dispatch to mizer |
 | Extensibility | Third-party code must call `mizerMR::foo()` explicitly | Standard R generics work transparently |
 | Correctness risk | Guard condition must be kept consistent everywhere | Enforced by class membership |
-| Bugs fixed | `plotResourcePred`/`plotResourceLevel` used wrong `other_params` path | Replaced by proper accessor functions |
+| Bugs fixed | `plotResourcePred`/`plotResourceLevel` used wrong `other_params` path; `mizerMRResourceMort` registered as `ResourceMort` returned wrong shape; `initialNResource` conflict broke `getEncounter` chain | Replaced by proper accessor functions; mortality computed in `mizerMR_dynamics`; `getEncounter.MRMizerParams` intercepts the call |

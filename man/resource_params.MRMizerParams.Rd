@@ -3,11 +3,14 @@
 \name{resource_params.MRMizerParams}
 \alias{resource_params.MRMizerParams}
 \alias{resource_params<-.MRMizerParams}
+\alias{resource_params<-.MizerParams}
 \title{Resource parameters}
 \usage{
 \method{resource_params}{MRMizerParams}(params)
 
 \method{resource_params}{MRMizerParams}(params) <- value
+
+\method{resource_params}{MizerParams}(params) <- value
 }
 \arguments{
 \item{params}{A MizerParams object}

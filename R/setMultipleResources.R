@@ -38,10 +38,6 @@ setMultipleResources <- function(params,
         # and keep it zero
         resource_dynamics(params) <- "resource_constant"
 
-        # Encounter and mortality will now come from "MR" slot in n_other
-        params <- setRateFunction(params, "Encounter", "mizerMREncounter")
-        params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
-
         # make empty parameters
         w_names <- names(mizer::initialNResource(params))
         r_names <- as.list(rp$resource)
@@ -60,6 +56,15 @@ setMultipleResources <- function(params,
             component_params = list(rate = template,
                                     capacity = template,
                                     interaction = interaction_default))
+
+        # Register rate function only after the MR component is in place so
+        # that mizer's validation call to it finds a populated
+        # params@other_params[["MR"]]$interaction matrix.
+        params <- setRateFunction(params, "Encounter", "mizerMREncounter")
+        # ResourceMort is NOT registered via setRateFunction because mizer
+        # validates that it returns a vector of length no_w_full, but our
+        # mizerMRResourceMort returns a matrix (no_res x no_w_full). Instead,
+        # per-resource mortality is computed directly inside mizerMR_dynamics.
     }
 
     resource_capacity <-
