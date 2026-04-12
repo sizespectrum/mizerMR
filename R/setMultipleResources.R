@@ -84,73 +84,70 @@ setMultipleResources <- function(params,
     params <- setLinetypes(params, linetypes)
 
     other_params(params)[["MR"]]$resource_params <- rp
-    setComponent(
+    params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
         dynamics_fun =  "mizerMR_dynamics",
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
                                 interaction = resource_interaction))
+    new("MRMizerParams", params)
 }
 
 #' @rdname setMultipleResources
 #' @export
-`resource_capacity` <- function(params) {
-    mr <- getComponent(params, "MR")
-    if (is.null(mr)) {
-        return(mizer::resource_capacity(params))
-    }
-    mr$component_params$capacity
+resource_capacity.MRMizerParams <- function(params) {
+    getComponent(params, "MR")$component_params$capacity
 }
 
 #' @rdname setMultipleResources
 #' @param value Value to assign
 #' @export
-`resource_capacity<-` <- function(params, value) {
+`resource_capacity<-.MRMizerParams` <- function(params, value) {
     setMultipleResources(params, resource_capacity = value)
 }
 
 #' @rdname setMultipleResources
 #' @export
-`resource_rate` <- function(params) {
-    mr <- getComponent(params, "MR")
-    if (is.null(mr)) {
-        return(mizer::resource_rate(params))
-    }
-    mr$component_params$rate
+resource_rate.MRMizerParams <- function(params) {
+    getComponent(params, "MR")$component_params$rate
 }
 
 #' @rdname setMultipleResources
 #' @export
-`resource_rate<-` <- function(params, value) {
+`resource_rate<-.MRMizerParams` <- function(params, value) {
     setMultipleResources(params, resource_rate = value)
 }
 
 #' @rdname setMultipleResources
 #' @export
-`resource_interaction` <- function(params) {
+resource_interaction <- function(params, ...) UseMethod("resource_interaction")
+
+#' @rdname setMultipleResources
+#' @export
+resource_interaction.MRMizerParams <- function(params, ...) {
     getComponent(params, "MR")$component_params$interaction
 }
 
 #' @rdname setMultipleResources
 #' @export
-`resource_interaction<-` <- function(params, value) {
+`resource_interaction<-` <- function(params, value) UseMethod("resource_interaction<-")
+
+#' @rdname setMultipleResources
+#' @export
+`resource_interaction<-.MRMizerParams` <- function(params, value) {
     setMultipleResources(params, resource_interaction = value)
 }
 
 #' @rdname setMultipleResources
 #' @export
-`initialNResource` <- function(params) {
-    mr <- getComponent(params, "MR")
-    if (is.null(mr)) {
-        return(mizer::initialNResource(params))
-    }
-    mr$initial_value
+initialNResource.MRMizerParams <- function(params) {
+    getComponent(params, "MR")$initial_value
 }
 
 #' @rdname setMultipleResources
 #' @export
-`initialNResource<-` <- function(params, value) {
+`initialNResource<-.MRMizerParams` <- function(params, value) {
     setMultipleResources(params, initial_resource = value)
 }
 

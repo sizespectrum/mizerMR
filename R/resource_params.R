@@ -20,18 +20,14 @@
 #' @export
 #' @seealso [validResourceParams()]
 #' @family functions for setting parameters
-resource_params <- function(params) {
-    op <- other_params(params)[["MR"]]
-    if (is.null(op)) {
-        return(mizer::resource_params(params))
-    }
-    op$resource_params
+resource_params.MRMizerParams <- function(params) {
+    other_params(params)[["MR"]]$resource_params
 }
 
-#' @rdname resource_params
+#' @rdname resource_params.MRMizerParams
 #' @param value A data frame with the resource parameters
 #' @export
-`resource_params<-` <- function(params, value) {
+`resource_params<-.MRMizerParams` <- function(params, value) {
     value <- validResourceParams(value, min_w = w_full(params)[[1]])
     setMultipleResources(params, resource_params = value)
 }

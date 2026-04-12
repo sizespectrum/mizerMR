@@ -2,10 +2,16 @@
 % Please edit documentation in R/plotResource.R
 \name{plotResourceLevel}
 \alias{plotResourceLevel}
+\alias{plotResourceLevel.MRMizerParams}
+\alias{plotResourceLevel.MizerParams}
 \title{Plot the proportion of the resource spectrum(s) compared to
 their carrying capacity}
 \usage{
 plotResourceLevel(object, return_data = FALSE)
+
+\method{plotResourceLevel}{MRMizerParams}(object, return_data = FALSE, ...)
+
+\method{plotResourceLevel}{MizerParams}(object, return_data = FALSE, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerSim} or
@@ -13,6 +19,8 @@ plotResourceLevel(object, return_data = FALSE)
 
 \item{return_data}{A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE}
+
+\item{...}{Other arguments (currently unused)}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
@@ -32,12 +40,12 @@ str(fr)
 }
 }
 \seealso{
-\link{plotting_functions}
+\link[mizer:plotting_functions]{mizer::plotting_functions}
 
 Other plotting functions: 
-\code{\link{animateSpectra}()},
-\code{\link{plotDiet}()},
+\code{\link{animateSpectra.MRMizerSim}()},
+\code{\link{plotDiet.MRMizerSim}()},
 \code{\link{plotResourcePred}()},
-\code{\link{plotSpectra}()}
+\code{\link{plotSpectra.MRMizerSim}()}
 }
 \concept{plotting functions}

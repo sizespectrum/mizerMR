@@ -22,24 +22,27 @@ library(mizerMR)
 # Overview
 
 This vignette is aimed at developers who want to understand how mizerMR is
-built on top of mizer's extension machinery, and how a future refactor could
-make the package cleaner by also adopting S3 subclassing. It assumes you have
-read `vignette("extensions", package = "mizer")`.
+built on top of mizer's extension machinery. It assumes you have read
+`vignette("extensions", package = "mizer")`.
 
-mizer offers five main routes for extending a model. mizerMR currently uses
-three of them — `setComponent()`, `setRateFunction()`, and `other_params()` —
-and does *not* yet use S3 subclassing. The second half of this vignette argues
-that adopting S3 subclassing would remove a class of fragility from the current
-code.
+mizerMR uses four of the five extension routes described there:
 
-# How mizerMR currently works
+1. **`setComponent()`** — the multiple resources are stored as a single
+   dynamical component named `"MR"`.
+2. **`setRateFunction()`** — encounter and resource-mortality rates are
+   replaced with MR-aware versions.
+3. **`other_params()`** — resource-level parameters (kappa, lambda, …) are
+   stored alongside the component parameters.
+4. **S3 subclassing** — `MRMizerParams` and `MRMizerSim` subclasses trigger
+   automatic dispatch to mizerMR methods for plotting, accessors, and
+   projection.
 
-## The resource state lives in a `setComponent()` component
+# The resource state lives in a `setComponent()` component
 
-The multiple resources are stored as a single dynamical component named `"MR"`.
-The component state is an array of dimensions `(resource × size)` holding the
-number density of each resource at each size on mizer's full size grid.
-`setMultipleResources()` registers this component:
+The multiple resources are stored as a single dynamical component named
+`"MR"`. The component state is an array of dimensions `(resource × size)`
+holding the number density of each resource at each size on mizer's full size
+grid. `setMultipleResources()` registers this component:
 
 ```r
 params <- setComponent(
@@ -63,13 +66,25 @@ computed earlier in the rate pipeline.
 The component state at every saved time step ends up in `sim@n_other[, "MR"]`
 and is exposed to users via `NResource(sim)` and `finalNResource(sim)`.
 
-## Two rate functions replace the defaults
+## Where parameters are stored
 
-The built-in mizer encounter and resource-mortality rate functions work with a
-single `n_pp` vector. mizerMR replaces both with versions that understand the
-multi-resource array.
+Per-resource scalar parameters (kappa, lambda, r_pp, w_min, w_max) are stored
+as a data frame at `other_params(params)[["MR"]]$resource_params`. The
+per-size arrays derived from those parameters live inside the component's own
+`component_params`, which mizer stores under the same `other_params[["MR"]]`
+key:
 
-### `mizerMREncounter`
+```
+params@other_params[["MR"]]
+  ├── resource_params  # data frame (resource × columns)
+  ├── rate             # array (resource × size)
+  ├── capacity         # array (resource × size)
+  └── interaction      # matrix (species × resource)
+```
+
+# Two rate functions replace the defaults
+
+## `mizerMREncounter`
 
 Registered with:
 
@@ -80,23 +95,13 @@ params <- setRateFunction(params, "Encounter", "mizerMREncounter")
 Instead of convolving the predation kernel against a single `n_pp`, it first
 multiplies the multi-resource state array by the species–resource interaction
 matrix to form a weighted prey field, adds the fish-to-fish contribution, and
-then runs the FFT-based convolution against the combined field.
+then runs the FFT-based convolution against the combined field. It also loops
+over `params@other_encounter` to include encounter contributions from any
+additional registered components — replicating work that the default
+`mizerEncounter()` would otherwise do, but which no longer runs because the
+entire encounter calculation has been replaced.
 
-```r
-mizerMREncounter <- function(params, n, n_pp, n_other, ...) {
-    prey <- params@other_params[["MR"]]$interaction %*% n_other[["MR"]]
-    prey[, idx_sp] <- prey[, idx_sp] + params@interaction %*% n
-    # ... FFT convolution against prey ...
-}
-```
-
-It also manually loops over `params@other_encounter` to include any additional
-encounter contributions from other registered components, replicating what
-mizer's built-in `mizerEncounter()` does. This is necessary because
-`setRateFunction()` replaces the entire encounter calculation, so the standard
-looping code no longer runs.
-
-### `mizerMRResourceMort`
+## `mizerMRResourceMort`
 
 Registered with:
 
@@ -120,92 +125,69 @@ inside `mizerMR_dynamics()`.
 
 ## The built-in single resource is silenced
 
-Because all resource dynamics are now handled by the "MR" component, the
-built-in mizer resource must not interfere. `setMultipleResources()` does two
-things to achieve this:
-
 ```r
 mizer::initialNResource(params) <- 0         # abundance set to zero
 resource_dynamics(params) <- "resource_constant"  # kept at zero forever
 ```
 
-## Resource parameters live in two places
+# S3 subclassing for automatic dispatch
 
-Resource-level parameters (kappa, lambda, r_pp, w_min, w_max) are stored as a
-data frame in `other_params(params)[["MR"]]$resource_params`. The per-size
-arrays derived from those parameters (carrying capacity and replenishment rate)
-live inside the component's own `component_params`. This split reflects the
-two-level structure recommended by mizer: `other_params()` for model-wide
-state, `component_params` for data belonging to a single component.
-
-## Result accessors and plots use manual dispatch
-
-Functions like `NResource()`, `finalNResource()`, `plotSpectra()`, `getDiet()`,
-and `plotDiet()` need to behave differently depending on whether the model has
-multiple resources or not. At present this is handled with an explicit guard
-at the top of each function:
-
-```r
-NResource <- function(sim) {
-    if (is.null(getComponent(getParams(sim), "MR"))) {
-        return(mizer::NResource(sim))   # fall back to mizer
-    }
-    # ... MR-aware implementation ...
-}
-```
-
-This pattern works but has costs: the same `is.null(getComponent(...))` test is
-repeated in every function, the functions shadow mizer's namespace without being
-formal S3 methods, and there is no compile-time guarantee that the two branches
-stay consistent with each other.
-
-# How S3 subclassing could improve the package
-
-mizer's S4 classes (`MizerParams`, `MizerSim`) are dispatched via S3 for all
-user-facing functions. That means an extension package can define S4 subclasses
-and write S3 methods for them, and mizer's generic machinery will dispatch to
-those methods automatically — no manual `if` guards required.
-
-Here is a sketch of what the refactor would look like.
-
-## Define the subclasses
+mizerMR defines two formal S4 subclasses so that R's S3 dispatch routes
+calls to the right method without any manual `if` guards:
 
 ```r
 setClass("MRMizerParams", contains = "MizerParams")
 setClass("MRMizerSim",    contains = "MizerSim")
 ```
 
-`setMultipleResources()` would coerce its return value to `MRMizerParams`:
+## `setMultipleResources()` returns `MRMizerParams`
+
+The last action of `setMultipleResources()` is:
 
 ```r
-setMultipleResources <- function(params, ...) {
-    # ... existing setup code ...
-    new("MRMizerParams", params)
+new("MRMizerParams", params)
+```
+
+Because `MRMizerParams` inherits all slots from `MizerParams` and adds none of
+its own, this is a zero-cost wrapping step. Every existing mizer function that
+accepts a `MizerParams` object continues to work on `MRMizerParams` without
+any changes.
+
+## `project.MRMizerParams` returns `MRMizerSim`
+
+```r
+project.MRMizerParams <- function(params, ...) {
+    sim <- NextMethod()       # calls mizer's project()
+    new("MRMizerSim", sim)   # wraps the result
 }
 ```
 
-Because `MRMizerParams` inherits from `MizerParams`, every existing mizer
-function that accepts a `MizerParams` object continues to work without any
-changes.
+This ensures that every simulation started from an `MRMizerParams` is
+automatically an `MRMizerSim`, so the correct downstream methods fire without
+the user doing anything special.
 
-## Dispatch plot and accessor functions automatically
+## S3 methods replace manual `if` guards
 
-Instead of the current:
+Before this refactor, every accessor and plot function contained an explicit
+check:
 
 ```r
-NResource <- function(sim) {
-    if (is.null(getComponent(getParams(sim), "MR"))) {
-        return(mizer::NResource(sim))
-    }
-    # MR-aware code ...
+if (is.null(getComponent(params, "MR"))) {
+    return(mizer::foo(params, ...))   # fall back to mizer
 }
+# ... MR-aware implementation ...
 ```
 
-the package would define:
+The same check was repeated in every function, the functions shadowed mizer's
+namespace without being formal S3 methods, and there was no guarantee that the
+two branches stayed consistent.
+
+After the refactor each function is split into a method pair. For example,
+`NResource`:
 
 ```r
+# MR-aware method — no guard needed, called only when sim is MRMizerSim
 NResource.MRMizerSim <- function(sim) {
-    # MR-aware code only — no guard needed
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
     dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
     names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
@@ -215,38 +197,69 @@ NResource.MRMizerSim <- function(sim) {
 
 When a user calls `NResource(sim)` and `sim` is an `MRMizerSim`, R dispatches
 to `NResource.MRMizerSim`. When `sim` is a plain `MizerSim` (no multiple
-resources), R dispatches to mizer's own `NResource.MizerSim`. No package-level
-override is needed, and the two branches are cleanly separated.
+resources), R dispatches to mizer's own method. No package-level override is
+needed and the two branches are cleanly separated.
 
-The same pattern applies to `finalNResource`, `plotSpectra`, `getDiet`,
-`plotDiet`, and `animateSpectra`.
+The full set of S3 methods defined by mizerMR is:
 
-## `project()` returns the right subclass
+| Generic | Method class | Defined in |
+|---|---|---|
+| `project` | `MRMizerParams` | `project_methods.R` |
+| `resource_params`, `resource_params<-` | `MRMizerParams` | `resource_params.R` |
+| `resource_capacity`, `resource_capacity<-` | `MRMizerParams` | `setMultipleResources.R` |
+| `resource_rate`, `resource_rate<-` | `MRMizerParams` | `setMultipleResources.R` |
+| `resource_interaction`, `resource_interaction<-` | `MRMizerParams` | `setMultipleResources.R` |
+| `initialNResource`, `initialNResource<-` | `MRMizerParams` | `setMultipleResources.R` |
+| `NResource` | `MRMizerSim` | `NResource.R` |
+| `finalNResource` | `MRMizerSim` | `NResource.R` |
+| `getDiet` | `MRMizerParams` | `diet.R` |
+| `plotDiet` | `MRMizerParams`, `MRMizerSim` | `diet.R` |
+| `plotSpectra` | `MRMizerParams`, `MRMizerSim` | `plotSpectra.R` |
+| `animateSpectra` | `MRMizerSim` | `animateSpectra.R` |
+| `plotResourceLevel` | `MRMizerParams`, `MizerParams` | `plotResource.R` |
+| `plotResourcePred` | `MRMizerParams`, `MizerParams` | `plotResource.R` |
 
-One extra step is needed: `project()` returns a `MizerSim`, not an
-`MRMizerSim`. The simplest fix is an S3 method for `project`:
+## Avoiding dispatch loops when calling mizer's own functions
+
+Several mizerMR methods (e.g. `plotSpectra.MRMizerParams`) need to call mizer's
+version of the same generic to get species-only data. Calling
+`mizer::plotSpectra(params, ...)` with `params` still being an `MRMizerParams`
+would loop back to our method because `mizer::plotSpectra` is itself just the
+S3 generic. The solution is to downcast `params` before the call:
 
 ```r
-project.MRMizerParams <- function(params, ...) {
-    sim <- NextMethod()          # call mizer's project()
-    new("MRMizerSim", sim)       # wrap the result
+df <- mizer::plotSpectra(as(params, "MizerParams"),
+                         resource = FALSE, return_data = TRUE, ...)
+```
+
+`as(params, "MizerParams")` strips the subclass, so mizer's
+`plotSpectra.MizerParams` is dispatched rather than ours.
+
+## `MRMizerSim` plot methods delegate to the params method
+
+When a plot function is called with a simulation object, it needs to collapse
+the time-averaged abundances back into an `MRMizerParams`. The `MRMizerSim`
+methods do this uniformly:
+
+```r
+plotSpectra.MRMizerSim <- function(object, ...) {
+    params <- new("MRMizerParams", setInitialValues(object@params, object))
+    plotSpectra(params, ...)
 }
 ```
 
-This ensures that every simulation result from an `MRMizerParams` is
-automatically an `MRMizerSim`, so the correct `NResource`, `plotSpectra`,
-etc. methods fire without the user having to do anything special.
+`setInitialValues()` is a mizer function that copies the final (or
+time-averaged) abundances into the initial-value slots of the params. It
+returns a plain `MizerParams`, so we re-wrap with `new("MRMizerParams", ...)`
+before dispatching onward.
 
-## Summary of benefits
+# Summary of benefits
 
-| Aspect | Current approach | With S3 subclassing |
+| Aspect | Before | After |
 |---|---|---|
 | Dispatch logic | `is.null(getComponent(...))` guard in every function | R method dispatch — no guards |
-| Namespace | Functions shadow mizer's generics | Proper S3 methods alongside mizer's |
-| Fallback to mizer | Explicit `mizer::foo()` call inside the guard | Automatic via `NextMethod()` or non-dispatch |
-| Extensibility | Third-party code must know to call `mizerMR::foo()` | Standard R generics — works transparently |
-| Correctness risk | Must keep guard condition consistent everywhere | Enforced by class membership |
-
-The extension mechanism in mizer is designed with this kind of layering in
-mind. Adopting S3 subclassing would align mizerMR more closely with that
-design intent and make the codebase easier to maintain and extend.
+| Namespace | Functions shadowed mizer's generics | Proper S3 methods alongside mizer's |
+| Fallback to mizer | Explicit `mizer::foo()` call inside the guard | Automatic — non-MR objects dispatch to mizer |
+| Extensibility | Third-party code must call `mizerMR::foo()` explicitly | Standard R generics work transparently |
+| Correctness risk | Guard condition must be kept consistent everywhere | Enforced by class membership |
+| Bugs fixed | `plotResourcePred`/`plotResourceLevel` used wrong `other_params` path | Replaced by proper accessor functions |

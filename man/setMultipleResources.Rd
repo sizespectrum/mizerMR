@@ -2,14 +2,16 @@
 % Please edit documentation in R/setMultipleResources.R
 \name{setMultipleResources}
 \alias{setMultipleResources}
-\alias{resource_capacity}
-\alias{resource_capacity<-}
-\alias{resource_rate}
-\alias{resource_rate<-}
+\alias{resource_capacity.MRMizerParams}
+\alias{resource_capacity<-.MRMizerParams}
+\alias{resource_rate.MRMizerParams}
+\alias{resource_rate<-.MRMizerParams}
 \alias{resource_interaction}
+\alias{resource_interaction.MRMizerParams}
 \alias{resource_interaction<-}
-\alias{initialNResource}
-\alias{initialNResource<-}
+\alias{resource_interaction<-.MRMizerParams}
+\alias{initialNResource.MRMizerParams}
+\alias{initialNResource<-.MRMizerParams}
 \title{Set up multiple resources}
 \usage{
 setMultipleResources(
@@ -21,21 +23,25 @@ setMultipleResources(
   initial_resource = NULL
 )
 
-resource_capacity(params)
+\method{resource_capacity}{MRMizerParams}(params)
 
-resource_capacity(params) <- value
+\method{resource_capacity}{MRMizerParams}(params) <- value
 
-resource_rate(params)
+\method{resource_rate}{MRMizerParams}(params)
 
-resource_rate(params) <- value
+\method{resource_rate}{MRMizerParams}(params) <- value
 
-resource_interaction(params)
+resource_interaction(params, ...)
+
+\method{resource_interaction}{MRMizerParams}(params, ...)
 
 resource_interaction(params) <- value
 
-initialNResource(params)
+\method{resource_interaction}{MRMizerParams}(params) <- value
 
-initialNResource(params) <- value
+\method{initialNResource}{MRMizerParams}(params)
+
+\method{initialNResource}{MRMizerParams}(params) <- value
 }
 \arguments{
 \item{params}{A MizerParams object}

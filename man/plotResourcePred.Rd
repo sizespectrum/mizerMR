@@ -2,11 +2,16 @@
 % Please edit documentation in R/plotResource.R
 \name{plotResourcePred}
 \alias{plotResourcePred}
+\alias{plotResourcePred.MRMizerParams}
+\alias{plotResourcePred.MizerParams}
 \alias{plotlyResourcePred}
-\title{Plot functions regarding the resources. Compatible with non mizerMR objects
-Plot the mortality applied on the resource spectrum(s)}
+\title{Plot the mortality applied on the resource spectrum(s)}
 \usage{
 plotResourcePred(object, proportion = TRUE, return_data = FALSE)
+
+\method{plotResourcePred}{MRMizerParams}(object, proportion = TRUE, return_data = FALSE, ...)
+
+\method{plotResourcePred}{MizerParams}(object, proportion = TRUE, return_data = FALSE, ...)
 
 plotlyResourcePred(object, proportion = TRUE, ...)
 }
@@ -27,7 +32,6 @@ A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
 frame with the four variables 'w', 'value', 'Predator', 'Resource' is returned.
 }
 \description{
-Plot functions regarding the resources. Compatible with non mizerMR objects
 Plot the mortality applied on the resource spectrum(s)
 }
 \examples{
@@ -40,12 +44,12 @@ str(fr)
 }
 }
 \seealso{
-\link{plotting_functions}
+\link[mizer:plotting_functions]{mizer::plotting_functions}
 
 Other plotting functions: 
-\code{\link{animateSpectra}()},
-\code{\link{plotDiet}()},
+\code{\link{animateSpectra.MRMizerSim}()},
+\code{\link{plotDiet.MRMizerSim}()},
 \code{\link{plotResourceLevel}()},
-\code{\link{plotSpectra}()}
+\code{\link{plotSpectra.MRMizerSim}()}
 }
 \concept{plotting functions}

@@ -2,15 +2,29 @@
 % Please edit documentation in R/NResource.R
 \name{NResource}
 \alias{NResource}
+\alias{NResource.MRMizerSim}
+\alias{NResource.default}
 \alias{finalNResource}
+\alias{finalNResource.MRMizerSim}
+\alias{finalNResource.default}
 \title{Access resource abundances in simulation result}
 \usage{
-NResource(sim)
+NResource(sim, ...)
 
-finalNResource(sim)
+\method{NResource}{MRMizerSim}(sim, ...)
+
+\method{NResource}{default}(sim, ...)
+
+finalNResource(sim, ...)
+
+\method{finalNResource}{MRMizerSim}(sim, ...)
+
+\method{finalNResource}{default}(sim, ...)
 }
 \arguments{
 \item{sim}{A MizerSim object}
+
+\item{...}{Unused}
 }
 \value{
 For \code{NResource()}: An array (time x resource x size) holding the

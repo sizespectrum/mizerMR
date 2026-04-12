@@ -1,3 +1,19 @@
+#' Project an MRMizerParams model forward in time
+#'
+#' S3 method for [project()] when called with an \linkS4class{MRMizerParams}
+#' object. Delegates all work to mizer's standard `project()` and wraps the
+#' result as an \linkS4class{MRMizerSim} so that mizerMR's accessor and
+#' plotting methods are dispatched automatically on the simulation output.
+#'
+#' @param params An \linkS4class{MRMizerParams} object.
+#' @param ... Further arguments passed to [mizer::project()].
+#' @return An object of class \linkS4class{MRMizerSim}.
+#' @export
+project.MRMizerParams <- function(params, ...) {
+    sim <- NextMethod()
+    new("MRMizerSim", sim)
+}
+
 #' @export
 mizerMREncounter <- function(params, n, n_pp, n_other, ...) {
     idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)

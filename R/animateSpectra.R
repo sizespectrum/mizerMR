@@ -25,46 +25,38 @@
 #' @return A plotly object
 #' @export
 #' @family plotting functions
-animateSpectra <- function(sim,
-                           species = NULL,
-                           resources = NULL,
-                           time_range,
-                           wlim = c(NA, NA),
-                           ylim = c(NA, NA),
-                           power = 1,
-                           total = FALSE) {
-    if (is.null(getComponent(getParams(sim), "MR"))) {
-        return(mizer::animateSpectra(sim = sim, species = species,
-                                     time_range = time_range,
-                                     wlim = wlim, ylim = ylim,
-                                     power = power, total = total,
-                                     resource = TRUE))
-    }
+animateSpectra.MRMizerSim <- function(sim,
+                                      species = NULL,
+                                      resources = NULL,
+                                      time_range,
+                                      wlim = c(NA, NA),
+                                      ylim = c(NA, NA),
+                                      power = 1,
+                                      total = FALSE) {
     species <- valid_species_arg(sim, species)
     resources <- valid_resources_arg(sim, resources)
     if (missing(time_range)) {
         time_range  <- as.numeric(dimnames(sim@n)$time)
     }
     time_elements <- get_time_elements(sim, time_range)
-    nf <- melt(sim@n[time_elements,
+    nf <- reshape2::melt(sim@n[time_elements,
                      as.character(dimnames(sim@n)$sp) %in% species,
                      , drop = FALSE]) %>%
         dplyr::rename(Spectra = sp)
     # Add resource ----
-    nf_res <- melt(NResource(sim)[time_elements,
+    nf_res <- reshape2::melt(NResource(sim)[time_elements,
                      resource_params(sim@params)$resource %in% resources,
                      , drop = FALSE]) %>%
         dplyr::rename(Spectra = resource)
     nf <- rbind(nf, nf_res)
     # Add total ----
     if (total) {
-        # Calculate total community abundance
         fish_idx <- (length(sim@params@w_full) -
                          length(sim@params@w) + 1):length(sim@params@w_full)
         total_n <- apply(NResource(sim), MARGIN = c(1, 3), sum)
         total_n[, fish_idx] <- total_n[, fish_idx] +
             rowSums(aperm(sim@n, c(1, 3, 2)), dims = 2)
-        nf_total <- melt(total_n[time_elements, , drop = FALSE])
+        nf_total <- reshape2::melt(total_n[time_elements, , drop = FALSE])
         nf_total$sp <- "Total"
         nf <- rbind(nf, nf_total)
     }

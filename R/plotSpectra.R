@@ -42,84 +42,72 @@
 #' @export
 #' @family plotting functions
 #' @seealso [plotting_functions]
-plotSpectra <- function(object, species = NULL, resources = NULL,
-                        wlim = c(NA, NA), ylim = c(NA, NA),
-                        power = 1,
-                        total = FALSE,
-                        background = TRUE,
-                        highlight = NULL, return_data = FALSE, ...) {
-    # If called with MizerSim, we want to use the final time step
-    if (is(object, "MizerSim")) {
-        params <- setInitialValues(object@params, object)
-    } else if (is(object, "MizerParams")) {
-        params <- object
-    } else {
-        stop("The first argument must be either a MizerSim or a MizerParams object")
-    }
-    if (is.null(getComponent(params, "MR"))) {
-        return(mizer::plotSpectra(params, species = species,
-                                  wlim = wlim, ylim = ylim,
-                                  power = power, total = total,
-                                  background = background,
-                                  highlight = highlight,
-                                  resource = TRUE,
-                                  return_data = return_data))
-    }
+plotSpectra.MRMizerSim <- function(object, ...) {
+    # Set initial values from the final time step and dispatch to the params
+    # method, which contains all the MR-aware logic.
+    params <- new("MRMizerParams", setInitialValues(object@params, object))
+    plotSpectra(params, ...)
+}
 
-    # set n_pp to total plankton abundance so that the total in mizer's
-    # plotSpectra() gives the right curve
+#' @rdname plotSpectra.MRMizerSim
+#' @export
+plotSpectra.MRMizerParams <- function(object, species = NULL, resources = NULL,
+                                      wlim = c(NA, NA), ylim = c(NA, NA),
+                                      power = 1,
+                                      total = FALSE,
+                                      background = TRUE,
+                                      highlight = NULL,
+                                      return_data = FALSE, ...) {
+    params <- object
+
+    # Set n_pp to total resource abundance so mizer's "total" curve is correct.
     params@initial_n_pp <- colSums(params@initial_n_other[["MR"]])
 
-    df <- mizer::plotSpectra(params, species = species,
-                        time_range = time_range,
-                        wlim = wlim, ylim - ylim,
-                        power = power, total = total,
-                        background = background,
-                        highlight = highlight,
-                        resource = FALSE,
-                        return_data = TRUE) %>%
+    # Fetch species data via mizer. Downcast to MizerParams to prevent
+    # dispatch looping back to this method.
+    df <- mizer::plotSpectra(as(params, "MizerParams"),
+                             species = species,
+                             wlim = wlim, ylim = ylim,
+                             power = power, total = total,
+                             background = background,
+                             highlight = highlight,
+                             resource = FALSE,
+                             return_data = TRUE) %>%
         dplyr::rename(Spectra = Species)
 
-    resources <- valid_resources_arg(params, resources)
+    resources <- valid_resources_arg(object, resources)
 
-    if (is.na(wlim[1])) {
-        wlim[1] <- min(params@w) / 100
-    }
-    if (is.na(wlim[2])) {
-        wlim[2] <- max(params@w_full)
-    }
-    rf <- melt(initialNResource(params)) %>%
-        dplyr::filter(value > 0,
-                      w >= wlim[[1]], w <= wlim[[2]]) %>%
-        dplyr::mutate(Legend = resource) %>%
-        dplyr::rename(Spectra = resource)
+    if (is.na(wlim[1])) wlim[1] <- min(params@w) / 100
+    if (is.na(wlim[2])) wlim[2] <- max(params@w_full)
+
+    rf <- reshape2::melt(initialNResource(object)) %>%
+        dplyr::filter(.data$value > 0,
+                      .data$w >= wlim[[1]], .data$w <= wlim[[2]],
+                      .data$resource %in% resources) %>%
+        dplyr::mutate(Legend = .data$resource) %>%
+        dplyr::rename(Spectra = "resource")
+
     # Impose ylim
-    if (!is.na(ylim[2])) {
-        rf <- rf[rf$value <= ylim[2], ]
-    }
-    if (is.na(ylim[1])) {
-        ylim[1] <- 1e-20
-    }
+    if (!is.na(ylim[2])) rf <- rf[rf$value <= ylim[2], ]
+    if (is.na(ylim[1])) ylim[1] <- 1e-20
     rf <- rf[rf$value > ylim[1], ]
 
-    # Deal with power argument ----
+    # Deal with power argument
     if (power %in% c(0, 1, 2)) {
         y_label <- c("Number density [1/g]", "Biomass density",
                      "Biomass density [g]")[power + 1]
     } else {
         y_label <- paste0("Number density * w^", power)
     }
-    rf <- dplyr::mutate(rf, value = value * w^power)
+    rf <- dplyr::mutate(rf, value = .data$value * .data$w ^ power)
 
     df <- rbind(df, rf)
-    if (return_data) {
-        return(df)
-    }
+    if (return_data) return(df)
     plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
                   ylab = y_label, xlab = "Size [g]")
 }
 
-#' @rdname plotSpectra
+#' @rdname plotSpectra.MRMizerSim
 #' @export
 plotlySpectra <- function(object, species = NULL, resources = NULL,
                           time_range,
