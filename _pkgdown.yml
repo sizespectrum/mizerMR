@@ -23,9 +23,15 @@ template:
 toc:
   depth: 3
 
+articles:
+- title: Articles
+  navbar: Articles
+  contents:
+  - extension-mechanism
+
 navbar:
   structure:
-    left: [intro, reference, news]
+    left: [intro, reference, articles, news]
     right: [blog, twitter, github]
   components:
     home: ~
