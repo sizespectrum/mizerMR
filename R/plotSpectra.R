@@ -66,14 +66,8 @@ plotSpectra.MRMizerParams <- function(object, species = NULL, resources = NULL,
 
     # Fetch species data via mizer. Downcast to MizerParams to prevent
     # dispatch looping back to this method.
-    df <- mizer::plotSpectra(as(params, "MizerParams"),
-                             species = species,
-                             wlim = wlim, ylim = ylim,
-                             power = power, total = total,
-                             background = background,
-                             highlight = highlight,
-                             resource = FALSE,
-                             return_data = TRUE) %>%
+    df <- NextMethod(resource = FALSE,
+                     return_data = TRUE) %>%
         dplyr::rename(Spectra = Species)
 
     resources <- valid_resources_arg(object, resources)

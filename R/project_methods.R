@@ -24,9 +24,7 @@ getEncounter.MRMizerParams <- function(params, n = initialN(params),
     # Always pass params@initial_n_pp (the zeroed built-in resource) as n_pp,
     # even if the caller passed initialNResource(params) (which for MRMizerParams
     # returns the MR matrix and would fail mizer's length assertion).
-    getEncounter(as(params, "MizerParams"),
-                 n = n, n_pp = params@initial_n_pp,
-                 n_other = n_other, t = t, ...)
+    NextMethod(n = n, n_pp = params@initial_n_pp, n_other = n_other, t = t)
 }
 
 #' @export
