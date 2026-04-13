@@ -20,11 +20,12 @@
 #' @export
 #' @seealso [validResourceParams()]
 #' @family functions for setting parameters
+#' @name resource_params
 resource_params.MRMizerParams <- function(params) {
     other_params(params)[["MR"]]$resource_params
 }
 
-#' @rdname resource_params.MRMizerParams
+#' @rdname resource_params
 #' @param value A data frame with the resource parameters
 #' @export
 `resource_params<-.MRMizerParams` <- function(params, value) {
@@ -32,7 +33,7 @@ resource_params.MRMizerParams <- function(params) {
     setMultipleResources(params, resource_params = value)
 }
 
-#' @rdname resource_params.MRMizerParams
+#' @rdname resource_params
 #' @export
 `resource_params<-.MizerParams` <- function(params, value) {
     setMultipleResources(params, resource_params = value)

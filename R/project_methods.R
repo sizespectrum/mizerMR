@@ -9,6 +9,7 @@
 #' @param ... Further arguments passed to [mizer::project()].
 #' @return An object of class \linkS4class{MRMizerSim}.
 #' @export
+#' @name project
 project.MRMizerParams <- function(params, ...) {
     sim <- NextMethod()
     new("MRMizerSim", sim)

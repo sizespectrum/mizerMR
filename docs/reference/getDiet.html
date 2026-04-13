@@ -19,7 +19,7 @@ The diet has units of grams/year."><meta property="og:image" content="https://si
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -78,10 +78,11 @@ The diet has units of grams/year.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">getDiet</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'MRMizerParams'</span></span>
+<span><span class="fu">getDiet</span><span class="op">(</span></span>
 <span>  <span class="va">params</span>,</span>
 <span>  n <span class="op">=</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialN-set.html" class="external-link">initialN</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,</span>
-<span>  n_pp <span class="op">=</span> <span class="fu"><a href="setMultipleResources.html">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,</span>
+<span>  n_pp <span class="op">=</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialNResource-set.html" class="external-link">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,</span>
 <span>  n_other <span class="op">=</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialNOther-set.html" class="external-link">initialNOther</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,</span>
 <span>  proportion <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -104,7 +105,8 @@ The diet has units of grams/year.</p>
 
 
 <dt id="arg-n-other">n_other<a class="anchor" aria-label="anchor" href="#arg-n-other"></a></dt>
-<dd><p>A list of abundances for other dynamical components of the</p></dd>
+<dd><p>A list of abundances for other dynamical components of the
+ecosystem.</p></dd>
 
 
 <dt id="arg-proportion">proportion<a class="anchor" aria-label="anchor" href="#arg-proportion"></a></dt>
@@ -136,7 +138,7 @@ defined an encounter rate function. This encounter rate is multiplied by
 \(1-f_i(w)\) to give the rate of consumption of biomass from these extra
 components.</p>
 <p>This function performs the same integration as
-<code><a href="https://sizespectrum.org/mizer/reference/getEncounter.html" class="external-link">getEncounter()</a></code> but does not aggregate over prey species, and
+<code><a href="https://sizespectrum.org/mizer/reference/getEncounter.html" class="external-link">mizer::getEncounter()</a></code> but does not aggregate over prey species, and
 multiplies by \(1-f_i(w)\) to get the consumed biomass rather than the
 available biomass. Outside the range of sizes for a predator species the
 returned rate is zero.</p>
@@ -148,13 +150,10 @@ returned rate is zero.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">diet</span> <span class="op">&lt;-</span> <span class="fu">getDiet</span><span class="op">(</span><span class="va">NS_params</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span><span class="va">diet</span> <span class="op">&lt;-</span> <span class="fu">getDiet</span><span class="op">(</span><span class="va">NS_params</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/str.html" class="external-link">str</a></span><span class="op">(</span><span class="va">diet</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  num [1:12, 1:100, 1:13] 8.94e-18 6.86e-19 3.46e-18 1.75e-09 1.12e-17 ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>  - attr(*, "dimnames")=List of 3</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ predator: chr [1:12] "Sprat" "Sandeel" "N.pout" "Herring" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ w       : chr [1:100] "0.001" "0.00119" "0.00142" "0.0017" ...</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   ..$ prey    : chr [1:13] "Sprat" "Sandeel" "N.pout" "Herring" ...</span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 </code></pre></div>
     </div>
   </div>

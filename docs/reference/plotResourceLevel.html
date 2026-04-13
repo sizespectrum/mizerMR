@@ -18,7 +18,7 @@ their carrying capacity"><meta property="og:image" content="https://sizespectrum
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -76,7 +76,13 @@ their carrying capacity</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotResourceLevel</span><span class="op">(</span><span class="va">object</span>, return_data <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotResourceLevel</span><span class="op">(</span><span class="va">object</span>, return_data <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'MRMizerParams'</span></span>
+<span><span class="fu">plotResourceLevel</span><span class="op">(</span><span class="va">object</span>, return_data <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'MizerParams'</span></span>
+<span><span class="fu">plotResourceLevel</span><span class="op">(</span><span class="va">object</span>, return_data <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -92,6 +98,10 @@ their carrying capacity</p>
 <dd><p>A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE</p></dd>
 
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Other arguments (currently unused)</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -100,7 +110,7 @@ frame with the three variables 'w', 'value', 'Resource' is returned.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><a href="https://sizespectrum.org/mizer/reference/plotting_functions.html" class="external-link">plotting_functions</a></p>
+    <div class="dont-index"><p><a href="https://sizespectrum.org/mizer/reference/plotting_functions.html" class="external-link">mizer::plotting_functions</a></p>
 <p>Other plotting functions:
 <code><a href="animateSpectra.html">animateSpectra()</a></code>,
 <code><a href="plotDiet.html">plotDiet()</a></code>,

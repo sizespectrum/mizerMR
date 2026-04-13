@@ -45,11 +45,20 @@ navbar:
 reference:
 - title: Setting multiple resources
 - contents:
+  - MRMizerParams-class
+  - MRMizerSim-class
   - resource_params
   - setMultipleResources
   - newMRParams
+- title: Modifying the model
+- contents:
+  - addSpecies
+  - removeSpecies
+  - renameSpecies
+  - expandSizeGrid
 - title: Accessing results of simulations
 - contents:
+  - project
   - NResource
   - plotSpectra
   - getDiet

@@ -5,7 +5,7 @@
 \alias{MRMizerSim-class}
 \title{S4 subclass of MizerSim for simulations with multiple resources}
 \description{
-Returned by \code{\link[mizer:project]{mizer::project()}} when called on an \linkS4class{MRMizerParams} object.
+Returned by \code{\link[=project]{project()}} when called on an \linkS4class{MRMizerParams} object.
 Inherits all slots from \linkS4class{MizerSim} and triggers S3 dispatch to
 mizerMR-specific methods for result accessors and plotting.
 }

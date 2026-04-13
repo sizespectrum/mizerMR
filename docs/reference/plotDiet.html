@@ -20,7 +20,7 @@ predator's size. These proportions are obtained with getDiet()."><meta property=
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -80,13 +80,18 @@ predator's size. These proportions are obtained with <code><a href="getDiet.html
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotDiet</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'MRMizerSim'</span></span>
+<span><span class="fu">plotDiet</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">time_range</span>,</span>
 <span>  wlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">NA</span><span class="op">)</span>,</span>
-<span>  return_data <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  return_data <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'MRMizerParams'</span></span>
+<span><span class="fu">plotDiet</span><span class="op">(</span><span class="va">object</span>, species <span class="op">=</span> <span class="cn">NULL</span>, wlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">NA</span><span class="op">)</span>, return_data <span class="op">=</span> <span class="cn">FALSE</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">plotlyDiet</span><span class="op">(</span><span class="va">object</span>, species <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">time_range</span>, wlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="cn">NA</span><span class="op">)</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>

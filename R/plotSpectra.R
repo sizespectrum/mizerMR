@@ -42,6 +42,7 @@
 #' @export
 #' @family plotting functions
 #' @seealso [plotting_functions]
+#' @name plotSpectra
 plotSpectra.MRMizerSim <- function(object, ...) {
     # setInitialValues preserves the MRMizerParams subclass, so the result
     # dispatches directly to plotSpectra.MRMizerParams.
@@ -49,7 +50,7 @@ plotSpectra.MRMizerSim <- function(object, ...) {
     plotSpectra(params, ...)
 }
 
-#' @rdname plotSpectra.MRMizerSim
+#' @rdname plotSpectra
 #' @export
 plotSpectra.MRMizerParams <- function(object, species = NULL, resources = NULL,
                                       wlim = c(NA, NA), ylim = c(NA, NA),
@@ -107,7 +108,7 @@ plotSpectra.MRMizerParams <- function(object, species = NULL, resources = NULL,
                   ylab = y_label, xlab = "Size [g]")
 }
 
-#' @rdname plotSpectra.MRMizerSim
+#' @rdname plotSpectra
 #' @export
 plotlySpectra <- function(object, species = NULL, resources = NULL,
                           time_range,

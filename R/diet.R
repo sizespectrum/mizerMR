@@ -46,6 +46,7 @@
 #' diet <- getDiet(NS_params)
 #' str(diet)
 #' }
+#' @name getDiet
 getDiet.MRMizerParams <- function(params,
                                    n = initialN(params),
                                    n_pp = initialNResource(params),
@@ -146,6 +147,7 @@ getDiet.MRMizerParams <- function(params,
 #' @export
 #' @seealso [getDiet()]
 #' @family plotting functions
+#' @name plotDiet
 plotDiet.MRMizerSim <- function(object, species = NULL, time_range,
                                  wlim = c(1, NA), return_data = FALSE, ...) {
     assert_that(is.flag(return_data))
@@ -162,7 +164,7 @@ plotDiet.MRMizerSim <- function(object, species = NULL, time_range,
     .plotDiet_data(diet, params, species, return_data)
 }
 
-#' @rdname plotDiet.MRMizerSim
+#' @rdname plotDiet
 #' @export
 plotDiet.MRMizerParams <- function(object, species = NULL,
                                     wlim = c(1, NA), return_data = FALSE, ...) {
@@ -191,7 +193,7 @@ plotDiet.MRMizerParams <- function(object, species = NULL,
                   xtrans = "log10", xlab = "Size [g]", wrap_scale = "free")
 }
 
-#' @rdname plotDiet.MRMizerSim
+#' @rdname plotDiet
 #' @export
 plotlyDiet <- function(object,
                        species = NULL,

@@ -5,6 +5,12 @@
 #' @importFrom utils globalVariables
 #' @importFrom rlang signal
 #' @importFrom dplyr %>% filter
+#' @importFrom mizer addSpecies animateSpectra expandSizeGrid finalNResource
+#'   getDiet getEncounter getResourceMort initialNResource plotDiet plotSpectra
+#'   project removeSpecies renameSpecies resource_capacity resource_params
+#'   resource_rate NResource
+#' @importFrom mizer "initialNResource<-" "resource_capacity<-"
+#'   "resource_params<-" "resource_rate<-"
 "_PACKAGE"
 
 # The following block is used by usethis to automatically manage

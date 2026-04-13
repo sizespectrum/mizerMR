@@ -18,7 +18,7 @@ specified by the power argument."><meta property="og:image" content="https://siz
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -76,7 +76,11 @@ specified by the <code>power</code> argument.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plotSpectra</span><span class="op">(</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'MRMizerSim'</span></span>
+<span><span class="fu">plotSpectra</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'MRMizerParams'</span></span>
+<span><span class="fu">plotSpectra</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
 <span>  species <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  resources <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -114,6 +118,10 @@ specified by the <code>power</code> argument.</p>
 <dl><dt id="arg-object">object<a class="anchor" aria-label="anchor" href="#arg-object"></a></dt>
 <dd><p>An object of class <a href="https://sizespectrum.org/mizer/reference/MizerSim-class.html" class="external-link">MizerSim</a> or
 <a href="https://sizespectrum.org/mizer/reference/MizerParams-class.html" class="external-link">MizerParams</a>.</p></dd>
+
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Other arguments (currently unused)</p></dd>
 
 
 <dt id="arg-species">species<a class="anchor" aria-label="anchor" href="#arg-species"></a></dt>
@@ -169,10 +177,6 @@ Default is TRUE.</p></dd>
 <dd><p>A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE</p></dd>
 
-
-<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Other arguments (currently unused)</p></dd>
-
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -189,7 +193,7 @@ object the initial abundance is plotted.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><a href="https://sizespectrum.org/mizer/reference/plotting_functions.html" class="external-link">plotting_functions</a></p>
+    <div class="dont-index"><p><a href="https://sizespectrum.org/mizer/reference/plotting_functions.html" class="external-link">mizer::plotting_functions</a></p>
 <p>Other plotting functions:
 <code><a href="animateSpectra.html">animateSpectra()</a></code>,
 <code><a href="plotDiet.html">plotDiet()</a></code>,

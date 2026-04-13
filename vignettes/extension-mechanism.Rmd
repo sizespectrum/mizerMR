@@ -1,5 +1,6 @@
 ---
 title: "How mizerMR uses mizer's extension mechanism"
+toc: true
 output:
   html_document:
     toc: yes
@@ -295,6 +296,37 @@ then override both `resource` and `return_data` before calling `NextMethod()`.
 The `as()` downcast was chosen because it makes the intent clearer: this is a
 subroutine call to mizer's implementation, not a delegation to the next method
 in the dispatch chain.
+
+## Importing mizer generics explicitly
+
+mizer is listed in mizerMR's `Depends` field, so calling `library(mizerMR)`
+attaches mizer and puts all its exported symbols on the search path. That makes
+the S3 dispatch work in an interactive session.
+
+However, tools such as pkgdown use `loadNamespace("mizerMR")` rather than
+`library()`. `loadNamespace` loads a package's own namespace but does **not**
+attach `Depends` packages to the search path. Any mizer generic that is not
+explicitly present in mizerMR's namespace environment is therefore invisible when
+the package is loaded this way, and S3 dispatch fails.
+
+The fix is to add an `@importFrom mizer` entry for every mizer generic that
+mizerMR provides a method for:
+
+```r
+#' @importFrom mizer addSpecies animateSpectra expandSizeGrid finalNResource
+#'   getDiet getEncounter getResourceMort initialNResource plotDiet plotSpectra
+#'   project removeSpecies renameSpecies resource_capacity resource_params
+#'   resource_rate NResource
+```
+
+Each `importFrom` entry copies the named symbol directly into mizerMR's
+namespace environment when the package is loaded, regardless of how it was
+loaded. The symbol does not shadow anything: it is the same function object that
+mizer exports; mizerMR merely holds a reference to it.
+
+Note that `import(mizer)` — importing the *entire* namespace — would have the
+same effect but is discouraged for large packages because it pulls in hundreds
+of symbols and creates an implicit dependency on everything mizer exports.
 
 ## `MRMizerSim` plot methods delegate to the params method
 

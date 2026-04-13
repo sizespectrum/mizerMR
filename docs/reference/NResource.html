@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -74,9 +74,11 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">NResource</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'MRMizerSim'</span></span>
+<span><span class="fu">NResource</span><span class="op">(</span><span class="va">sim</span>, <span class="va">...</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">finalNResource</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># S3 method for class 'MRMizerSim'</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/finalN.html" class="external-link">finalNResource</a></span><span class="op">(</span><span class="va">sim</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -86,12 +88,16 @@
 <dl><dt id="arg-sim">sim<a class="anchor" aria-label="anchor" href="#arg-sim"></a></dt>
 <dd><p>A MizerSim object</p></dd>
 
+
+<dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
+<dd><p>Unused</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
     <p>For <code>NResource()</code>: An array (time x resource x size) holding the
 resource number densities at all saved timesteps of the simulation.</p>
-<p>For <code>finalNResource()</code>: An array (resource x size) holding the
+<p>For <code><a href="https://sizespectrum.org/mizer/reference/finalN.html" class="external-link">finalNResource()</a></code>: An array (resource x size) holding the
 resource number densities at the end of the simulation</p>
     </div>
 

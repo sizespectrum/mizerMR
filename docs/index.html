@@ -43,7 +43,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -131,7 +131,7 @@
 <code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/setMultipleResources.html">setMultipleResources</a></span><span class="op">(</span><span class="va">NS_params</span>, <span class="va">resource_params</span><span class="op">)</span></span></code></pre></div>
 <p>This has given us a new MizerParams object in which the original resource has been replaced by our two resources. We can then work with this MizerParams object as usual. For example we can project it forward in time:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/project.html" class="external-link">project</a></span><span class="op">(</span><span class="va">params</span>, t_max <span class="op">=</span> <span class="fl">2</span>, t_save <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/project.html">project</a></span><span class="op">(</span><span class="va">params</span>, t_max <span class="op">=</span> <span class="fl">2</span>, t_save <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
 <p>and plot the resulting spectra:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/plotSpectra.html">plotSpectra</a></span><span class="op">(</span><span class="va">sim</span>, power <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code></pre></div>
@@ -172,11 +172,11 @@
 <span><span class="fu"><a href="reference/setMultipleResources.html">resource_interaction</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">resource_interaction</span></span></code></pre></div>
 <p>By default the initial values for the resources will be equal to the carrying capacities. But if a user has their own array (resource x size) of resource number densities <code>my_n_resource</code> they can set these as the initial values with</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/setMultipleResources.html">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_n_resource</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialNResource-set.html" class="external-link">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_n_resource</span></span></code></pre></div>
 <p>Users who are not happy with the allometric expressions for the resource carrying capacities or the replenishment rates but have created their own matrices <code>my_capacity</code> and <code>my_rate</code> with one row for each resource and one column for each size can set these with</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/setMultipleResources.html">resource_capacity</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_capacity</span></span>
-<span><span class="fu"><a href="reference/setMultipleResources.html">resource_rate</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_rate</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">resource_capacity</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_capacity</span></span>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">resource_rate</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="va">my_rate</span></span></code></pre></div>
 <p>Rather than adding the multiple resources to an existing model, the user can also create a new model with multiple resources with</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/newMRParams.html">newMRParams</a></span><span class="op">(</span><span class="va">species_params</span>, <span class="va">interaction</span>, <span class="va">resource_params</span>,</span>

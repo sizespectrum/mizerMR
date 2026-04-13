@@ -25,6 +25,7 @@
 #' @return A plotly object
 #' @export
 #' @family plotting functions
+#' @name animateSpectra
 animateSpectra.MRMizerSim <- function(sim,
                                       species = NULL,
                                       resources = NULL,

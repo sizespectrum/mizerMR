@@ -37,7 +37,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -114,14 +114,14 @@ have read <code>vignette("extensions", package = "mizer")</code>.</p>
 <p>mizerMR uses four of the five extension routes described there:</p>
 <ol style="list-style-type: decimal">
 <li>
-<strong><code>setComponent()</code></strong> — the multiple
+<strong><code><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent()</a></code></strong> — the multiple
 resources are stored as a single dynamical component named
 <code>"MR"</code>.</li>
 <li>
-<strong><code>setRateFunction()</code></strong> — encounter and
+<strong><code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">setRateFunction()</a></code></strong> — encounter and
 resource-mortality rates are replaced with MR-aware versions.</li>
 <li>
-<strong><code>other_params()</code></strong> — resource-level
+<strong><code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">other_params()</a></code></strong> — resource-level
 parameters (kappa, lambda, …) are stored alongside the component
 parameters.</li>
 <li>
@@ -140,7 +140,7 @@ named <code>"MR"</code>. The component state is an array of dimensions
 resource at each size on mizer’s full size grid.
 <code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> registers this component:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">setComponent</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setComponent.html" class="external-link">setComponent</a></span><span class="op">(</span></span>
 <span>    params      <span class="op">=</span> <span class="va">params</span>,</span>
 <span>    component   <span class="op">=</span> <span class="st">"MR"</span>,</span>
 <span>    initial_value <span class="op">=</span> <span class="va">initial_resource</span>,   <span class="co"># array (resource × size)</span></span>
@@ -151,7 +151,7 @@ resource at each size on mizer’s full size grid.
 <span>        interaction <span class="op">=</span> <span class="va">resource_interaction</span>  <span class="co"># matrix (species × resource)</span></span>
 <span>    <span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>During a call to <code>project()</code>, mizer automatically calls
+<p>During a call to <code><a href="../reference/project.html">project()</a></code>, mizer automatically calls
 <code>mizerMR_dynamics()</code> at each time step. That function
 iterates over resources and applies semi-chemostat dynamics to each row
 of the state array, using the per-resource mortality computed earlier in
@@ -184,7 +184,7 @@ arrays derived from those parameters live inside the component’s own
 </h3>
 <p>Registered with:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">setRateFunction</span><span class="op">(</span><span class="va">params</span>, <span class="st">"Encounter"</span>, <span class="st">"mizerMREncounter"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">setRateFunction</a></span><span class="op">(</span><span class="va">params</span>, <span class="st">"Encounter"</span>, <span class="st">"mizerMREncounter"</span><span class="op">)</span></span></code></pre></div>
 <p>Instead of convolving the predation kernel against a single
 <code>n_pp</code>, it first multiplies the multi-resource state array by
 the species–resource interaction matrix to form a weighted prey field,
@@ -192,7 +192,7 @@ adds the fish-to-fish contribution, and then runs the FFT-based
 convolution against the combined field. It also loops over
 <code>params@other_encounter</code> to include encounter contributions
 from any additional registered components — replicating work that the
-default <code>mizerEncounter()</code> would otherwise do, but which no
+default <code><a href="https://sizespectrum.org/mizer/reference/mizerEncounter.html" class="external-link">mizerEncounter()</a></code> would otherwise do, but which no
 longer runs because the entire encounter calculation has been
 replaced.</p>
 </div>
@@ -200,27 +200,33 @@ replaced.</p>
 <h3 id="mizermrresourcemort">
 <code>mizerMRResourceMort</code><a class="anchor" aria-label="anchor" href="#mizermrresourcemort"></a>
 </h3>
-<p>Registered with:</p>
+<p><code>mizerMRResourceMort</code> is <strong>not</strong> registered
+via <code>setRateFunction</code>. mizer now validates that a
+<code>ResourceMort</code> replacement returns a vector of exactly
+<code>no_w_full</code> values, but our function returns a matrix
+<code>(resource × size)</code> — one mortality row per resource.
+Registering it would therefore cause an error at startup.</p>
+<p>Instead, per-resource mortality is computed directly inside
+<code>mizerMR_dynamics()</code> from <code>rates$pred_rate</code> (which
+is in scope because it has already been calculated by the time the
+dynamics function runs):</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">setRateFunction</span><span class="op">(</span><span class="va">params</span>, <span class="st">"ResourceMort"</span>, <span class="st">"mizerMRResourceMort"</span><span class="op">)</span></span></code></pre></div>
-<p>mizer’s default <code>ResourceMort</code> returns a single vector
-(one value per size bin) representing mortality on <code>n_pp</code>.
-The replacement returns a matrix <code>(resource × size)</code> by
-multiplying the predation rate matrix by the species–resource
-interaction:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">mizerMRResourceMort</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span>, <span class="va">pred_rate</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">params</span><span class="op">@</span><span class="va">other_params</span><span class="op">[[</span><span class="st">"MR"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">interaction</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">pred_rate</span></span>
+<code class="sourceCode R"><span><span class="va">interaction</span> <span class="op">&lt;-</span> <span class="va">params</span><span class="op">@</span><span class="va">other_params</span><span class="op">[[</span><span class="st">"MR"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">interaction</span>  <span class="co"># (no_sp × no_res)</span></span>
+<span><span class="va">resource_mort</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="va">interaction</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/matmult.html" class="external-link">%*%</a></span> <span class="va">rates</span><span class="op">$</span><span class="va">pred_rate</span>     <span class="co"># (no_res × no_w_full)</span></span>
+<span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="va">no_res</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="va">rates_mod</span><span class="op">$</span><span class="va">resource_mort</span> <span class="op">&lt;-</span> <span class="va">resource_mort</span><span class="op">[</span><span class="va">i</span>, <span class="op">]</span></span>
+<span>    <span class="va">...</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p>This matrix is later passed row-by-row to each per-resource dynamics
-function inside <code>mizerMR_dynamics()</code>.</p>
+<p><code>mizerMRResourceMort</code> is still exported and callable
+directly; it is used by <code>getResourceMort.MRMizerParams</code> to
+expose per-resource mortalities to users.</p>
 </div>
 <div class="section level3">
 <h3 id="the-built-in-single-resource-is-silenced">The built-in single resource is silenced<a class="anchor" aria-label="anchor" href="#the-built-in-single-resource-is-silenced"></a>
 </h3>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">mizer</span><span class="fu">::</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialNResource-set.html" class="external-link">initialNResource</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fl">0</span>         <span class="co"># abundance set to zero</span></span>
-<span><span class="fu">resource_dynamics</span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"resource_constant"</span>  <span class="co"># kept at zero forever</span></span></code></pre></div>
+<span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">resource_dynamics</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"resource_constant"</span>  <span class="co"># kept at zero forever</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -229,7 +235,7 @@ function inside <code>mizerMR_dynamics()</code>.</p>
 <p>mizerMR defines two formal S4 subclasses so that R’s S3 dispatch
 routes calls to the right method without any manual <code>if</code>
 guards:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw">setClass</span><span class="op">(</span><span class="st">"MRMizerParams"</span>, contains <span class="op">=</span> <span class="st">"MizerParams"</span><span class="op">)</span></span>
 <span><span class="kw">setClass</span><span class="op">(</span><span class="st">"MRMizerSim"</span>,    contains <span class="op">=</span> <span class="st">"MizerSim"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
@@ -238,7 +244,7 @@ guards:</p>
 <code>MRMizerParams</code><a class="anchor" aria-label="anchor" href="#setmultipleresources-returns-mrmizerparams"></a>
 </h3>
 <p>The last action of <code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> is:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">new</span><span class="op">(</span><span class="st">"MRMizerParams"</span>, <span class="va">params</span><span class="op">)</span></span></code></pre></div>
 <p>Because <code>MRMizerParams</code> inherits all slots from
 <code>MizerParams</code> and adds none of its own, this is a zero-cost
@@ -251,7 +257,7 @@ wrapping step. Every existing mizer function that accepts a
 <code>project.MRMizerParams</code> returns
 <code>MRMizerSim</code><a class="anchor" aria-label="anchor" href="#project-mrmizerparams-returns-mrmizersim"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">project.MRMizerParams</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">sim</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span><span class="op">)</span>       <span class="co"># calls mizer's project()</span></span>
 <span>    <span class="fu">new</span><span class="op">(</span><span class="st">"MRMizerSim"</span>, <span class="va">sim</span><span class="op">)</span>   <span class="co"># wraps the result</span></span>
@@ -266,8 +272,8 @@ special.</p>
 </h3>
 <p>Before this refactor, every accessor and plot function contained an
 explicit check:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu">getComponent</span><span class="op">(</span><span class="va">params</span>, <span class="st">"MR"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/getComponent.html" class="external-link">getComponent</a></span><span class="op">(</span><span class="va">params</span>, <span class="st">"MR"</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="fu">mizer</span><span class="fu">::</span><span class="fu">foo</span><span class="op">(</span><span class="va">params</span>, <span class="va">...</span><span class="op">)</span><span class="op">)</span>   <span class="co"># fall back to mizer</span></span>
 <span><span class="op">}</span></span>
 <span><span class="co"># ... MR-aware implementation ...</span></span></code></pre></div>
@@ -276,12 +282,12 @@ mizer’s namespace without being formal S3 methods, and there was no
 guarantee that the two branches stayed consistent.</p>
 <p>After the refactor each function is split into a method pair. For
 example, <code>NResource</code>:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># MR-aware method — no guard needed, called only when sim is MRMizerSim</span></span>
 <span><span class="va">NResource.MRMizerSim</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">n_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/aperm.html" class="external-link">aperm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">simplify2array</a></span><span class="op">(</span><span class="fu">NOther</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[</span>, <span class="st">"MR"</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">n_res</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="fu">NOther</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">n_res</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="fu">NOther</span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="va">n_res</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/aperm.html" class="external-link">aperm</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">simplify2array</a></span><span class="op">(</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/NOther.html" class="external-link">NOther</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">[</span>, <span class="st">"MR"</span><span class="op">]</span><span class="op">)</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">3</span>, <span class="fl">1</span>, <span class="fl">2</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">n_res</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/NOther.html" class="external-link">NOther</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="va">n_res</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/dimnames.html" class="external-link">dimnames</a></span><span class="op">(</span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/NOther.html" class="external-link">NOther</a></span><span class="op">(</span><span class="va">sim</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span></span>
 <span>    <span class="va">n_res</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <p>When a user calls <code>NResource(sim)</code> and <code>sim</code> is
@@ -309,6 +315,16 @@ cleanly separated.</p>
 <td><code>project_methods.R</code></td>
 </tr>
 <tr class="even">
+<td><code>getEncounter</code></td>
+<td><code>MRMizerParams</code></td>
+<td><code>project_methods.R</code></td>
+</tr>
+<tr class="odd">
+<td><code>getResourceMort</code></td>
+<td><code>MRMizerParams</code></td>
+<td><code>resource_dynamics.R</code></td>
+</tr>
+<tr class="even">
 <td>
 <code>resource_params</code>, <code>resource_params&lt;-</code>
 </td>
@@ -316,6 +332,11 @@ cleanly separated.</p>
 <td><code>resource_params.R</code></td>
 </tr>
 <tr class="odd">
+<td><code>resource_params&lt;-</code></td>
+<td><code>MizerParams</code></td>
+<td><code>resource_params.R</code></td>
+</tr>
+<tr class="even">
 <td>
 <code>resource_capacity</code>,
 <code>resource_capacity&lt;-</code>
@@ -323,14 +344,14 @@ cleanly separated.</p>
 <td><code>MRMizerParams</code></td>
 <td><code>setMultipleResources.R</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 <code>resource_rate</code>, <code>resource_rate&lt;-</code>
 </td>
 <td><code>MRMizerParams</code></td>
 <td><code>setMultipleResources.R</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td>
 <code>resource_interaction</code>,
 <code>resource_interaction&lt;-</code>
@@ -338,7 +359,7 @@ cleanly separated.</p>
 <td><code>MRMizerParams</code></td>
 <td><code>setMultipleResources.R</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td>
 <code>initialNResource</code>,
 <code>initialNResource&lt;-</code>
@@ -346,48 +367,48 @@ cleanly separated.</p>
 <td><code>MRMizerParams</code></td>
 <td><code>setMultipleResources.R</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>NResource</code></td>
 <td><code>MRMizerSim</code></td>
 <td><code>NResource.R</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>finalNResource</code></td>
 <td><code>MRMizerSim</code></td>
 <td><code>NResource.R</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>getDiet</code></td>
 <td><code>MRMizerParams</code></td>
 <td><code>diet.R</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>plotDiet</code></td>
 <td>
 <code>MRMizerParams</code>, <code>MRMizerSim</code>
 </td>
 <td><code>diet.R</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>plotSpectra</code></td>
 <td>
 <code>MRMizerParams</code>, <code>MRMizerSim</code>
 </td>
 <td><code>plotSpectra.R</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>animateSpectra</code></td>
 <td><code>MRMizerSim</code></td>
 <td><code>animateSpectra.R</code></td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td><code>plotResourceLevel</code></td>
 <td>
 <code>MRMizerParams</code>, <code>MizerParams</code>
 </td>
 <td><code>plotResource.R</code></td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td><code>plotResourcePred</code></td>
 <td>
 <code>MRMizerParams</code>, <code>MizerParams</code>
@@ -396,6 +417,54 @@ cleanly separated.</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level3">
+<h3 id="getencounter-mrmizerparams-and-the-initialnresource-conflict">
+<code>getEncounter.MRMizerParams</code> and the
+<code>initialNResource</code> conflict<a class="anchor" aria-label="anchor" href="#getencounter-mrmizerparams-and-the-initialnresource-conflict"></a>
+</h3>
+<p><code>initialNResource.MRMizerParams</code> returns the MR resource
+array — the <code>(resource × size)</code> matrix stored in the
+<code>"MR"</code> component. This is the natural user-facing meaning:
+“what are the initial resource abundances?”</p>
+<p>However, mizer’s internal functions (<code>getFeedingLevel</code>,
+<code>getPredRate</code>, …) all use
+<code>n_pp = initialNResource(params)</code> as their default for the
+built-in plankton resource. When <code>params</code> is an
+<code>MRMizerParams</code>, S3 dispatch gives them the MR matrix instead
+of the scalar <code>0</code> stored in <code>params@initial_n_pp</code>.
+mizer then asserts
+<code>length(n_pp) == length(params@initial_n_pp)</code>, which fails
+because the MR matrix has <code>no_res × no_w_full</code> elements
+rather than <code>no_w_full</code>.</p>
+<p>The fix is <code>getEncounter.MRMizerParams</code>, which sits at the
+top of the call chain and substitutes the correct value before
+dispatching to mizer’s implementation:</p>
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">getEncounter.MRMizerParams</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span> <span class="op">=</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialN-set.html" class="external-link">initialN</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,</span>
+<span>                                       <span class="va">n_pp</span> <span class="op">=</span> <span class="va">params</span><span class="op">@</span><span class="va">initial_n_pp</span>,</span>
+<span>                                       <span class="va">n_other</span> <span class="op">=</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/initialNOther-set.html" class="external-link">initialNOther</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span>,</span>
+<span>                                       <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
+<span>    <span class="fu"><a href="https://sizespectrum.org/mizer/reference/getEncounter.html" class="external-link">getEncounter</a></span><span class="op">(</span><span class="fu">as</span><span class="op">(</span><span class="va">params</span>, <span class="st">"MizerParams"</span><span class="op">)</span>,</span>
+<span>                 n <span class="op">=</span> <span class="va">n</span>, n_pp <span class="op">=</span> <span class="va">params</span><span class="op">@</span><span class="va">initial_n_pp</span>,</span>
+<span>                 n_other <span class="op">=</span> <span class="va">n_other</span>, t <span class="op">=</span> <span class="va">t</span>, <span class="va">...</span><span class="op">)</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<p>Two details worth noting:</p>
+<ul>
+<li>The body uses <code>params@initial_n_pp</code> directly rather than
+the <code>n_pp</code> formal. This is intentional: mizer’s
+<code>getFeedingLevel</code> calls
+<code>getEncounter(params, n_pp = initialNResource(params), ...)</code>,
+which binds <code>n_pp</code> to the MR matrix. By ignoring the formal
+and reading the slot directly, we ensure the scalar <code>0</code> is
+always passed — regardless of what the caller supplied.</li>
+<li>We use <code>as(params, "MizerParams")</code> (not
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>) for the same reason described in the
+<code>plotSpectra</code> section below: the registered encounter
+function is <code>mizerMREncounter</code>, not
+<code>mizerEncounter</code>, so <code>getEncounter.MizerParams</code>
+already calls the MR-aware function automatically.</li>
+</ul>
 </div>
 <div class="section level3">
 <h3 id="calling-mizers-method-as-a-subroutine-from-plotspectra-mrmizerparams">Calling mizer’s method as a subroutine from
@@ -437,6 +506,37 @@ mizer’s implementation, not a delegation to the next method in the
 dispatch chain.</p>
 </div>
 <div class="section level3">
+<h3 id="importing-mizer-generics-explicitly">Importing mizer generics explicitly<a class="anchor" aria-label="anchor" href="#importing-mizer-generics-explicitly"></a>
+</h3>
+<p>mizer is listed in mizerMR’s <code>Depends</code> field, so calling
+<code><a href="http://sizespectrum.org/mizerMR/" class="external-link">library(mizerMR)</a></code> attaches mizer and puts all its exported
+symbols on the search path. That makes the S3 dispatch work in an
+interactive session.</p>
+<p>However, tools such as pkgdown use
+<code>loadNamespace("mizerMR")</code> rather than
+<code><a href="https://rdrr.io/r/base/library.html" class="external-link">library()</a></code>. <code>loadNamespace</code> loads a package’s own
+namespace but does <strong>not</strong> attach <code>Depends</code>
+packages to the search path. Any mizer generic that is not explicitly
+present in mizerMR’s namespace environment is therefore invisible when
+the package is loaded this way, and S3 dispatch fails.</p>
+<p>The fix is to add an <code>@importFrom mizer</code> entry for every
+mizer generic that mizerMR provides a method for:</p>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co">#' @importFrom mizer addSpecies animateSpectra expandSizeGrid finalNResource</span></span>
+<span><span class="co">#'   getDiet getEncounter getResourceMort initialNResource plotDiet plotSpectra</span></span>
+<span><span class="co">#'   project removeSpecies renameSpecies resource_capacity resource_params</span></span>
+<span><span class="co">#'   resource_rate NResource</span></span></code></pre></div>
+<p>Each <code>importFrom</code> entry copies the named symbol directly
+into mizerMR’s namespace environment when the package is loaded,
+regardless of how it was loaded. The symbol does not shadow anything: it
+is the same function object that mizer exports; mizerMR merely holds a
+reference to it.</p>
+<p>Note that <code>import(mizer)</code> — importing the <em>entire</em>
+namespace — would have the same effect but is discouraged for large
+packages because it pulls in hundreds of symbols and creates an implicit
+dependency on everything mizer exports.</p>
+</div>
+<div class="section level3">
 <h3 id="mrmizersim-plot-methods-delegate-to-the-params-method">
 <code>MRMizerSim</code> plot methods delegate to the params
 method<a class="anchor" aria-label="anchor" href="#mrmizersim-plot-methods-delegate-to-the-params-method"></a>
@@ -445,12 +545,12 @@ method<a class="anchor" aria-label="anchor" href="#mrmizersim-plot-methods-deleg
 collapse the time-averaged abundances back into a params object and then
 dispatch to the params method. The <code>MRMizerSim</code> methods do
 this uniformly:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plotSpectra.MRMizerSim</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">object</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu">setInitialValues</span><span class="op">(</span><span class="va">object</span><span class="op">@</span><span class="va">params</span>, <span class="va">object</span><span class="op">)</span></span>
-<span>    <span class="fu">plotSpectra</span><span class="op">(</span><span class="va">params</span>, <span class="va">...</span><span class="op">)</span></span>
+<span>    <span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://sizespectrum.org/mizer/reference/setInitialValues.html" class="external-link">setInitialValues</a></span><span class="op">(</span><span class="va">object</span><span class="op">@</span><span class="va">params</span>, <span class="va">object</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="../reference/plotSpectra.html">plotSpectra</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">...</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
-<p><code>setInitialValues()</code> is a mizer S3 generic with a
+<p><code><a href="https://sizespectrum.org/mizer/reference/setInitialValues.html" class="external-link">setInitialValues()</a></code> is a mizer S3 generic with a
 <code>setInitialValues.MizerParams</code> method. When called with
 <code>object@params</code> — which is an <code>MRMizerParams</code> — S3
 dispatch falls through to <code>setInitialValues.MizerParams</code> via
@@ -509,8 +609,13 @@ explicitly</td>
 <td>Bugs fixed</td>
 <td>
 <code>plotResourcePred</code>/<code>plotResourceLevel</code> used
-wrong <code>other_params</code> path</td>
-<td>Replaced by proper accessor functions</td>
+wrong <code>other_params</code> path; <code>mizerMRResourceMort</code>
+registered as <code>ResourceMort</code> returned wrong shape;
+<code>initialNResource</code> conflict broke <code>getEncounter</code>
+chain</td>
+<td>Replaced by proper accessor functions; mortality computed in
+<code>mizerMR_dynamics</code>; <code>getEncounter.MRMizerParams</code>
+intercepts the call</td>
 </tr>
 </tbody>
 </table>
@@ -519,7 +624,9 @@ wrong <code>other_params</code> path</td>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

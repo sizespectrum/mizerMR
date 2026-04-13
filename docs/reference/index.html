@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mizerMR</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.4.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.5.4.9113</span>
       </span>
     </div>
 
@@ -72,11 +72,19 @@
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="resource_params.html">resource_params()</a></code> <code><a href="resource_params.html">`resource_params&lt;-`()</a></code> </p>
+          <p><code><a href="MRMizerParams-class.html">MRMizerParams-class</a></code> </p>
+        </td>
+        <td><p>S4 subclass of MizerParams for models with multiple resources</p></td>
+      </tr><tr><td>
+          <p><code><a href="MRMizerSim-class.html">MRMizerSim-class</a></code> </p>
+        </td>
+        <td><p>S4 subclass of MizerSim for simulations with multiple resources</p></td>
+      </tr><tr><td>
+          <p><code><a href="resource_params.html">resource_params(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="resource_params.html">`resource_params&lt;-`(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="resource_params.html">`resource_params&lt;-`(<i>&lt;MizerParams&gt;</i>)</a></code> </p>
         </td>
         <td><p>Resource parameters</p></td>
       </tr><tr><td>
-          <p><code><a href="setMultipleResources.html">setMultipleResources()</a></code> <code><a href="setMultipleResources.html">resource_capacity()</a></code> <code><a href="setMultipleResources.html">`resource_capacity&lt;-`()</a></code> <code><a href="setMultipleResources.html">resource_rate()</a></code> <code><a href="setMultipleResources.html">`resource_rate&lt;-`()</a></code> <code><a href="setMultipleResources.html">resource_interaction()</a></code> <code><a href="setMultipleResources.html">`resource_interaction&lt;-`()</a></code> <code><a href="setMultipleResources.html">initialNResource()</a></code> <code><a href="setMultipleResources.html">`initialNResource&lt;-`()</a></code> </p>
+          <p><code><a href="setMultipleResources.html">getEncounter(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">getResourceMort(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">setMultipleResources()</a></code> <code><a href="setMultipleResources.html">resource_capacity(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">`resource_capacity&lt;-`(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">resource_rate(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">`resource_rate&lt;-`(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">resource_interaction()</a></code> <code><a href="setMultipleResources.html">`resource_interaction&lt;-`()</a></code> <code><a href="setMultipleResources.html">initialNResource(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="setMultipleResources.html">`initialNResource&lt;-`(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
         </td>
         <td><p>Set up multiple resources</p></td>
       </tr><tr><td>
@@ -84,23 +92,47 @@
         </td>
         <td><p>Create a new multi-resource, multi-species model</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
+          <h2 id="modifying-the-model">Modifying the model <a href="#modifying-the-model" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p>
+        </th>
+      </tr></tbody><tbody><tr><td>
+          <p><code><a href="addSpecies.html">addSpecies(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Add species to an MRMizerParams model</p></td>
+      </tr><tr><td>
+          <p><code><a href="removeSpecies.html">removeSpecies(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Remove species from an MRMizerParams model</p></td>
+      </tr><tr><td>
+          <p><code><a href="renameSpecies.html">renameSpecies(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Rename species in an MRMizerParams model</p></td>
+      </tr><tr><td>
+          <p><code><a href="expandSizeGrid.html">expandSizeGrid(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Expand the size grid of an MRMizerParams model</p></td>
+      </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="accessing-results-of-simulations">Accessing results of simulations <a href="#accessing-results-of-simulations" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="NResource.html">NResource()</a></code> <code><a href="NResource.html">finalNResource()</a></code> </p>
+          <p><code><a href="project.html">project(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
+        </td>
+        <td><p>Project an MRMizerParams model forward in time</p></td>
+      </tr><tr><td>
+          <p><code><a href="NResource.html">NResource(<i>&lt;MRMizerSim&gt;</i>)</a></code> <code><a href="NResource.html">finalNResource(<i>&lt;MRMizerSim&gt;</i>)</a></code> </p>
         </td>
         <td><p>Access resource abundances in simulation result</p></td>
       </tr><tr><td>
-          <p><code><a href="plotSpectra.html">plotSpectra()</a></code> <code><a href="plotSpectra.html">plotlySpectra()</a></code> </p>
+          <p><code><a href="plotSpectra.html">plotSpectra(<i>&lt;MRMizerSim&gt;</i>)</a></code> <code><a href="plotSpectra.html">plotSpectra(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="plotSpectra.html">plotlySpectra()</a></code> </p>
         </td>
         <td><p>Plot the abundance spectra</p></td>
       </tr><tr><td>
-          <p><code><a href="getDiet.html">getDiet()</a></code> </p>
+          <p><code><a href="getDiet.html">getDiet(<i>&lt;MRMizerParams&gt;</i>)</a></code> </p>
         </td>
         <td><p>Get diet of predator at size, resolved by prey species</p></td>
       </tr><tr><td>
-          <p><code><a href="plotDiet.html">plotDiet()</a></code> <code><a href="plotDiet.html">plotlyDiet()</a></code> </p>
+          <p><code><a href="plotDiet.html">plotDiet(<i>&lt;MRMizerSim&gt;</i>)</a></code> <code><a href="plotDiet.html">plotDiet(<i>&lt;MRMizerParams&gt;</i>)</a></code> <code><a href="plotDiet.html">plotlyDiet()</a></code> </p>
         </td>
         <td><p>Plot diet, resolved by prey species, as function of predator at size.</p></td>
       </tr><tr><td>
@@ -110,9 +142,9 @@
       </tr><tr><td>
           <p><code><a href="plotResourcePred.html">plotResourcePred()</a></code> <code><a href="plotResourcePred.html">plotlyResourcePred()</a></code> </p>
         </td>
-        <td><p>Plot functions regarding the resources. Compatible with non mizerMR objects Plot the mortality applied on the resource spectrum(s)</p></td>
+        <td><p>Plot the mortality applied on the resource spectrum(s)</p></td>
       </tr><tr><td>
-          <p><code><a href="animateSpectra.html">animateSpectra()</a></code> </p>
+          <p><code><a href="animateSpectra.html">animateSpectra(<i>&lt;MRMizerSim&gt;</i>)</a></code> </p>
         </td>
         <td><p>Animation of the abundance spectra</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
