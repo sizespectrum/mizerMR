@@ -21,6 +21,10 @@ mizerMR_dynamics <- function(params, n_other, n_pp, rates, ...) {
 }
 
 #' @export
-mizerMRResourceMort <- function(params, n, n_pp, n_other, t, pred_rate, ...) {
+projectResourceMort.mizerMR <- function(params, n, n_pp, n_other, t = 0,
+                                        pred_rate, ...) {
     t(params@other_params[["MR"]]$interaction) %*% pred_rate
 }
+
+#' @export
+mizerMRResourceMort <- projectResourceMort.mizerMR

@@ -4,10 +4,7 @@
 #' @return For `NResource()`: An array (time x resource x size) holding the
 #'   resource number densities at all saved timesteps of the simulation.
 #' @export
-NResource <- function(sim) {
-    if (is.null(getComponent(getParams(sim), "MR"))) {
-        return(mizer::NResource(sim))
-    }
+NResource.mizerMRSim <- function(sim) {
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
     dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
     names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
@@ -18,9 +15,6 @@ NResource <- function(sim) {
 #' @return For `finalNResource()`: An array (resource x size) holding the
 #'   resource number densities at the end of the simulation
 #' @export
-finalNResource <- function(sim) {
-    if (is.null(getComponent(getParams(sim), "MR"))) {
-        return(mizer::finalNResource(sim))
-    }
+finalNResource.mizerMRSim <- function(sim) {
     NOther(sim)[[idxFinalT(sim), "MR"]]
 }

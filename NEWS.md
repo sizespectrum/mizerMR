@@ -1,6 +1,11 @@
 # mizerMR 0.2.4.0
 
-* Compatible with mizer version 2.4.0
+* Compatible with mizer version 2.5.4.9124.
+* `setMultipleResources()` now uses mizer's extension-chain methods for
+  encounter and resource mortality instead of replacing entries in
+  `params@rates_funcs`, allowing composition with other extension packages.
+* Accessors and plots that need multiple-resource behaviour are now registered
+  as methods for mizer's generics. `plotlySpectra()` has been removed.
 
 # mizerMR 0.0.3
 

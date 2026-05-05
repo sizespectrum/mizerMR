@@ -28,19 +28,10 @@ setMultipleResources <- function(params,
     # If there is no MR component yet then we need to create it. We'll
     # fill it in properly later
     if (is.null(getComponent(params, "MR"))) {
-        # register MR in the extensions slot
-        extensions <- c(mizerMR = "sizespectrum/mizerMR",
-                        params@extensions)
-        params@extensions <- extensions
-
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0
         # and keep it zero
         resource_dynamics(params) <- "resource_constant"
-
-        # Encounter and mortality will now come from "MR" slot in n_other
-        params <- setRateFunction(params, "Encounter", "mizerMREncounter")
-        params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
 
         # make empty parameters
         w_names <- names(mizer::initialNResource(params))
@@ -84,13 +75,23 @@ setMultipleResources <- function(params,
     params <- setLinetypes(params, linetypes)
 
     other_params(params)[["MR"]]$resource_params <- rp
-    setComponent(
+    params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
         dynamics_fun =  "mizerMR_dynamics",
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
                                 interaction = resource_interaction))
+
+    registerMizerMRExtension(params)
+}
+
+registerMizerMRExtension <- function(params) {
+    if (!"mizerMR" %in% names(params@extensions)) {
+        params@extensions <- c(mizerMR = NA_character_, params@extensions)
+    }
+    mizer::registerExtensions(params@extensions)
+    mizer::coerceToExtensionClass(params)
 }
 
 #' @rdname setMultipleResources
@@ -140,17 +141,14 @@ setMultipleResources <- function(params,
 
 #' @rdname setMultipleResources
 #' @export
-`initialNResource` <- function(params) {
+initialNResource.mizerMR <- function(params) {
     mr <- getComponent(params, "MR")
-    if (is.null(mr)) {
-        return(mizer::initialNResource(params))
-    }
     mr$initial_value
 }
 
 #' @rdname setMultipleResources
 #' @export
-`initialNResource<-` <- function(params, value) {
+`initialNResource<-.mizerMR` <- function(params, value) {
     setMultipleResources(params, initial_resource = value)
 }
 
