@@ -4,6 +4,7 @@
 #' @return For `NResource()`: An array (time x resource x size) holding the
 #'   resource number densities at all saved timesteps of the simulation.
 #' @export
+#' @name NResource
 NResource.mizerMRSim <- function(sim) {
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
     dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]

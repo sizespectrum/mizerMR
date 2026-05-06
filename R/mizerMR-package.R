@@ -14,3 +14,8 @@
 NULL
 
 globalVariables(c("expect_equal"))
+
+.onLoad <- function(libname, pkgname) {
+    registerExtensions(stats::setNames(as.character(utils::packageVersion(pkgname)),
+                                       pkgname))
+}

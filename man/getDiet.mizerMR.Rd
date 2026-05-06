@@ -62,7 +62,7 @@ diet <- getDiet(NS_params)
 str(diet)
 }
 \seealso{
-\code{\link[mizer:plotDiet]{plotDiet()}}
+\code{\link[=plotDiet]{plotDiet()}}
 }
 \concept{summary functions}
 \concept{summary_function}

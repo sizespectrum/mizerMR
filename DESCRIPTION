@@ -31,6 +31,7 @@ Imports:
     plotly,
     rlang
 Collate:
+    mizerMR-class.R
     animateSpectra.R
     mizerMR-package.R
     newMRParams.R
@@ -43,6 +44,7 @@ Collate:
     test-helpers.R
     diet.R
     plotResource.R
+    species_utils.R
 URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB

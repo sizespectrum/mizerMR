@@ -90,8 +90,7 @@ registerMizerMRExtension <- function(params) {
     if (!"mizerMR" %in% names(params@extensions)) {
         params@extensions <- c(mizerMR = NA_character_, params@extensions)
     }
-    mizer::registerExtensions(params@extensions)
-    mizer::coerceToExtensionClass(params)
+    new("mizerMR", params)
 }
 
 #' @rdname setMultipleResources

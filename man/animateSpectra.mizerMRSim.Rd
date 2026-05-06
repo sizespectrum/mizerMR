@@ -51,7 +51,7 @@ A plotly object
 }
 \seealso{
 Other plotting functions:
-\code{\link[=plotDiet.mizerMR]{plotDiet.mizerMR()}},
+\code{\link{plotDiet}},
 \code{\link[=plotResourceLevel]{plotResourceLevel()}},
 \code{\link[=plotResourcePred]{plotResourcePred()}},
 \code{\link[=plotSpectra.mizerMRSim]{plotSpectra.mizerMRSim()}}

@@ -36,7 +36,7 @@ str(fr)
 
 Other plotting functions:
 \code{\link[=animateSpectra.mizerMRSim]{animateSpectra.mizerMRSim()}},
-\code{\link[=plotDiet.mizerMR]{plotDiet.mizerMR()}},
+\code{\link{plotDiet}},
 \code{\link[=plotResourcePred]{plotResourcePred()}},
 \code{\link[=plotSpectra.mizerMRSim]{plotSpectra.mizerMRSim()}}
 }

@@ -139,8 +139,8 @@ getDiet.mizerMR <- function(params, n = initialN(params),
 #'   frame with the three variables 'w', 'Proportion', 'Prey' is returned.
 #' @seealso [getDiet()]
 #' @family plotting functions
-
 #' @export
+#' @name plotDiet
 plotDiet.mizerMR <- function(object, species = NULL, time_range,
                              wlim = c(1, NA), return_data = FALSE) {
     assert_that(is.flag(return_data))
@@ -150,6 +150,7 @@ plotDiet.mizerMR <- function(object, species = NULL, time_range,
     plotDietData(params, diet, species = species, return_data = return_data)
 }
 
+#' @rdname plotDiet
 #' @export
 plotDiet.mizerMRSim <- function(object, species = NULL, time_range,
                                 wlim = c(1, NA), return_data = FALSE) {
