@@ -2,20 +2,22 @@
 % Please edit documentation in R/species_utils.R
 \name{removeSpecies}
 \alias{removeSpecies}
-\alias{removeSpecies.MRMizerParams}
-\title{Remove species from an MRMizerParams model}
+\alias{removeSpecies.mizerMR}
+\title{Remove species from a mizerMR model}
 \usage{
-\method{removeSpecies}{MRMizerParams}(params, species)
+\method{removeSpecies}{mizerMR}(params, species, ...)
 }
 \arguments{
-\item{params}{An \linkS4class{MRMizerParams} object.}
+\item{params}{A \linkS4class{mizerMR} object.}
 
 \item{species}{The species to be removed. A vector of species names, or a
 numeric vector of species indices, or a logical vector indicating for
 each species whether it is to be removed (TRUE) or not.}
+
+\item{...}{Additional arguments}
 }
 \value{
-An \linkS4class{MRMizerParams} object with the specified species removed.
+A \linkS4class{mizerMR} object with the specified species removed.
 }
 \description{
 Extends \code{\link[mizer:removeSpecies]{mizer::removeSpecies()}} to also trim the resource interaction

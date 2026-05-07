@@ -13,6 +13,8 @@ valid_resource_capacity(
 \arguments{
 \item{params}{A MizerParams object}
 
+\item{resource_params}{A data frame with the resource parameters}
+
 \item{resource_capacity}{Array (resource x size) of the
 intrinsic resource carrying capacities}
 }
@@ -27,3 +29,4 @@ user and stored in \code{params} with a comment, then this is returned. Otherwis
 a resource capacity is calculated from \code{resource_params}. If this is NULL to
 it is taken from \code{params}.
 }
+\keyword{internal}

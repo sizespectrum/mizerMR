@@ -21,18 +21,26 @@
 #' to logarithmic size bins.
 #' @param total A boolean value that determines whether the total over all
 #'   species in the system is plotted as well. Default is FALSE.
+#' @param resource Deprecated compatibility argument from mizer's generic.
+#' @param background Deprecated compatibility argument from mizer's generic.
+#' @param ... Other arguments (currently unused).
 #'
 #' @return A plotly object
 #' @family plotting functions
 #' @export
+#' @name animateSpectra
 animateSpectra.mizerMRSim <- function(sim,
                                       species = NULL,
-                                      resources = NULL,
                                       time_range,
                                       wlim = c(NA, NA),
                                       ylim = c(NA, NA),
                                       power = 1,
-                                      total = FALSE) {
+                                      total = FALSE,
+                                      resource = TRUE,
+                                      background = TRUE,
+                                      ...,
+                                      resources = NULL) {
+    NextMethod(resource = FALSE, background = background, ...)
     species <- valid_species_arg(sim, species)
     resources <- valid_resources_arg(sim, resources)
     if (missing(time_range)) {

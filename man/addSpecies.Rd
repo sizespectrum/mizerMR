@@ -2,31 +2,26 @@
 % Please edit documentation in R/species_utils.R
 \name{addSpecies}
 \alias{addSpecies}
-\alias{addSpecies.MRMizerParams}
-\title{Add species to an MRMizerParams model}
+\alias{addSpecies.mizerMR}
+\title{Add species to a mizerMR model}
 \usage{
-\method{addSpecies}{MRMizerParams}(
+\method{addSpecies}{mizerMR}(
   params,
   species_params,
-  interaction,
   gear_params = data.frame(),
   initial_effort,
-  resource_interaction = NULL,
+  interaction,
+  steady = TRUE,
   info_level = 0,
-  ...
+  ...,
+  resource_interaction = NULL
 )
 }
 \arguments{
-\item{params}{An \linkS4class{MRMizerParams} object.}
+\item{params}{A \linkS4class{mizerMR} object.}
 
 \item{species_params}{A data frame with the species parameters of the new
 species.}
-
-\item{interaction}{Interaction matrix. A square matrix giving either the
-interaction coefficients between all species or only those between the new
-species. In the latter case all interaction between an old and a new
-species are set to 1. If this argument is missing, all interactions
-involving a new species are set to 1.}
 
 \item{gear_params}{Data frame with the gear parameters for the new
 species. If not provided then the new species will not be fished.}
@@ -37,18 +32,31 @@ fished by already existing gear. Should not include effort values
 for existing gear. New gear for which no effort is set via this
 vector will have an initial effort of 0.}
 
-\item{resource_interaction}{Optional matrix (new species x resources) of
-interaction values between new species and each resource. Defaults to 1
-for all new species and resources.}
+\item{interaction}{Interaction matrix. A square matrix giving either the
+interaction coefficients between all species or only those between the new
+species. In the latter case all interaction between an old and a new
+species are set to 1. If this argument is missing, all interactions
+involving a new species are set to 1.}
+
+\item{steady}{If \code{TRUE} (default), runs \code{\link[mizer:steadySingleSpecies]{steadySingleSpecies()}} to
+initialise the new species at their single-species steady state and
+retuning their reproductive efficiencies. Set to \code{FALSE} when the caller
+(e.g. an extension package using \code{NextMethod()}) needs to make further
+changes to the params object before that steady-state calculation can be
+run successfully.}
 
 \item{info_level}{Controls the amount of information messages that are shown
 when the function sets default values for parameters. Higher levels lead
 to more messages. Set to 0 to suppress all such messages.}
 
 \item{...}{Additional arguments}
+
+\item{resource_interaction}{Optional matrix (new species x resources) of
+interaction values between new species and each resource. Defaults to 1
+for all new species and resources.}
 }
 \value{
-An \linkS4class{MRMizerParams} object with the new species added.
+A \linkS4class{mizerMR} object with the new species added.
 }
 \description{
 Extends \code{\link[mizer:addSpecies]{mizer::addSpecies()}} to handle the multiple-resource interaction

@@ -2,19 +2,21 @@
 % Please edit documentation in R/species_utils.R
 \name{renameSpecies}
 \alias{renameSpecies}
-\alias{renameSpecies.MRMizerParams}
-\title{Rename species in an MRMizerParams model}
+\alias{renameSpecies.mizerMR}
+\title{Rename species in a mizerMR model}
 \usage{
-\method{renameSpecies}{MRMizerParams}(params, replace)
+\method{renameSpecies}{mizerMR}(params, replace, ...)
 }
 \arguments{
-\item{params}{An \linkS4class{MRMizerParams} object.}
+\item{params}{A \linkS4class{mizerMR} object.}
 
 \item{replace}{A named character vector, with new names as values, and old
 names as names.}
+
+\item{...}{Additional arguments}
 }
 \value{
-An \linkS4class{MRMizerParams} object with the species renamed.
+A \linkS4class{mizerMR} object with the species renamed.
 }
 \description{
 Extends \code{\link[mizer:renameSpecies]{mizer::renameSpecies()}} to also update the row names of the

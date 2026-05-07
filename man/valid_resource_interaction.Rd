@@ -19,3 +19,4 @@ An array (resource x size)
 If \verb{resource interaction} is given it is checked for validity and returned.
 Otherwise the value stored in \code{params} is returned.
 }
+\keyword{internal}

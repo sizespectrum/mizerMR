@@ -18,3 +18,4 @@ An array (resource x size)
 If \code{initial_resource} is given it is checked for validity and returned.
 Otherwise the value stored in \code{params} is returned.
 }
+\keyword{internal}

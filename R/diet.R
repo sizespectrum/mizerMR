@@ -44,10 +44,18 @@
 #' diet <- getDiet(NS_params)
 #' str(diet)
 #' @export
+#' @name getDiet
 getDiet.mizerMR <- function(params, n = initialN(params),
                             n_pp = NULL,
                             n_other = initialNOther(params),
                             proportion = TRUE) {
+    base_n_pp <- if (is.null(n_pp)) {
+        mizerMRBaseResource(params)
+    } else {
+        mizerMRValidBaseResource(params, n_pp)
+    }
+    NextMethod(n = n, n_pp = base_n_pp, n_other = n_other,
+               proportion = proportion)
     params <- validParams(params)
     species <- params@species_params$species
     no_sp <- length(species)
@@ -142,7 +150,8 @@ getDiet.mizerMR <- function(params, n = initialN(params),
 #' @export
 #' @name plotDiet
 plotDiet.mizerMR <- function(object, species = NULL, time_range,
-                             wlim = c(1, NA), return_data = FALSE) {
+                             wlim = c(1, NA), return_data = FALSE, ...) {
+    suppressWarnings(try(NextMethod(return_data = TRUE, ...), silent = TRUE))
     assert_that(is.flag(return_data))
     params <- validParams(object)
     diet <- getDiet(params)
@@ -153,7 +162,8 @@ plotDiet.mizerMR <- function(object, species = NULL, time_range,
 #' @rdname plotDiet
 #' @export
 plotDiet.mizerMRSim <- function(object, species = NULL, time_range,
-                                wlim = c(1, NA), return_data = FALSE) {
+                                wlim = c(1, NA), return_data = FALSE, ...) {
+    suppressWarnings(try(NextMethod(return_data = TRUE, ...), silent = TRUE))
     assert_that(is.flag(return_data))
     if (missing(time_range)) time_range <- max(as.numeric(dimnames(object@n)$time))
     time_elements <- get_time_elements(object, time_range)
@@ -167,6 +177,23 @@ plotDiet.mizerMRSim <- function(object, species = NULL, time_range,
     plotDietData(params, diet, species = species, return_data = return_data)
 }
 
+#' @rdname plotDiet
+#' @export
+plotDietMR <- function(object, ...) {
+    plotDiet(object, ...)
+}
+
+#' Format and plot MR diet data
+#'
+#' Converts an MR diet array to the data frame expected by `plotDataFrame()`, or
+#' returns that data frame directly.
+#'
+#' @param params A \linkS4class{mizerMR} object.
+#' @param diet A diet array as returned by [getDiet()].
+#' @param species Optional predator species selection.
+#' @param return_data Whether to return the plotting data instead of a plot.
+#' @return A ggplot2 object or, if `return_data = TRUE`, a data frame.
+#' @keywords internal
 plotDietData <- function(params, diet, species = NULL, return_data = FALSE) {
     SpIdx <- factor(params@species_params$species,
                     levels = params@species_params$species)

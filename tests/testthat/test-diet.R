@@ -33,3 +33,8 @@ test_that("plotDiet returns the right dimensions", {
     sim <- project(params, t_max = 0.1)
     expect_equal(dim(plotDiet(sim, return_data = TRUE)), c(6080, 4))
 })
+
+test_that("old plotDietMR() alias still works", {
+    expect_equal(plotDietMR(params, return_data = TRUE),
+                 plotDiet(params, return_data = TRUE))
+})

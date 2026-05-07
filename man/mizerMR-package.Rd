@@ -13,7 +13,7 @@ An add-on to the mizer package which allows multiple size-structured resource sp
 \seealso{
 Useful links:
 \itemize{
-  \item \url{http://sizespectrum.org/mizerMR/}
+  \item \url{https://sizespectrum.org/mizerMR}
   \item \url{https://github.com/sizespectrum/mizerMR}
   \item Report bugs at \url{https://github.com/sizespectrum/mizerMR/issues}
 }

@@ -43,9 +43,9 @@ str(fr)
 \link[mizer:plotting_functions]{plotting_functions}
 
 Other plotting functions:
-\code{\link[=animateSpectra.mizerMRSim]{animateSpectra.mizerMRSim()}},
+\code{\link{animateSpectra}},
 \code{\link{plotDiet}},
 \code{\link[=plotResourceLevel]{plotResourceLevel()}},
-\code{\link[=plotSpectra.mizerMRSim]{plotSpectra.mizerMRSim()}}
+\code{\link{plotSpectra}}
 }
 \concept{plotting functions}

@@ -27,9 +27,10 @@ built on top of mizer's extension machinery. It assumes you have read
 
 mizerMR uses `setComponent()` for the multiple-resource state,
 `other_params()` for resource metadata, and mizer's extension-chain S3 methods
-for the projection rate hooks that need to know about the multiple resources.
-This means mizerMR can compose with other extension packages, such as
-therMizer, instead of replacing entire mizer rate functions.
+for mizer generics that need to know about the multiple resources. Its methods
+call `NextMethod()` so that mizerMR can compose with other extension packages,
+such as therMizer, instead of replacing entire mizer rate functions or plotting
+helpers.
 
 # How mizerMR currently works
 
@@ -62,21 +63,36 @@ computed earlier in the rate pipeline.
 The component state at every saved time step ends up in `sim@n_other[, "MR"]`
 and is exposed to users via `NResource(sim)` and `finalNResource(sim)`.
 
-## Two projection methods extend the defaults
+## mizerMR registers as a dispatching extension
+
+mizerMR defines the S4 marker classes `mizerMR` and `mizerMRSim`. The package
+registers itself with mizer when it is loaded:
+
+```r
+.onLoad <- function(libname, pkgname) {
+    mizer::registerExtensions(
+        stats::setNames("sizespectrum/mizerMR", pkgname))
+}
+```
+
+When `setMultipleResources()` has finished setting up the component state, it
+records the current session extension chain in the object and coerces the object
+to the appropriate dispatch class:
+
+```r
+params@extensions <- mizer::getRegisteredExtensions()
+mizer::coerceToExtensionClass(params)
+```
+
+This is the same two-step constructor pattern described in mizer's extension
+package vignette. The stored value for mizerMR is the package requirement string
+`"sizespectrum/mizerMR"`, which mizer can use when loading saved objects.
+
+## Projection methods extend the defaults
 
 The built-in mizer encounter and resource-mortality rate functions work with a
 single `n_pp` vector. mizerMR adds methods for the `mizerMR` extension class so
 that extension-aware projections understand the multi-resource array.
-
-`setMultipleResources()` records `mizerMR` in `params@extensions`, registers the
-resulting extension chain and coerces the params object to the appropriate
-dispatch class. The value is `NA_character_` because mizer creates the S4 marker
-class dynamically for the active extension chain.
-
-```r
-params@extensions <- c(mizerMR = NA_character_, params@extensions)
-params <- mizer::coerceToExtensionClass(params)
-```
 
 ### `projectEncounter.mizerMR`
 
@@ -90,13 +106,15 @@ encounter contribution.
 
 ```r
 projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
-    encounter <- NextMethod()
+    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    encounter <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
     for (resource in seq_len(nrow(n_other[["MR"]]))) {
         params@species_params$interaction_resource <-
             params@other_params[["MR"]]$interaction[, resource]
         n[] <- 0
         n_pp <- n_other[["MR"]][resource, ]
-        encounter <- encounter + NextMethod()
+        encounter <- encounter + NextMethod(n = n, n_pp = n_pp,
+                                            n_other = n_other, t = t)
     }
     encounter
 }
@@ -116,16 +134,15 @@ species–resource interaction:
 ```r
 projectResourceMort.mizerMR <- function(params, n, n_pp, n_other, t,
                                         pred_rate, ...) {
+    NextMethod()
     t(params@other_params[["MR"]]$interaction) %*% pred_rate
 }
 ```
 
-This matrix is later passed row-by-row to each per-resource dynamics function
-inside `mizerMR_dynamics()`.
-
-The exported `mizerMRResourceMort()` name is retained as a compatibility alias,
-but `setMultipleResources()` leaves `params@rates_funcs$ResourceMort` pointing
-at mizer's default function.
+The `NextMethod()` call keeps the extension chain live. mizerMR does not use the
+single-resource mortality vector returned by mizer's base method; instead it
+returns a matrix that is later passed row-by-row to each per-resource dynamics
+function inside `mizerMR_dynamics()`.
 
 ## The built-in single resource is silenced
 
@@ -147,24 +164,18 @@ live inside the component's own `component_params`. This split reflects the
 two-level structure recommended by mizer: `other_params()` for model-wide
 state, `component_params` for data belonging to a single component.
 
-## Result accessors and plots are methods
+## Accessors, plots and species utilities are methods
 
 Functions like `NResource()`, `finalNResource()`, `plotSpectra()`, `getDiet()`,
 and `plotDiet()` need to behave differently depending on whether the model has
-multiple resources or not. They are implemented as S3 generics with methods for
-plain mizer objects that delegate to mizer and methods for `mizerMR` or
-`mizerMRSim` objects that use the multiple-resource component.
+multiple resources or not. They are mizer S3 generics, and mizerMR registers
+methods for `mizerMR` or `mizerMRSim` objects that use the multiple-resource
+component. Those methods still call `NextMethod()` so that other extension
+packages can participate in the same generic.
 
 ```r
-NResource <- function(sim) {
-    UseMethod("NResource")
-}
-
-NResource.MizerSim <- function(sim) {
-    mizer::NResource(sim)
-}
-
 NResource.mizerMRSim <- function(sim) {
+    NextMethod()
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
     dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
     names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
@@ -174,24 +185,28 @@ NResource.mizerMRSim <- function(sim) {
 
 When a user calls `NResource(sim)` and `sim` is a `mizerMRSim`, R dispatches
 to `NResource.mizerMRSim`. When `sim` is a plain `MizerSim` (no multiple
-resources), R dispatches to `NResource.MizerSim`, which simply calls
-`mizer::NResource(sim)`.
+resources), R dispatches to mizer's own `NResource.MizerSim`.
 
 The same pattern applies to `finalNResource`, `plotSpectra`, `getDiet`,
 `plotDiet`, and `animateSpectra`.
 
-mizer creates the `mizerMR` and `mizerMRSim` marker classes dynamically when
-`setMultipleResources()` registers the extension chain. `project()` then returns
-a `mizerMRSim` object automatically, so the correct methods fire without the
-user having to do anything special.
+Species-manipulation helpers follow the same rule. Methods such as
+`addSpecies.mizerMR`, `removeSpecies.mizerMR`, `renameSpecies.mizerMR` and
+`expandSizeGrid.mizerMR` strip the MR component temporarily when mizer's base
+operation needs to run on an ordinary single-resource object, call
+`NextMethod()`, and then rebuild the MR component on the returned object.
+
+`project()` returns a `mizerMRSim` object automatically because the params object
+inside the simulation carries the `mizerMR` extension chain, so the correct
+methods fire without the user having to do anything special.
 
 ## Summary of benefits
 
 | Aspect | Method approach |
 |---|---|
 | Dispatch logic | R method dispatch, with no repeated component guards |
-| Fallback to mizer | Plain `MizerParams` and `MizerSim` methods delegate to mizer |
-| Extensibility | User-facing helpers follow standard R generic behaviour |
+| Fallback to mizer | Methods call `NextMethod()` to keep the chain live |
+| Extensibility | Rate hooks, accessors, plots and species utilities follow standard R generic behaviour |
 | Correctness risk | MR-specific code is tied to the `mizerMR` class membership |
 
 The extension mechanism in mizer is designed with this kind of layering in

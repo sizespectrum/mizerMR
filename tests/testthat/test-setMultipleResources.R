@@ -15,7 +15,8 @@ test_that("Can reproduce single resource behaviour", {
     expect_equal(sim@n_other[[11, "MR"]][1, ], simo@n_pp[11, ])
 
     # test that extension field in metadata is set
-    expect_true(is.na(getMetadata(params)$extensions[["mizerMR"]]))
+    expect_equal(getMetadata(params)$extensions[["mizerMR"]],
+                 "sizespectrum/mizerMR")
     expect_equal(params@rates_funcs$Encounter, "mizerEncounter")
     expect_equal(params@rates_funcs$ResourceMort, "mizerResourceMort")
 })
@@ -130,6 +131,17 @@ test_that("Work with non-MR objects", {
                      mizer::resource_capacity(NS_params))
     expect_identical(resource_rate(NS_params),
                      mizer::resource_rate(NS_params))
+})
+
+test_that("mizerMR methods fall back before MR component is installed", {
+    params <- NS_params
+    params@extensions <- mizer::getRegisteredExtensions()
+    params <- mizer::coerceToExtensionClass(params)
+    expect_identical(initialNResource(params),
+                     mizer::initialNResource(NS_params))
+    initial <- 0 * mizer::initialNResource(NS_params)
+    initialNResource(params) <- initial
+    expect_identical(mizer::initialNResource(params), initial)
 })
 
 test_that("Multiple resources compose with outer encounter methods", {

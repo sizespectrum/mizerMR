@@ -33,7 +33,7 @@ resource_interaction(params)
 
 resource_interaction(params) <- value
 
-\method{initialNResource}{mizerMR}(params)
+\method{initialNResource}{mizerMR}(object)
 
 \method{initialNResource}{mizerMR}(params) <- value
 }
@@ -54,6 +54,8 @@ resource growth rates}
 \item{initial_resource}{Optional. Array (resource x size) of initial values}
 
 \item{value}{Value to assign}
+
+\item{object}{A mizerMR object}
 }
 \description{
 Set up multiple resources

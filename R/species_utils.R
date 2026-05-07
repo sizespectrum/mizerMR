@@ -1,25 +1,26 @@
-#' Add species to an MRMizerParams model
+#' Add species to a mizerMR model
 #'
 #' Extends [mizer::addSpecies()] to handle the multiple-resource interaction
 #' matrix. New species are added with a resource interaction of 1 for all
 #' resources by default, or as specified by `resource_interaction`.
 #'
-#' @param params An \linkS4class{MRMizerParams} object.
+#' @param params A \linkS4class{mizerMR} object.
 #' @param species_params A data frame with the species parameters of the new
 #'   species.
 #' @param resource_interaction Optional matrix (new species x resources) of
 #'   interaction values between new species and each resource. Defaults to 1
 #'   for all new species and resources.
 #' @inheritParams mizer::addSpecies
-#' @return An \linkS4class{MRMizerParams} object with the new species added.
+#' @return A \linkS4class{mizerMR} object with the new species added.
 #' @export
 #' @name addSpecies
-addSpecies.MRMizerParams <- function(params, species_params,
-                                     interaction,
-                                     gear_params = data.frame(),
-                                     initial_effort,
-                                     resource_interaction = NULL,
-                                     info_level = 0, ...) {
+addSpecies.mizerMR <- function(params, species_params,
+                               gear_params = data.frame(),
+                               initial_effort,
+                               interaction,
+                               steady = TRUE,
+                               info_level = 0, ...,
+                               resource_interaction = NULL) {
     # Save MR state
     rp <- resource_params(params)
     old_interaction <- resource_interaction(params)
@@ -27,18 +28,13 @@ addSpecies.MRMizerParams <- function(params, species_params,
     no_res <- nrow(rp)
 
     # Strip MR so mizer's addSpecies can compute encounter rates normally
-    p_stripped <- .strip_mr(params)
+    params <- .strip_mr(params)
 
     # Call mizer's addSpecies
     if (missing(interaction)) {
-        p <- addSpecies(p_stripped, species_params,
-                        gear_params = gear_params,
-                        info_level = info_level, ...)
+        p <- NextMethod()
     } else {
-        p <- addSpecies(p_stripped, species_params,
-                        interaction = interaction,
-                        gear_params = gear_params,
-                        info_level = info_level, ...)
+        p <- NextMethod()
     }
     if (!missing(initial_effort)) {
         p@initial_effort[names(initial_effort)] <- initial_effort
@@ -77,97 +73,113 @@ addSpecies.MRMizerParams <- function(params, species_params,
 }
 
 
-#' Remove species from an MRMizerParams model
+#' Remove species from a mizerMR model
 #'
 #' Extends [mizer::removeSpecies()] to also trim the resource interaction
 #' matrix.
 #'
-#' @param params An \linkS4class{MRMizerParams} object.
+#' @param params A \linkS4class{mizerMR} object.
 #' @inheritParams mizer::removeSpecies
-#' @return An \linkS4class{MRMizerParams} object with the specified species removed.
+#' @return A \linkS4class{mizerMR} object with the specified species removed.
 #' @export
 #' @name removeSpecies
-removeSpecies.MRMizerParams <- function(params, species) {
+removeSpecies.mizerMR <- function(params, species, ...) {
+    rp <- resource_params(params)
+    capacity <- resource_capacity(params)
+    rate <- resource_rate(params)
+    initial_resource <- initialNResource(params)
     old_interaction <- resource_interaction(params)
 
     # Provide initial resource values so the MR encounter function works
     # during any internal validation inside mizer's removeSpecies
-    p <- as(params, "MizerParams")
-    p@initial_n_other[["MR"]] <- getComponent(params, "MR")$initial_value
+    params <- as(params, "MizerParams")
+    params@initial_n_other[["MR"]] <- initial_resource
 
-    p <- removeSpecies(p, species)
+    p <- NextMethod()
 
     # Trim the interaction matrix to the remaining species
     remaining_sp <- p@species_params$species
-    p@other_params[["MR"]]$interaction <-
-        old_interaction[remaining_sp, , drop = FALSE]
-
-    new("MRMizerParams", p)
+    interaction <- old_interaction[remaining_sp, , drop = FALSE]
+    setMultipleResources(p, resource_params = rp,
+                         resource_interaction = interaction,
+                         resource_capacity = capacity,
+                         resource_rate = rate,
+                         initial_resource = initial_resource)
 }
 
 
-#' Rename species in an MRMizerParams model
+#' Rename species in a mizerMR model
 #'
 #' Extends [mizer::renameSpecies()] to also update the row names of the
 #' resource interaction matrix.
 #'
-#' @param params An \linkS4class{MRMizerParams} object.
+#' @param params A \linkS4class{mizerMR} object.
 #' @inheritParams mizer::renameSpecies
-#' @return An \linkS4class{MRMizerParams} object with the species renamed.
+#' @return A \linkS4class{mizerMR} object with the species renamed.
 #' @export
 #' @name renameSpecies
-renameSpecies.MRMizerParams <- function(params, replace) {
+renameSpecies.mizerMR <- function(params, replace, ...) {
+    rp <- resource_params(params)
+    capacity <- resource_capacity(params)
+    rate <- resource_rate(params)
+    initial_resource <- initialNResource(params)
     old_interaction <- resource_interaction(params)
 
     # Provide initial resource values so the MR encounter function works
     # during any internal validation inside mizer's renameSpecies
-    p <- as(params, "MizerParams")
-    p@initial_n_other[["MR"]] <- getComponent(params, "MR")$initial_value
+    params <- as(params, "MizerParams")
+    params@initial_n_other[["MR"]] <- initial_resource
 
-    p <- renameSpecies(p, replace)
+    p <- NextMethod()
 
     # Update row names in the interaction matrix
     rownames(old_interaction) <- p@species_params$species
-    p@other_params[["MR"]]$interaction <- old_interaction
-
-    new("MRMizerParams", p)
+    setMultipleResources(p, resource_params = rp,
+                         resource_interaction = old_interaction,
+                         resource_capacity = capacity,
+                         resource_rate = rate,
+                         initial_resource = initial_resource)
 }
 
 
-#' Expand the size grid of an MRMizerParams model
+#' Expand the size grid of a mizerMR model
 #'
-#' Extends [mizer::expandSizeGrid()] to handle \linkS4class{MRMizerParams}
+#' Extends [mizer::expandSizeGrid()] to handle \linkS4class{mizerMR}
 #' objects. The resource rate, capacity, and initial abundance arrays are
 #' recalculated on the new grid from the resource parameters.
 #'
-#' @param params An \linkS4class{MRMizerParams} object.
+#' @param params A \linkS4class{mizerMR} object.
 #' @inheritParams mizer::expandSizeGrid
-#' @return An \linkS4class{MRMizerParams} object with an expanded size grid.
+#' @return A \linkS4class{mizerMR} object with an expanded size grid.
 #' @export
 #' @name expandSizeGrid
-expandSizeGrid.MRMizerParams <- function(params,
-                                         new_min_w = min(params@w),
-                                         new_max_w = max(params@w),
-                                         preserve_species =
-                                             params@species_params$species) {
+expandSizeGrid.mizerMR <- function(params,
+                                   new_min_w = min(params@w),
+                                   new_max_w = max(params@w),
+                                   preserve_species =
+                                       params@species_params$species,
+                                   ...) {
     rp <- resource_params(params)
     interaction <- resource_interaction(params)
 
-    p_stripped <- .strip_mr(params)
-    p <- mizer::expandSizeGrid(p_stripped, new_min_w = new_min_w,
-                               new_max_w = new_max_w,
-                               preserve_species = preserve_species)
+    params <- .strip_mr(params)
+    p <- NextMethod()
 
     setMultipleResources(p, resource_params = rp,
                          resource_interaction = interaction)
 }
 
 
-# Internal helper: strip the MR extension from params so that mizer's own
-# methods (addSpecies, expandSizeGrid) can run without triggering the MR
-# encounter function.  Also restores the built-in resource to the state
-# implied by the stored resource_params so that steadySingleSpecies can find
-# a valid solution.
+#' Strip the MR extension from params
+#'
+#' Removes the MR extension state so that mizer's own methods can run without
+#' triggering the MR encounter method. Also restores the built-in resource from
+#' the stored mizer resource parameters so that steady-state calculations have a
+#' valid single-resource spectrum.
+#'
+#' @param params A \linkS4class{mizerMR} object.
+#' @return A \linkS4class{MizerParams} object without the MR extension.
+#' @keywords internal
 .strip_mr <- function(params) {
     p <- as(params, "MizerParams")
 

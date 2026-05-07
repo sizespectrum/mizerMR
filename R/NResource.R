@@ -6,6 +6,7 @@
 #' @export
 #' @name NResource
 NResource.mizerMRSim <- function(sim) {
+    NextMethod()
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
     dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
     names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
@@ -17,5 +18,6 @@ NResource.mizerMRSim <- function(sim) {
 #'   resource number densities at the end of the simulation
 #' @export
 finalNResource.mizerMRSim <- function(sim) {
+    NextMethod()
     NOther(sim)[[idxFinalT(sim), "MR"]]
 }

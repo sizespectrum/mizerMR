@@ -20,10 +20,16 @@
 #' @param ylim A numeric vector of length two providing lower and upper limits
 #'   for the y axis. Use NA to refer to the existing minimum or maximum. Any
 #'   values below 1e-20 are always cut off.
+#' @param time_range The time range to average over when called with a
+#'   \linkS4class{MizerSim} object.
+#' @param geometric_mean Whether to average abundances using a geometric mean
+#'   when called with a \linkS4class{MizerSim} object.
 #' @param power The abundance is plotted as the number density times the weight
 #' raised to `power`. The default \code{power = 1} gives the biomass
 #' density, whereas \code{power = 2} gives the biomass density with respect
 #' to logarithmic size bins.
+#' @param biomass Deprecated compatibility argument. If `power` is missing,
+#'   `power` is set to `as.numeric(biomass)`.
 #' @param total A boolean value that determines whether the total over all
 #'   species and resources in the system is plotted as well. Note that even if
 #'   the plot only shows a selection of species, the total is including all
@@ -42,20 +48,77 @@
 #' @family plotting functions
 #' @seealso [plotting_functions]
 #' @export
+#' @name plotSpectra
 plotSpectra.mizerMRSim <- function(object, species = NULL, resources = NULL,
+                                   time_range,
+                                   geometric_mean = FALSE,
                                    wlim = c(NA, NA), ylim = c(NA, NA),
-                                   power = 1,
+                                   power = 1, biomass = TRUE,
                                    total = FALSE,
                                    background = TRUE,
                                    highlight = NULL, return_data = FALSE,
                                    ...) {
-    params <- setInitialValues(object@params, object)
-    mizer::plotSpectra(params, species = species, resources = resources,
-                       wlim = wlim, ylim = ylim, power = power, total = total,
-                       background = background, highlight = highlight,
-                       return_data = return_data, ...)
+    if (missing(power)) {
+        power <- as.numeric(biomass)
+    }
+    if (missing(time_range)) {
+        time_range  <- max(as.numeric(dimnames(object@n)$time))
+    }
+    time_elements <- get_time_elements(object, time_range)
+    mean_fn <- mean
+    if (geometric_mean) {
+        mean_fn <- function(x) {
+            exp(mean(log(x)))
+        }
+    }
+
+    object@n_pp <- apply(NResource(object), c(1, 3), sum)
+    df <- NextMethod(species = species, time_range = time_range,
+                     geometric_mean = geometric_mean,
+                     wlim = wlim, ylim = ylim, power = power, total = total,
+                     resource = FALSE, background = background,
+                     highlight = highlight, return_data = TRUE, ...) %>%
+        dplyr::rename(Spectra = Species)
+    params <- object@params
+    resources <- valid_resources_arg(params, resources)
+
+    if (is.na(wlim[1])) {
+        wlim[1] <- min(params@w) / 100
+    }
+    if (is.na(wlim[2])) {
+        wlim[2] <- max(params@w_full)
+    }
+    n_res <- apply(NResource(object)[time_elements, resources, , drop = FALSE],
+                   c(2, 3), mean_fn)
+    rf <- melt(n_res) %>%
+        dplyr::filter(value > 0,
+                      w >= wlim[[1]], w <= wlim[[2]]) %>%
+        dplyr::mutate(Legend = resource) %>%
+        dplyr::rename(Spectra = resource)
+    if (!is.na(ylim[2])) {
+        rf <- rf[rf$value <= ylim[2], ]
+    }
+    if (is.na(ylim[1])) {
+        ylim[1] <- 1e-20
+    }
+    rf <- rf[rf$value > ylim[1], ]
+    rf <- dplyr::mutate(rf, value = value * w^power)
+
+    df <- rbind(df, rf)
+    if (return_data) {
+        return(df)
+    }
+    if (power %in% c(0, 1, 2)) {
+        y_label <- c("Number density [1/g]", "Biomass density",
+                     "Biomass density [g]")[power + 1]
+    } else {
+        y_label <- paste0("Number density * w^", power)
+    }
+    plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
+                  ylab = y_label, xlab = "Size [g]")
 }
 
+#' @rdname plotSpectra
 #' @export
 plotSpectra.mizerMR <- function(object, species = NULL, resources = NULL,
                                 wlim = c(NA, NA), ylim = c(NA, NA),
@@ -67,15 +130,14 @@ plotSpectra.mizerMR <- function(object, species = NULL, resources = NULL,
 
     # set n_pp to total plankton abundance so that the total in mizer's
     # plotSpectra() gives the right curve
-    params@initial_n_pp <- colSums(params@initial_n_other[["MR"]])
+    object@initial_n_pp <- colSums(object@initial_n_other[["MR"]])
 
-    df <- mizer::plotSpectra(params, species = species,
-                             wlim = wlim, ylim = ylim,
-                             power = power, total = total,
-                             background = background,
-                             highlight = highlight,
-                             resource = FALSE,
-                             return_data = TRUE, ...) %>%
+    df <- NextMethod(species = species, wlim = wlim, ylim = ylim,
+                     power = power, total = total,
+                     background = background,
+                     highlight = highlight,
+                     resource = FALSE,
+                     return_data = TRUE, ...) %>%
         dplyr::rename(Spectra = Species)
 
     resources <- valid_resources_arg(params, resources)

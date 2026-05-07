@@ -1,53 +1,101 @@
+#' Multiple-resource project methods
+#'
+#' Internal helpers and S3 methods used to make mizer's rate and projection
+#' generics work with the multiple-resource component.
+#'
+#' @param params A \linkS4class{mizerMR} object.
+#' @param n A matrix of species abundances (species x size).
+#' @param n_pp A resource abundance vector, or an MR resource array that will be
+#'   replaced by the silenced built-in resource vector before calling mizer's
+#'   base method.
+#' @param n_other A list of abundances for other dynamical components.
+#' @param effort Fishing effort by gear.
+#' @param t Current projection time.
+#' @param ... Further arguments passed along the mizer method chain.
+#'
+#' @return The return value depends on the method called: a rate array, a rate
+#'   list, or a resource abundance vector.
+#' @keywords internal
+#' @name project_methods
+NULL
+
+#' Return the silenced built-in resource vector.
+#'
+#' @rdname project_methods
 mizerMRBaseResource <- function(params) {
     get("initialNResource.MizerParams", asNamespace("mizer"))(params)
 }
 
+#' Replace MR resource arrays before calling base mizer methods.
+#'
+#' @rdname project_methods
+mizerMRValidBaseResource <- function(params, n_pp) {
+    if (!is.null(dim(n_pp)) || length(n_pp) != length(params@initial_n_pp)) {
+        return(mizerMRBaseResource(params))
+    }
+    n_pp
+}
+
+#' Extend [mizer::getEncounter()] for mizerMR params.
+#'
+#' @rdname project_methods
 #' @export
 getEncounter.mizerMR <- function(params, n = initialN(params),
                                  n_pp = mizerMRBaseResource(params),
                                  n_other = initialNOther(params),
                                  t = 0, ...) {
-    if (!is.null(dim(n_pp)) || length(n_pp) != length(params@initial_n_pp)) {
-        n_pp <- mizerMRBaseResource(params)
-    }
-    get("getEncounter.MizerParams", asNamespace("mizer"))(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
 }
 
+#' Extend [mizer::getPredRate()] for mizerMR params.
+#'
+#' @rdname project_methods
 #' @export
 getPredRate.mizerMR <- function(params, n = initialN(params),
                                 n_pp = mizerMRBaseResource(params),
                                 n_other = initialNOther(params),
                                 t = 0, ...) {
-    get("getPredRate.MizerParams", asNamespace("mizer"))(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
 }
 
+#' Extend [mizer::getResourceMort()] for mizerMR params.
+#'
+#' @rdname project_methods
 #' @export
 getResourceMort.mizerMR <- function(params, n = initialN(params),
                                     n_pp = mizerMRBaseResource(params),
                                     n_other = initialNOther(params),
                                     t = 0, ...) {
-    get("getResourceMort.MizerParams", asNamespace("mizer"))(
-        params, n = n, n_pp = n_pp, n_other = n_other, t = t, ...)
+    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
 }
 
+#' Extend [mizer::getRates()] for mizerMR params.
+#'
+#' @rdname project_methods
 #' @export
 getRates.mizerMR <- function(params, n = initialN(params),
                              n_pp = mizerMRBaseResource(params),
                              n_other = initialNOther(params),
                              effort, t = 0, ...) {
-    args <- list(params = params, n = n, n_pp = n_pp, n_other = n_other,
-                 t = t, ...)
-    if (!missing(effort)) {
-        args$effort <- effort
+    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    if (missing(effort)) {
+        NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
+    } else {
+        NextMethod(n = n, n_pp = n_pp, n_other = n_other, effort = effort,
+                   t = t)
     }
-    do.call(get("getRates.MizerParams", asNamespace("mizer")), args)
 }
 
+#' Add MR resource encounter rates during projection.
+#'
+#' @rdname project_methods
 #' @export
 projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
-    encounter <- NextMethod()
+    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    encounter <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
     n_mr <- n_other[["MR"]]
     if (is.null(n_mr)) {
         return(encounter)
@@ -71,12 +119,16 @@ projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
             params@other_params[["MR"]]$interaction[, resource]
         n <- zero_n
         n_pp <- n_mr[resource, ]
-        encounter <- encounter + NextMethod()
+        encounter <- encounter + NextMethod(n = n, n_pp = n_pp,
+                                            n_other = n_other, t = t)
     }
 
     encounter
 }
 
+#' Compatibility wrapper for the MR encounter contribution.
+#'
+#' @rdname project_methods
 #' @export
 mizerMREncounter <- function(params, n, n_pp, n_other, t = 0, ...) {
     encounter <- mizerEncounter(
@@ -87,6 +139,9 @@ mizerMREncounter <- function(params, n, n_pp, n_other, t = 0, ...) {
     encounter + mizerMRResourceEncounter(params, n_other)
 }
 
+#' Calculate the MR resource encounter contribution.
+#'
+#' @rdname project_methods
 mizerMRResourceEncounter <- function(params, n_other) {
     idx_sp <- (length(params@w_full) - length(params@w) + 1):length(params@w_full)
     prey <- params@other_params[["MR"]]$interaction %*% n_other[["MR"]]
@@ -100,4 +155,21 @@ mizerMRResourceEncounter <- function(params, n_other) {
     encounter <- params@search_vol * avail_energy
 
     return(encounter)
+}
+
+#' Multiple-resource predation mortality
+#'
+#' Internal projection hook for predation mortality on multiple resources.
+#'
+#' @keywords internal
+#' @export
+#' @rdname project_methods
+projectResourceMort.mizerMR <- function(params, n, n_pp, n_other, t = 0,
+                                        pred_rate, ...) {
+    resource_mort <- NextMethod()
+    interaction <- params@other_params[["MR"]]$interaction
+    if (is.null(interaction)) {
+        return(resource_mort)
+    }
+    t(interaction) %*% pred_rate
 }

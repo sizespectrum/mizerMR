@@ -2,18 +2,19 @@
 % Please edit documentation in R/species_utils.R
 \name{expandSizeGrid}
 \alias{expandSizeGrid}
-\alias{expandSizeGrid.MRMizerParams}
-\title{Expand the size grid of an MRMizerParams model}
+\alias{expandSizeGrid.mizerMR}
+\title{Expand the size grid of a mizerMR model}
 \usage{
-\method{expandSizeGrid}{MRMizerParams}(
+\method{expandSizeGrid}{mizerMR}(
   params,
   new_min_w = min(params@w),
   new_max_w = max(params@w),
-  preserve_species = params@species_params$species
+  preserve_species = params@species_params$species,
+  ...
 )
 }
 \arguments{
-\item{params}{An \linkS4class{MRMizerParams} object.}
+\item{params}{A \linkS4class{mizerMR} object.}
 
 \item{new_min_w}{The new minimum size in the grid. Must not be larger than
 the current minimum size.}
@@ -25,12 +26,14 @@ the current maximum size.}
 should be copied over to the new params object rather than being
 re-calculated from the species parameters. If missing, all species are
 preserved.}
+
+\item{...}{Additional arguments (currently unused).}
 }
 \value{
-An \linkS4class{MRMizerParams} object with an expanded size grid.
+A \linkS4class{mizerMR} object with an expanded size grid.
 }
 \description{
-Extends \code{\link[mizer:expandSizeGrid]{mizer::expandSizeGrid()}} to handle \linkS4class{MRMizerParams}
+Extends \code{\link[mizer:expandSizeGrid]{mizer::expandSizeGrid()}} to handle \linkS4class{mizerMR}
 objects. The resource rate, capacity, and initial abundance arrays are
 recalculated on the new grid from the resource parameters.
 }

@@ -7,7 +7,8 @@
 #' Objects of class `mizerMRSim` are returned automatically by [project()]
 #' when called on a `mizerMR` params object.
 #'
-#' @name mizerShelf-class
+#' @name mizerMR-class
+#' @aliases mizerMRSim-class
 NULL
 
 #' @export

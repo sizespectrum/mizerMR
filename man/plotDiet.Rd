@@ -4,6 +4,7 @@
 \alias{plotDiet}
 \alias{plotDiet.mizerMR}
 \alias{plotDiet.mizerMRSim}
+\alias{plotDietMR}
 \alias{plotlyDiet}
 \title{Plot diet, resolved by prey species, as function of predator at size.}
 \usage{
@@ -12,7 +13,8 @@
   species = NULL,
   time_range,
   wlim = c(1, NA),
-  return_data = FALSE
+  return_data = FALSE,
+  ...
 )
 
 \method{plotDiet}{mizerMRSim}(
@@ -20,8 +22,11 @@
   species = NULL,
   time_range,
   wlim = c(1, NA),
-  return_data = FALSE
+  return_data = FALSE,
+  ...
 )
+
+plotDietMR(object, ...)
 
 plotlyDiet(object, species = NULL, time_range, wlim = c(1, NA), ...)
 }
@@ -59,12 +64,12 @@ Prey species that contribute less than 1 permille to the diet are suppressed
 in the plot.
 }
 \seealso{
-\code{\link[mizer:getDiet]{getDiet()}}
+\code{\link[=getDiet]{getDiet()}}
 
 Other plotting functions:
-\code{\link[=animateSpectra.mizerMRSim]{animateSpectra.mizerMRSim()}},
+\code{\link{animateSpectra}},
 \code{\link[=plotResourceLevel]{plotResourceLevel()}},
 \code{\link[=plotResourcePred]{plotResourcePred()}},
-\code{\link[=plotSpectra.mizerMRSim]{plotSpectra.mizerMRSim()}}
+\code{\link{plotSpectra}}
 }
 \concept{plotting functions}

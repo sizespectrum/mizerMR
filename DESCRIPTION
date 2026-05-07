@@ -45,11 +45,14 @@ Collate:
     diet.R
     plotResource.R
     species_utils.R
-URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
+URL: https://sizespectrum.org/mizerMR, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB
 Suggests: 
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
