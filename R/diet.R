@@ -201,9 +201,9 @@ plotDietData <- function(params, diet, species = NULL, return_data = FALSE) {
 
     plot_dat <- melt(diet)
     plot_dat <- plot_dat[plot_dat$value > 0.001, ]
-    colnames(plot_dat) <- c("Predator", "size", "Prey", "Proportion")
+    colnames(plot_dat) <- c("Predator", "w", "Prey", "Proportion")
     plot_dat$Prey <- factor(plot_dat$Prey, levels = rev(unique(plot_dat$Prey)))
-    plot_dat <- plot_dat[, c("size","Proportion","Prey","Predator")]
+    plot_dat <- plot_dat[, c("w","Proportion","Prey","Predator")]
     plot_dat <- dplyr::filter(plot_dat, Predator %in% species)
 
     if (return_data)  return(plot_dat)
@@ -211,16 +211,4 @@ plotDietData <- function(params, diet, species = NULL, return_data = FALSE) {
     plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator", xtrans = "log10",
                   xlab = "Size [g]",
                   wrap_scale = "free")
-}
-
-#' @rdname plotDiet
-#' @export
-plotlyDiet <- function(object,
-                       species = NULL,
-                       time_range,
-                       wlim = c(1, NA),
-                        ...) {
-    argg <- c(as.list(environment()), list(...))
-    ggplotly(do.call(mizer::plotDiet, argg),
-             tooltip = c("size","Proportion","Prey"))
 }

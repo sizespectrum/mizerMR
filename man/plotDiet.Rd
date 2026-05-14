@@ -5,7 +5,6 @@
 \alias{plotDiet.mizerMR}
 \alias{plotDiet.mizerMRSim}
 \alias{plotDietMR}
-\alias{plotlyDiet}
 \title{Plot diet, resolved by prey species, as function of predator at size.}
 \usage{
 \method{plotDiet}{mizerMR}(
@@ -27,8 +26,6 @@
 )
 
 plotDietMR(object, ...)
-
-plotlyDiet(object, species = NULL, time_range, wlim = c(1, NA), ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerSim} or

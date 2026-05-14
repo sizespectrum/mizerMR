@@ -30,8 +30,12 @@ test_that("plotDiet plot has not changed", {
 
 test_that("plotDiet returns the right dimensions", {
     expect_equal(dim(plotDiet(params, return_data = TRUE)), c(6080, 4))
+    expect_equal(names(plotDiet(params, return_data = TRUE)),
+                 c("w", "Proportion", "Prey", "Predator"))
     sim <- project(params, t_max = 0.1)
     expect_equal(dim(plotDiet(sim, return_data = TRUE)), c(6080, 4))
+    expect_equal(names(plotDiet(sim, return_data = TRUE)),
+                 c("w", "Proportion", "Prey", "Predator"))
 })
 
 test_that("old plotDietMR() alias still works", {
