@@ -10,6 +10,12 @@
   for all resources combined instead of one per resource, so the encounter cost
   no longer grows with the number of resources. A per-resource fallback is
   retained for models with a custom (non-Fourier) predation kernel.
+* `scaleModel()`, `scaleRates()`, `setResource()` and `summary()` now have
+  multiple-resource methods. `scaleModel()` and `scaleRates()` rescale all
+  resource capacities, abundances and rates consistently (previously
+  `scaleModel()` errored); `setResource()` warns that it only affects the
+  silenced built-in resource; and `summary()` reports the combined resource
+  size range instead of the empty built-in resource.
 
 # mizerMR 0.0.3
 

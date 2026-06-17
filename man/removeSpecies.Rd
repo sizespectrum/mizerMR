@@ -14,7 +14,7 @@
 numeric vector of species indices, or a logical vector indicating for
 each species whether it is to be removed (TRUE) or not.}
 
-\item{...}{Additional arguments}
+\item{...}{Currently unused.}
 }
 \value{
 A \linkS4class{mizerMR} object with the specified species removed.

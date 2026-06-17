@@ -13,7 +13,7 @@
 \item{replace}{A named character vector, with new names as values, and old
 names as names.}
 
-\item{...}{Additional arguments}
+\item{...}{Currently unused.}
 }
 \value{
 A \linkS4class{mizerMR} object with the species renamed.

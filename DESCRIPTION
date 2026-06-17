@@ -41,6 +41,7 @@ Collate:
     resource_dynamics.R
     resource_params.R
     setMultipleResources.R
+    params_methods.R
     test-helpers.R
     diet.R
     plotResource.R

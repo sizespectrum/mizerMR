@@ -5,7 +5,7 @@
 \alias{animateSpectra.mizerMRSim}
 \title{Animation of the abundance spectra}
 \usage{
-\method{animateSpectra}{mizerMRSim}(
+animateSpectra.mizerMRSim(
   sim,
   species = NULL,
   time_range,
