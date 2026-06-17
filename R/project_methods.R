@@ -101,6 +101,21 @@ projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
         return(encounter)
     }
 
+    # Fast path: with the default Fourier predation kernel the resource
+    # encounter is linear in the resource spectra, so all resources collapse
+    # into a single combined prey matrix and a single FFT
+    # (`sum_r FFT(outer(theta[, r], N_r)) == FFT(theta %*% N)`). This makes the
+    # encounter cost flat in the number of resources instead of one FFT per
+    # resource.
+    if (is.null(comment(params@pred_kernel))) {
+        return(encounter + mizerMRResourceEncounter(params, n_other))
+    }
+
+    # Fallback for a user-supplied (non-Fourier) predation kernel, which
+    # `mizerMRResourceEncounter()` cannot handle: add each resource's
+    # contribution separately. The base resource, `other_encounter` and
+    # `ext_encounter` contributions are already in `encounter`, so they are
+    # silenced here to avoid counting them once per resource.
     zero_n <- n
     zero_n[] <- 0
     interaction_resource <- params@species_params$interaction_resource
