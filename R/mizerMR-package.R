@@ -1,10 +1,11 @@
 #' @keywords internal
 #' @import mizerExperimental ggplot2 methods assertthat
 #' @importFrom mizer addSpecies animateSpectra expandSizeGrid finalNResource getDiet getEncounter getPredRate getRates getResourceMort initialNResource initialNResource<- NResource plotDiet plotSpectra projectEncounter projectResourceMort removeSpecies renameSpecies
+#' @importFrom mizer plotDataFrame plotHover parsePlotLog apply_wlim
 #' @importFrom plotly ggplotly
 #' @importFrom stats mvfft
 #' @importFrom utils globalVariables
-#' @importFrom rlang signal
+#' @importFrom rlang signal %||%
 #' @importFrom dplyr %>% filter
 "_PACKAGE"
 

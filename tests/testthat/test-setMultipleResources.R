@@ -54,8 +54,8 @@ test_that("Test setting of single resource", {
     expect_unchanged(params,
                      setMultipleResources(params, resource_params = rp))
     # The initial resource should be at carrying capacity
-    expect_identical(initialNResource(params),
-                     resource_capacity(params))
+    expect_equal(initialNResource(params),
+                 resource_capacity(params), ignore_attr = TRUE)
     # The initial values, once set, should not be changed
     initialNResource(params) <- initialNResource(params) / 2
     expect_unchanged(params,
@@ -73,7 +73,7 @@ test_that("Test setting of single resource", {
     expect_identical(resource_interaction(params), interaction)
     initial <- initialNResource(params) / 2
     initialNResource(params) <- initial
-    expect_identical(initialNResource(params), initial)
+    expect_equal(initialNResource(params), initial, ignore_attr = TRUE)
     expect_unchanged(setMultipleResources(NS_params,
                                           resource_params = rp,
                                           resource_interaction = interaction,
@@ -104,7 +104,7 @@ test_that("Test setting of two resources", {
     expect_identical(resource_interaction(params), interaction)
     initial <- initialNResource(params) / 2
     initialNResource(params) <- initial
-    expect_identical(initialNResource(params), initial)
+    expect_equal(initialNResource(params), initial, ignore_attr = TRUE)
     expect_unchanged(setMultipleResources(NS_params,
                                           resource_params = rp,
                                           resource_interaction = interaction,
@@ -139,11 +139,11 @@ test_that("mizerMR methods fall back before MR component is installed", {
     params <- NS_params
     params@extensions <- mizer::getRegisteredExtensions()
     params <- mizer::coerceToExtensionClass(params)
-    expect_identical(initialNResource(params),
-                     mizer::initialNResource(NS_params))
+    expect_equal(initialNResource(params),
+                 mizer::initialNResource(NS_params), ignore_attr = TRUE)
     initial <- 0 * mizer::initialNResource(NS_params)
     initialNResource(params) <- initial
-    expect_identical(mizer::initialNResource(params), initial)
+    expect_equal(mizer::initialNResource(params), initial, ignore_attr = TRUE)
 })
 
 test_that("Multiple resources compose with outer encounter methods", {

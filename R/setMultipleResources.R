@@ -151,7 +151,8 @@ initialNResource.mizerMR <- function(object) {
     if (is.null(mr)) {
         return(NextMethod())
     }
-    mr$initial_value
+    MRArrayResourceBySize(mr$initial_value, value_name = "Number density",
+                          units = "1/g", params = object)
 }
 
 #' @rdname setMultipleResources
