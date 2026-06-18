@@ -28,7 +28,8 @@ setMultipleResources <- function(params,
 
     # If there is no MR component yet then we need to create it. We'll
     # fill it in properly later
-    if (is.null(getComponent(params, "MR"))) {
+    creating <- is.null(getComponent(params, "MR"))
+    if (creating) {
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0
         # and keep it zero
@@ -44,14 +45,14 @@ setMultipleResources <- function(params,
             array(1, dim = c(no_sp, no_res),
                   dimnames = list(sp = sp_names, resource = r_names))
 
-        other_params(params)[["MR"]]$resource_params <- rp
         params <- setComponent(
             params = params, component = "MR",
             initial_value = template,
             dynamics_fun =  "mizerMR_dynamics",
             component_params = list(rate = template,
                                     capacity = template,
-                                    interaction = interaction_default))
+                                    interaction = interaction_default,
+                                    resource_params = rp))
     }
 
     resource_capacity <-
@@ -75,16 +76,26 @@ setMultipleResources <- function(params,
     names(linetypes) <- rp$resource
     params <- setLinetypes(params, linetypes)
 
-    other_params(params)[["MR"]]$resource_params <- rp
     params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
         dynamics_fun =  "mizerMR_dynamics",
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
-                                interaction = resource_interaction))
+                                interaction = resource_interaction,
+                                resource_params = rp))
 
-    params@extensions <- mizer::getRegisteredExtensions()
+    # Record mizerMR in the object's extension chain. The version stamp is set
+    # only when the component is first created (the object then conforms to the
+    # installed mizerMR); ordinary modifications preserve the existing stamp so
+    # that a pending upgrade is not masked. See mizer::recordExtension().
+    if (creating) {
+        params <- mizer::recordExtension(
+            params, "mizerMR",
+            version = as.character(utils::packageVersion("mizerMR")))
+    } else {
+        params <- mizer::recordExtension(params, "mizerMR")
+    }
     mizer::coerceToExtensionClass(params)
 }
 

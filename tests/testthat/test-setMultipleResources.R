@@ -14,9 +14,11 @@ test_that("Can reproduce single resource behaviour", {
     expect_equal(sim@n_other[[1, "MR"]][1, ], simo@n_pp[1, ])
     expect_equal(sim@n_other[[11, "MR"]][1, ], simo@n_pp[11, ])
 
-    # test that extension field in metadata is set
-    expect_equal(getMetadata(params)$extensions[["mizerMR"]],
+    # test that extension field in metadata is set, including the version stamp
+    expect_equal(unname(getMetadata(params)$extensions[["mizerMR"]][["requirement"]]),
                  "sizespectrum/mizerMR")
+    expect_equal(unname(getMetadata(params)$extensions[["mizerMR"]][["version"]]),
+                 as.character(utils::packageVersion("mizerMR")))
     expect_equal(params@rates_funcs$Encounter, "mizerEncounter")
     expect_equal(params@rates_funcs$ResourceMort, "mizerResourceMort")
 })

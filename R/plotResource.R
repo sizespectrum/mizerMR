@@ -37,7 +37,7 @@ plotResourcePred <- function(object, proportion = TRUE, return_data = FALSE)
     if(!is.null(getComponent(params, "MR")))
     {
         plot_dat <- NULL
-        for(iRes in 1:dim(params@other_params$other$MR$resource_params)[1])
+        for(iRes in 1:dim(params@other_params$MR$resource_params)[1])
         {
             select <- (params@other_params$MR$capacity[iRes,] > 0)
             pred_rate <- params@other_params$MR$interaction[,iRes] *
@@ -55,7 +55,7 @@ plotResourcePred <- function(object, proportion = TRUE, return_data = FALSE)
                                   w = rep(params@w_full[select], each = dim(pred_rate)[[1]]),
                                   value = c(pred_rate),
                                   Predator = SpIdx,
-                                  Resource = params@other_params$other$MR$resource_params$resource[iRes]
+                                  Resource = params@other_params$MR$resource_params$resource[iRes]
                               ))
         }
         pl <- plotDataFrame(plot_dat, params, style = "area", xtrans = "log10",
@@ -126,14 +126,14 @@ plotResourceLevel <- function(object, return_data = FALSE)
     if(!is.null(getComponent(params, "MR")))
     {
         plot_dat <- NULL
-        for(iRes in 1:dim(params@other_params$other$MR$resource_params)[1])
+        for(iRes in 1:dim(params@other_params$MR$resource_params)[1])
         {
             select <- (params@other_params$MR$capacity[iRes,] > 0)
             plot_dat <- rbind(plot_dat,
                               data.frame(
                                   w = params@w_full[select],
                                   value = params@initial_n_other$MR[iRes,select] / params@other_params$MR$capacity[iRes,select],
-                                  Resource = params@other_params$other$MR$resource_params$resource[iRes])
+                                  Resource = params@other_params$MR$resource_params$resource[iRes])
             )
         }
     } else {

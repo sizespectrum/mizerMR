@@ -190,7 +190,6 @@ expandSizeGrid.mizerMR <- function(params,
     p@other_mort[["MR"]]      <- NULL
     p@other_encounter[["MR"]] <- NULL
     p@other_params[["MR"]]    <- NULL
-    p@other_params$other[["MR"]] <- NULL
     p@initial_n_other[["MR"]] <- NULL
 
     # Restore built-in resource from the mizer resource_params so that

@@ -181,14 +181,16 @@ mizer::initialNResource(params) <- 0         # abundance set to zero
 resource_dynamics(params) <- "resource_constant"  # kept at zero forever
 ```
 
-## Resource parameters live in two places
+## Resource parameters live in the component
 
-Resource-level parameters (kappa, lambda, r_pp, w_min, w_max) are stored as a
-data frame in `other_params(params)[["MR"]]$resource_params`. The per-size
-arrays derived from those parameters (carrying capacity and replenishment rate)
-live inside the component's own `component_params`. This split reflects the
-two-level structure recommended by mizer: `other_params()` for model-wide
-state, `component_params` for data belonging to a single component.
+All of the data belonging to the multiple-resource component is stored in its
+`component_params`, accessible at `params@other_params[["MR"]]`. This holds the
+resource-level parameter data frame (`resource_params`, with columns kappa,
+lambda, r_pp, w_min, w_max, ...) alongside the per-size arrays derived from
+those parameters (the carrying `capacity` and replenishment `rate`) and the
+species-resource `interaction` matrix. Keeping everything in one place under
+the component keeps the MR state self-contained and consistent with how mizer
+stores a component's `component_params`.
 
 ## Accessors, plots and species utilities are methods
 

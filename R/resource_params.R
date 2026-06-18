@@ -21,7 +21,7 @@
 #' @seealso [validResourceParams()]
 #' @family functions for setting parameters
 resource_params <- function(params) {
-    op <- other_params(params)[["MR"]]
+    op <- params@other_params[["MR"]]
     if (is.null(op)) {
         return(mizer::resource_params(params))
     }
