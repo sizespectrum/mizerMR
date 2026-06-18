@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerMR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -151,30 +151,62 @@ projections understand the multi-resource array.</p>
 <code>projectEncounter.mizerMR</code><a class="anchor" aria-label="anchor" href="#projectencounter-mizermr"></a>
 </h4>
 <p>The method first calls <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> to get the encounter
-rate from the rest of the extension chain. It then adds the contribution
-from each additional resource. For each resource it temporarily exposes
-that resource through the standard <code>n_pp</code> and
-<code>interaction_resource</code> arguments and calls
-<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> again. This lets other extension methods, for
-example therMizer’s temperature-scaling of search volume, also affect
-the multiple-resource encounter contribution.</p>
+rate from the rest of the extension chain (the fish community plus the
+silenced built-in resource, together with any other extensions’
+contributions). It then adds the encounter on the multiple
+resources.</p>
+<p>The encounter convolution is <em>linear</em> in the prey spectra, and
+all resources share mizer’s full size grid. So the contributions of the
+individual resources do not need a separate Fourier transform each: they
+can be summed into a single combined prey spectrum for each predator and
+transformed once. With the species × resource interaction matrix
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Θ</mi><annotation encoding="application/x-tex">\Theta</annotation></semantics></math>
+and the resource state
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
+(an array with one row per resource),
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mi>r</mi></munder><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><msub><mi mathvariant="normal">Θ</mi><mrow><mi>⋅</mi><mi>r</mi></mrow></msub><mspace width="0.167em"></mspace><msub><mi>N</mi><mi>r</mi></msub><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mi mathvariant="normal">Θ</mi><mspace width="0.167em"></mspace><mi>N</mi><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">
+\sum_r \mathrm{FFT}\bigl(\Theta_{\cdot r}\,N_r\bigr)
+   = \mathrm{FFT}\bigl(\Theta\,N\bigr),
+</annotation></semantics></math> so a single transform of
+<code>interaction %*% n_other[["MR"]]</code> gives the whole resource
+encounter. This is what <code><a href="../reference/project_methods.html">mizerMRResourceEncounter()</a></code>
+computes, and it makes the encounter cost flat in the number of
+resources rather than growing with it.
+<code>projectEncounter.mizerMR</code> uses this fast path whenever the
+model uses mizer’s default Fourier predation kernel:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">projectEncounter.mizerMR</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">params</span>, <span class="va">n</span>, <span class="va">n_pp</span>, <span class="va">n_other</span>, <span class="va">t</span> <span class="op">=</span> <span class="fl">0</span>, <span class="va">...</span><span class="op">)</span> <span class="op">{</span></span>
 <span>    <span class="va">n_pp</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/project_methods.html">mizerMRValidBaseResource</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">n_pp</span><span class="op">)</span></span>
 <span>    <span class="va">encounter</span> <span class="op">&lt;-</span> <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, n_pp <span class="op">=</span> <span class="va">n_pp</span>, n_other <span class="op">=</span> <span class="va">n_other</span>, t <span class="op">=</span> <span class="va">t</span><span class="op">)</span></span>
-<span>    <span class="kw">for</span> <span class="op">(</span><span class="va">resource</span> <span class="kw">in</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq_len</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">n_other</span><span class="op">[[</span><span class="st">"MR"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
-<span>        <span class="va">params</span><span class="op">@</span><span class="va">species_params</span><span class="op">$</span><span class="va">interaction_resource</span> <span class="op">&lt;-</span></span>
-<span>            <span class="va">params</span><span class="op">@</span><span class="va">other_params</span><span class="op">[[</span><span class="st">"MR"</span><span class="op">]</span><span class="op">]</span><span class="op">$</span><span class="va">interaction</span><span class="op">[</span>, <span class="va">resource</span><span class="op">]</span></span>
-<span>        <span class="va">n</span><span class="op">[</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="fl">0</span></span>
-<span>        <span class="va">n_pp</span> <span class="op">&lt;-</span> <span class="va">n_other</span><span class="op">[[</span><span class="st">"MR"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="va">resource</span>, <span class="op">]</span></span>
-<span>        <span class="va">encounter</span> <span class="op">&lt;-</span> <span class="va">encounter</span> <span class="op">+</span> <span class="kw"><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod</a></span><span class="op">(</span>n <span class="op">=</span> <span class="va">n</span>, n_pp <span class="op">=</span> <span class="va">n_pp</span>,</span>
-<span>                                            n_other <span class="op">=</span> <span class="va">n_other</span>, t <span class="op">=</span> <span class="va">t</span><span class="op">)</span></span>
+<span>    <span class="va">n_mr</span> <span class="op">&lt;-</span> <span class="va">n_other</span><span class="op">[[</span><span class="st">"MR"</span><span class="op">]</span><span class="op">]</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="va">n_mr</span><span class="op">)</span><span class="op">)</span> <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">encounter</span><span class="op">)</span></span>
+<span></span>
+<span>    <span class="co"># Fast path: one FFT for all resources combined.</span></span>
+<span>    <span class="kw">if</span> <span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NULL.html" class="external-link">is.null</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/comment.html" class="external-link">comment</a></span><span class="op">(</span><span class="va">params</span><span class="op">@</span><span class="va">pred_kernel</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>        <span class="kw"><a href="https://rdrr.io/r/base/function.html" class="external-link">return</a></span><span class="op">(</span><span class="va">encounter</span> <span class="op">+</span> <span class="fu"><a href="../reference/project_methods.html">mizerMRResourceEncounter</a></span><span class="op">(</span><span class="va">params</span>, <span class="va">n_other</span><span class="op">)</span><span class="op">)</span></span>
 <span>    <span class="op">}</span></span>
-<span>    <span class="va">encounter</span></span>
+<span></span>
+<span>    <span class="co"># Fallback for a user-supplied (non-Fourier) predation kernel: add each</span></span>
+<span>    <span class="co"># resource's contribution separately by exposing it through the standard</span></span>
+<span>    <span class="co"># `n_pp` and `interaction_resource` arguments and calling `NextMethod()`.</span></span>
+<span>    <span class="co"># ... (per-resource loop, see source) ...</span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<p>The per-resource fallback loop is kept only for models with a custom,
+non-Fourier predation kernel, which
+<code><a href="../reference/project_methods.html">mizerMRResourceEncounter()</a></code> cannot handle. In that loop each
+resource is exposed in turn through the standard <code>n_pp</code> and
+<code>interaction_resource</code> arguments and
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> is called again, so that other extension
+methods — for example therMizer’s temperature-scaling of search volume —
+still affect the multiple-resource encounter contribution. (The
+<code>other_encounter</code> and <code>ext_encounter</code>
+contributions are already in <code>encounter</code> from the first
+<code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code> call, so they are silenced inside the loop to
+avoid counting them once per resource.)</p>
 <p>The exported <code><a href="../reference/project_methods.html">mizerMREncounter()</a></code> function is retained as
-a compatibility wrapper, but <code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> no
-longer installs it in <code>params@rates_funcs</code>.</p>
+a compatibility wrapper around <code><a href="../reference/project_methods.html">mizerMRResourceEncounter()</a></code>,
+but <code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> no longer installs it in
+<code>params@rates_funcs</code>.</p>
 </div>
 <div class="section level4">
 <h4 id="projectresourcemort-mizermr">
@@ -256,6 +288,37 @@ and <code>animateSpectra</code>.</p>
 when mizer’s base operation needs to run on an ordinary single-resource
 object, call <code><a href="https://rdrr.io/r/base/UseMethod.html" class="external-link">NextMethod()</a></code>, and then rebuild the MR
 component on the returned object.</p>
+</div>
+<div class="section level3">
+<h3 id="model-rescaling-and-reporting-are-methods">Model rescaling and reporting are methods<a class="anchor" aria-label="anchor" href="#model-rescaling-and-reporting-are-methods"></a>
+</h3>
+<p>A few mizer functions that transform or report on a whole model also
+need to be aware of the resources, because those functions only know
+about the single built-in resource that mizerMR has silenced. mizerMR
+therefore provides methods for them too:</p>
+<ul>
+<li>
+<code>scaleModel.mizerMR</code> and <code>scaleRates.mizerMR</code>
+rescale the resource capacities, abundances and rates stored in the MR
+component, which the base methods do not see (the base
+<code><a href="https://sizespectrum.org/mizer/reference/scaleModel.html" class="external-link">scaleModel()</a></code> would even error on a <code>mizerMR</code>
+object). They delegate the consumer scaling to the base method.</li>
+<li>
+<code>setResource.mizerMR</code> warns that it only affects the
+silenced built-in resource and points the user to
+<code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> and the
+<code>resource_rate&lt;-</code> / <code>resource_capacity&lt;-</code>
+setters.</li>
+<li>
+<code>summary.mizerMR</code> reports the combined size range of all
+resources instead of the (empty) built-in resource.</li>
+</ul>
+<p><code>scaleModel.mizerMR</code> and <code>setResource.mizerMR</code>
+reach the base method by coercing to the plain class with the extension
+chain temporarily cleared, so that the base method’s internal
+<code><a href="https://sizespectrum.org/mizer/reference/validParams.html" class="external-link">validParams()</a></code> does not re-promote the object to the
+<code>mizerMR</code> class and dispatch back into the MR-aware
+setters.</p>
 <p><code><a href="https://sizespectrum.org/mizer/reference/project.html" class="external-link">project()</a></code> returns a <code>mizerMRSim</code> object
 automatically because the params object inside the simulation carries
 the <code>mizerMR</code> extension chain, so the correct methods fire

@@ -13,6 +13,7 @@ invertebrates), supporting ontogenetic dietary shifts.
 These are run from within an R session or via `Rscript`:
 
 ``` r
+
 # Load package for interactive development
 devtools::load_all()
 
@@ -36,6 +37,7 @@ Visual regression tests use [vdiffr](https://vdiffr.r-lib.org/). To
 update snapshots after intentional plot changes:
 
 ``` r
+
 vdiffr::manage_cases()
 ```
 
@@ -109,4 +111,4 @@ Simulation output is stored in `sim@other[["MR"]]` — an array
 | `plotSpectra.R` | Multi-resource spectral plots (replaces mizer’s version) |
 | `plotResource.R` | Resource-specific plots (level, predation) |
 | `animateSpectra.R` | Animated spectral plots via plotly |
-| `diet.R` | [`getDiet()`](https://sizespectrum.org/mizerMR/reference/getDiet.md) and [`plotDiet()`](https://sizespectrum.org/mizerMR/reference/plotDiet.md) / [`plotlyDiet()`](https://sizespectrum.org/mizerMR/reference/plotDiet.md) |
+| `diet.R` | [`getDiet()`](https://sizespectrum.org/mizerMR/reference/getDiet.md) and [`plotDiet()`](https://sizespectrum.org/mizerMR/reference/plotDiet.md) / `plotlyDiet()` |

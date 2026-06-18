@@ -30,8 +30,6 @@ plotDiet(
 )
 
 plotDietMR(object, ...)
-
-plotlyDiet(object, species = NULL, time_range, wlim = c(1, NA), ...)
 ```
 
 ## Arguments

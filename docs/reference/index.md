@@ -31,7 +31,6 @@
 - [`plotDiet(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/plotDiet.md)
   [`plotDiet(`*`<mizerMRSim>`*`)`](https://sizespectrum.org/mizerMR/reference/plotDiet.md)
   [`plotDietMR()`](https://sizespectrum.org/mizerMR/reference/plotDiet.md)
-  [`plotlyDiet()`](https://sizespectrum.org/mizerMR/reference/plotDiet.md)
   **\[experimental\]** : Plot diet, resolved by prey species, as
   function of predator at size.
 - [`plotResourceLevel()`](https://sizespectrum.org/mizerMR/reference/plotResourceLevel.md)
@@ -41,8 +40,13 @@
   [`plotlyResourcePred()`](https://sizespectrum.org/mizerMR/reference/plotResourcePred.md)
   : Plot functions regarding the resources. Compatible with non mizerMR
   objects Plot the mortality applied on the resource spectrum(s)
-- [`animateSpectra(`*`<mizerMRSim>`*`)`](https://sizespectrum.org/mizerMR/reference/animateSpectra.md)
+- [`animateSpectra.mizerMRSim()`](https://sizespectrum.org/mizerMR/reference/animateSpectra.md)
   **\[experimental\]** : Animation of the abundance spectra
+- [`scaleModel(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/params_methods.md)
+  [`scaleRates(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/params_methods.md)
+  [`setResource(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/params_methods.md)
+  [`summary(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/params_methods.md)
+  : Multiple-resource methods for model rescaling and reporting
 
 ## Species utilities
 

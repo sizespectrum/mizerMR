@@ -28,6 +28,7 @@ size on mizer’s full size grid.
 registers this component:
 
 ``` r
+
 params <- setComponent(
     params      = params,
     component   = "MR",
@@ -59,6 +60,7 @@ mizerMR defines the S4 marker classes `mizerMR` and `mizerMRSim`. The
 package registers itself with mizer when it is loaded:
 
 ``` r
+
 .onLoad <- function(libname, pkgname) {
     mizer::registerExtensions(
         stats::setNames("sizespectrum/mizerMR", pkgname))
@@ -72,6 +74,7 @@ session extension chain in the object and coerces the object to the
 appropriate dispatch class:
 
 ``` r
+
 params@extensions <- mizer::getRegisteredExtensions()
 mizer::coerceToExtensionClass(params)
 ```
@@ -92,33 +95,67 @@ multi-resource array.
 
 The method first calls
 [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) to get the
-encounter rate from the rest of the extension chain. It then adds the
-contribution from each additional resource. For each resource it
-temporarily exposes that resource through the standard `n_pp` and
-`interaction_resource` arguments and calls
-[`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) again. This lets
-other extension methods, for example therMizer’s temperature-scaling of
-search volume, also affect the multiple-resource encounter contribution.
+encounter rate from the rest of the extension chain (the fish community
+plus the silenced built-in resource, together with any other extensions’
+contributions). It then adds the encounter on the multiple resources.
+
+The encounter convolution is *linear* in the prey spectra, and all
+resources share mizer’s full size grid. So the contributions of the
+individual resources do not need a separate Fourier transform each: they
+can be summed into a single combined prey spectrum for each predator and
+transformed once. With the species × resource interaction matrix
+$`\Theta`$ and the resource state $`N`$ (an array with one row per
+resource),
+``` math
+\sum_r \mathrm{FFT}\bigl(\Theta_{\cdot r}\,N_r\bigr)
+   = \mathrm{FFT}\bigl(\Theta\,N\bigr),
+```
+so a single transform of `interaction %*% n_other[["MR"]]` gives the
+whole resource encounter. This is what
+[`mizerMRResourceEncounter()`](https://sizespectrum.org/mizerMR/reference/project_methods.md)
+computes, and it makes the encounter cost flat in the number of
+resources rather than growing with it. `projectEncounter.mizerMR` uses
+this fast path whenever the model uses mizer’s default Fourier predation
+kernel:
 
 ``` r
+
 projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
     n_pp <- mizerMRValidBaseResource(params, n_pp)
     encounter <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
-    for (resource in seq_len(nrow(n_other[["MR"]]))) {
-        params@species_params$interaction_resource <-
-            params@other_params[["MR"]]$interaction[, resource]
-        n[] <- 0
-        n_pp <- n_other[["MR"]][resource, ]
-        encounter <- encounter + NextMethod(n = n, n_pp = n_pp,
-                                            n_other = n_other, t = t)
+    n_mr <- n_other[["MR"]]
+    if (is.null(n_mr)) return(encounter)
+
+    # Fast path: one FFT for all resources combined.
+    if (is.null(comment(params@pred_kernel))) {
+        return(encounter + mizerMRResourceEncounter(params, n_other))
     }
-    encounter
+
+    # Fallback for a user-supplied (non-Fourier) predation kernel: add each
+    # resource's contribution separately by exposing it through the standard
+    # `n_pp` and `interaction_resource` arguments and calling `NextMethod()`.
+    # ... (per-resource loop, see source) ...
 }
 ```
 
+The per-resource fallback loop is kept only for models with a custom,
+non-Fourier predation kernel, which
+[`mizerMRResourceEncounter()`](https://sizespectrum.org/mizerMR/reference/project_methods.md)
+cannot handle. In that loop each resource is exposed in turn through the
+standard `n_pp` and `interaction_resource` arguments and
+[`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) is called again,
+so that other extension methods — for example therMizer’s
+temperature-scaling of search volume — still affect the
+multiple-resource encounter contribution. (The `other_encounter` and
+`ext_encounter` contributions are already in `encounter` from the first
+[`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) call, so they
+are silenced inside the loop to avoid counting them once per resource.)
+
 The exported
 [`mizerMREncounter()`](https://sizespectrum.org/mizerMR/reference/project_methods.md)
-function is retained as a compatibility wrapper, but
+function is retained as a compatibility wrapper around
+[`mizerMRResourceEncounter()`](https://sizespectrum.org/mizerMR/reference/project_methods.md),
+but
 [`setMultipleResources()`](https://sizespectrum.org/mizerMR/reference/setMultipleResources.md)
 no longer installs it in `params@rates_funcs`.
 
@@ -130,6 +167,7 @@ matrix `(resource × size)` by multiplying the predation rate matrix by
 the species–resource interaction:
 
 ``` r
+
 projectResourceMort.mizerMR <- function(params, n, n_pp, n_other, t,
                                         pred_rate, ...) {
     NextMethod()
@@ -152,6 +190,7 @@ built-in mizer resource must not interfere.
 does two things to achieve this:
 
 ``` r
+
 mizer::initialNResource(params) <- 0         # abundance set to zero
 resource_dynamics(params) <- "resource_constant"  # kept at zero forever
 ```
@@ -184,6 +223,7 @@ multiple-resource component. Those methods still call
 extension packages can participate in the same generic.
 
 ``` r
+
 NResource.mizerMRSim <- function(sim) {
     NextMethod()
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
@@ -207,6 +247,33 @@ and `expandSizeGrid.mizerMR` strip the MR component temporarily when
 mizer’s base operation needs to run on an ordinary single-resource
 object, call [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html),
 and then rebuild the MR component on the returned object.
+
+### Model rescaling and reporting are methods
+
+A few mizer functions that transform or report on a whole model also
+need to be aware of the resources, because those functions only know
+about the single built-in resource that mizerMR has silenced. mizerMR
+therefore provides methods for them too:
+
+- `scaleModel.mizerMR` and `scaleRates.mizerMR` rescale the resource
+  capacities, abundances and rates stored in the MR component, which the
+  base methods do not see (the base
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  would even error on a `mizerMR` object). They delegate the consumer
+  scaling to the base method.
+- `setResource.mizerMR` warns that it only affects the silenced built-in
+  resource and points the user to
+  [`setMultipleResources()`](https://sizespectrum.org/mizerMR/reference/setMultipleResources.md)
+  and the `resource_rate<-` / `resource_capacity<-` setters.
+- `summary.mizerMR` reports the combined size range of all resources
+  instead of the (empty) built-in resource.
+
+`scaleModel.mizerMR` and `setResource.mizerMR` reach the base method by
+coercing to the plain class with the extension chain temporarily
+cleared, so that the base method’s internal
+[`validParams()`](https://sizespectrum.org/mizer/reference/validParams.html)
+does not re-promote the object to the `mizerMR` class and dispatch back
+into the MR-aware setters.
 
 [`project()`](https://sizespectrum.org/mizer/reference/project.html)
 returns a `mizerMRSim` object automatically because the params object

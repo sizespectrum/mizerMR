@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerMR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.4.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,11 +38,14 @@
     </div>
 
     <div class="section level2">
-<h2 class="pkg-version" data-toc-text="0.2.4.0" id="mizermr-0240">mizerMR 0.2.4.0<a class="anchor" aria-label="anchor" href="#mizermr-0240"></a></h2>
-<ul><li>Compatible with mizer version 2.5.4.9124.</li>
+<h2 class="pkg-version" data-toc-text="0.3.0" id="mizermr-030">mizerMR 0.3.0<a class="anchor" aria-label="anchor" href="#mizermr-030"></a></h2>
+<ul><li>Compatible with mizer version 3.0.0</li>
 <li>
 <code><a href="../reference/setMultipleResources.html">setMultipleResources()</a></code> now uses mizer’s extension-chain methods for encounter and resource mortality instead of replacing entries in <code>params@rates_funcs</code>, allowing composition with other extension packages.</li>
 <li>Accessors and plots that need multiple-resource behaviour are now registered as methods for mizer’s generics. <code><a href="https://sizespectrum.org/mizer/reference/plotSpectra.html" class="external-link">plotlySpectra()</a></code> has been removed.</li>
+<li>The resource encounter rate is now computed with a single Fourier transform for all resources combined instead of one per resource, so the encounter cost no longer grows with the number of resources. A per-resource fallback is retained for models with a custom (non-Fourier) predation kernel.</li>
+<li>
+<code><a href="https://sizespectrum.org/mizer/reference/scaleModel.html" class="external-link">scaleModel()</a></code>, <code><a href="https://sizespectrum.org/mizer/reference/scaleRates.html" class="external-link">scaleRates()</a></code>, <code><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">setResource()</a></code> and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> now have multiple-resource methods. <code><a href="https://sizespectrum.org/mizer/reference/scaleModel.html" class="external-link">scaleModel()</a></code> and <code><a href="https://sizespectrum.org/mizer/reference/scaleRates.html" class="external-link">scaleRates()</a></code> rescale all resource capacities, abundances and rates consistently (previously <code><a href="https://sizespectrum.org/mizer/reference/scaleModel.html" class="external-link">scaleModel()</a></code> errored); <code><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">setResource()</a></code> warns that it only affects the silenced built-in resource; and <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> reports the combined resource size range instead of the empty built-in resource.</li>
 </ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.0.3" id="mizermr-003">mizerMR 0.0.3<a class="anchor" aria-label="anchor" href="#mizermr-003"></a></h2>

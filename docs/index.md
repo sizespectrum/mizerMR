@@ -17,6 +17,7 @@ extension packages such as therMizer.
 # Installation
 
 ``` r
+
 remotes::install_github("sizespectrum/mizerMR")
 library(mizerMR)
 ```
@@ -30,6 +31,7 @@ multiple resources we need a `resource_params` data frame, with one row
 for each resource. Here is an artificial example with two resources:
 
 ``` r
+
 library(tibble)
 resource_params <- tribble(
     ~resource,  ~kappa, ~lambda, ~r_pp, ~w_min, ~w_max,
@@ -47,6 +49,7 @@ So if for example we wanted to add these resources to the North Sea
 model described by the `NS_params` MizerParams object, we would do
 
 ``` r
+
 params <- setMultipleResources(NS_params, resource_params)
 ```
 
@@ -56,12 +59,14 @@ this MizerParams object as usual. For example we can project it forward
 in time:
 
 ``` r
+
 sim <- project(params, t_max = 2, t_save = 0.2)
 ```
 
 and plot the resulting spectra:
 
 ``` r
+
 plotSpectra(sim, power = 2)
 ```
 
@@ -75,6 +80,7 @@ We can access the simulation results for the resource with
 This gives a three-dimensional array:
 
 ``` r
+
 str(NResource(sim))
 #>  num [1:11, 1:2, 1:226] 9.87e+37 9.87e+37 9.87e+37 9.87e+37 9.87e+37 ...
 #>  - attr(*, "dimnames")=List of 3
@@ -88,6 +94,7 @@ third the size. Thus to get the abundance density of Resource 2 at time
 0.6 at sizes between 0.1g and 5g we could do
 
 ``` r
+
 select_w <- w_full(params) >= 1 & w_full(params) <= 5
 NResource(sim)["0.6", "Resource 2", select_w]
 #>        1.18         1.4        1.68           2        2.39        2.85 
@@ -109,6 +116,7 @@ how strongly a predator species interacts with each resource via the
 and one column for each resource. For example
 
 ``` r
+
 resource_interaction <- matrix(runif(24), nrow = 12, ncol = 2)
 params <- setMultipleResources(NS_params, resource_params, resource_interaction)
 ```
@@ -117,6 +125,7 @@ Resource parameters can be changed at any time. For example we can
 double the carrying capacity of the first resource with
 
 ``` r
+
 resource_params(params)$kappa[1] <- 2 * resource_params(params)$kappa[1]
 ```
 
@@ -124,6 +133,7 @@ We can also use this kind of notation as an alternative to
 `setMultispeciesParams()`. For example
 
 ``` r
+
 params <- NS_params
 resource_params(params) <- resource_params
 resource_interaction(params) <- resource_interaction
@@ -135,6 +145,7 @@ of resource number densities `my_n_resource` they can set these as the
 initial values with
 
 ``` r
+
 initialNResource(params) <- my_n_resource
 ```
 
@@ -144,6 +155,7 @@ own matrices `my_capacity` and `my_rate` with one row for each resource
 and one column for each size can set these with
 
 ``` r
+
 resource_capacity(params) <- my_capacity
 resource_rate(params) <- my_rate
 ```
@@ -152,6 +164,7 @@ Rather than adding the multiple resources to an existing model, the user
 can also create a new model with multiple resources with
 
 ``` r
+
 params <- newMRParams(species_params, interaction, resource_params,
                       resource_interaction, gear_params)
 ```

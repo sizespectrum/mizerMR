@@ -5,8 +5,7 @@
 ## Usage
 
 ``` r
-# S3 method for class 'mizerMRSim'
-animateSpectra(
+animateSpectra.mizerMRSim(
   sim,
   species = NULL,
   time_range,

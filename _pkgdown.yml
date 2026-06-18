@@ -67,6 +67,7 @@ reference:
   - plotResourceLevel
   - plotResourcePred
   - animateSpectra
+  - params_methods
 - title: Species utilities
 - contents:
   - addSpecies

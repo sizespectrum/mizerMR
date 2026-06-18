@@ -75,7 +75,7 @@ addSpecies(
 
 - ...:
 
-  Additional arguments
+  Currently unused.
 
 - resource_interaction:
 

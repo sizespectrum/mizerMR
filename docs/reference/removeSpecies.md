@@ -27,7 +27,7 @@ removeSpecies(params, species, ...)
 
 - ...:
 
-  Additional arguments
+  Currently unused.
 
 ## Value
 

@@ -26,7 +26,7 @@ renameSpecies(params, replace, ...)
 
 - ...:
 
-  Additional arguments
+  Currently unused.
 
 ## Value
 

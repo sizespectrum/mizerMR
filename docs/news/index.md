@@ -1,8 +1,8 @@
 # Changelog
 
-## mizerMR 0.2.4.0
+## mizerMR 0.3.0
 
-- Compatible with mizer version 2.5.4.9124.
+- Compatible with mizer version 3.0.0
 - [`setMultipleResources()`](https://sizespectrum.org/mizerMR/reference/setMultipleResources.md)
   now uses mizer’s extension-chain methods for encounter and resource
   mortality instead of replacing entries in `params@rates_funcs`,
@@ -11,6 +11,27 @@
   registered as methods for mizer’s generics.
   [`plotlySpectra()`](https://sizespectrum.org/mizer/reference/plotSpectra.html)
   has been removed.
+- The resource encounter rate is now computed with a single Fourier
+  transform for all resources combined instead of one per resource, so
+  the encounter cost no longer grows with the number of resources. A
+  per-resource fallback is retained for models with a custom
+  (non-Fourier) predation kernel.
+- [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html),
+  [`scaleRates()`](https://sizespectrum.org/mizer/reference/scaleRates.html),
+  [`setResource()`](https://sizespectrum.org/mizer/reference/setResource.html)
+  and [`summary()`](https://rdrr.io/r/base/summary.html) now have
+  multiple-resource methods.
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  and
+  [`scaleRates()`](https://sizespectrum.org/mizer/reference/scaleRates.html)
+  rescale all resource capacities, abundances and rates consistently
+  (previously
+  [`scaleModel()`](https://sizespectrum.org/mizer/reference/scaleModel.html)
+  errored);
+  [`setResource()`](https://sizespectrum.org/mizer/reference/setResource.html)
+  warns that it only affects the silenced built-in resource; and
+  [`summary()`](https://rdrr.io/r/base/summary.html) reports the
+  combined resource size range instead of the empty built-in resource.
 
 ## mizerMR 0.0.3
 

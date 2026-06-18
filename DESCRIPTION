@@ -1,6 +1,6 @@
 Package: mizerMR
 Title: Add multiple size-structured resources to a mizer model
-Version: 0.3.0.0
+Version: 0.3.0
 Authors@R: c(
     person(given = "Gustav",
            family = "Delius",
@@ -18,8 +18,8 @@ License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends:
-    R (>= 3.1),
-    mizer (>= 2.5.4.9124),
+    R (>= 3.5),
+    mizer (>= 3.0.0),
     mizerExperimental (>= 2.4.0)
 Remotes:
     github::sizespectrum/mizerExperimental
