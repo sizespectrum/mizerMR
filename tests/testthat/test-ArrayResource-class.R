@@ -1,14 +1,21 @@
 # Tests for the MRArrayResourceBySize / MRArrayTimeByResourceBySize classes.
 
-# A small two-resource model reused across the tests in this file.
+# A small two-resource model reused across the tests in this file. The two
+# resources are given unequal abundances, and unequal predator interactions, so
+# that they show up as distinct lines in the snapshot plots (resource mortality
+# depends on the interaction rather than on a resource's own abundance).
 mr_params <- local({
     rp <- as.data.frame(NS_params@resource_params)[c(1, 1), ]
     rp$resource <- c("Resource A", "Resource B")
     initial <- array(dim = c(2, length(NS_params@w_full)))
-    initial[1, ] <- NS_params@initial_n_pp / 2
-    initial[2, ] <- NS_params@initial_n_pp / 2
-    setMultipleResources(NS_params, resource_params = rp,
-                         initial_resource = initial)
+    initial[1, ] <- NS_params@initial_n_pp
+    initial[2, ] <- NS_params@initial_n_pp / 4
+    params <- setMultipleResources(NS_params, resource_params = rp,
+                                   initial_resource = initial)
+    inter <- resource_interaction(params)
+    inter[, "Resource B"] <- inter[, "Resource B"] / 2
+    resource_interaction(params) <- inter
+    params
 })
 mr_sim <- project(mr_params, t_max = 2, t_save = 1)
 
