@@ -2,18 +2,30 @@
 % Please edit documentation in R/diet.R
 \name{plotDiet}
 \alias{plotDiet}
-\alias{plotlyDiet}
+\alias{plotDiet.mizerMR}
+\alias{plotDiet.mizerMRSim}
+\alias{plotDietMR}
 \title{Plot diet, resolved by prey species, as function of predator at size.}
 \usage{
-plotDiet(
+\method{plotDiet}{mizerMR}(
   object,
   species = NULL,
   time_range,
   wlim = c(1, NA),
-  return_data = FALSE
+  return_data = FALSE,
+  ...
 )
 
-plotlyDiet(object, species = NULL, time_range, wlim = c(1, NA), ...)
+\method{plotDiet}{mizerMRSim}(
+  object,
+  species = NULL,
+  time_range,
+  wlim = c(1, NA),
+  return_data = FALSE,
+  ...
+)
+
+plotDietMR(object, ...)
 }
 \arguments{
 \item{object}{An object of class \linkS4class{MizerSim} or
@@ -51,10 +63,10 @@ in the plot.
 \seealso{
 \code{\link[=getDiet]{getDiet()}}
 
-Other plotting functions: 
-\code{\link{animateSpectra}()},
-\code{\link{plotResourceLevel}()},
-\code{\link{plotResourcePred}()},
-\code{\link{plotSpectra}()}
+Other plotting functions:
+\code{\link{animateSpectra}},
+\code{\link[=plotResourceLevel]{plotResourceLevel()}},
+\code{\link[=plotResourcePred]{plotResourcePred()}},
+\code{\link{plotSpectra}}
 }
 \concept{plotting functions}

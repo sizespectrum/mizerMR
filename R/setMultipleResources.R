@@ -1,6 +1,7 @@
 #' Set up multiple resources
 #'
 #' @param params A MizerParams object
+#' @param object A mizerMR object
 #' @param resource_params A data frame with the resource parameters
 #' @param resource_interaction Optional interaction matrix between species and
 #'   resources (predator species x prey resource). By default all entries are 1.
@@ -28,19 +29,10 @@ setMultipleResources <- function(params,
     # If there is no MR component yet then we need to create it. We'll
     # fill it in properly later
     if (is.null(getComponent(params, "MR"))) {
-        # register MR in the extensions slot
-        extensions <- c(mizerMR = "sizespectrum/mizerMR",
-                        params@extensions)
-        params@extensions <- extensions
-
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0
         # and keep it zero
         resource_dynamics(params) <- "resource_constant"
-
-        # Encounter and mortality will now come from "MR" slot in n_other
-        params <- setRateFunction(params, "Encounter", "mizerMREncounter")
-        params <- setRateFunction(params, "ResourceMort", "mizerMRResourceMort")
 
         # make empty parameters
         w_names <- names(mizer::initialNResource(params))
@@ -84,13 +76,16 @@ setMultipleResources <- function(params,
     params <- setLinetypes(params, linetypes)
 
     other_params(params)[["MR"]]$resource_params <- rp
-    setComponent(
+    params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
         dynamics_fun =  "mizerMR_dynamics",
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
                                 interaction = resource_interaction))
+
+    params@extensions <- mizer::getRegisteredExtensions()
+    mizer::coerceToExtensionClass(params)
 }
 
 #' @rdname setMultipleResources
@@ -140,18 +135,24 @@ setMultipleResources <- function(params,
 
 #' @rdname setMultipleResources
 #' @export
-`initialNResource` <- function(params) {
-    mr <- getComponent(params, "MR")
+initialNResource.mizerMR <- function(object) {
+    mr <- getComponent(object, "MR")
     if (is.null(mr)) {
-        return(mizer::initialNResource(params))
+        return(NextMethod())
     }
     mr$initial_value
 }
 
 #' @rdname setMultipleResources
 #' @export
-`initialNResource<-` <- function(params, value) {
-    setMultipleResources(params, initial_resource = value)
+`initialNResource<-.mizerMR` <- function(params, value) {
+    if (is.null(getComponent(params, "MR"))) {
+        return(NextMethod())
+    }
+    initial_resource <- value
+    value <- 0 * mizerMRBaseResource(params)
+    params <- NextMethod()
+    setMultipleResources(params, initial_resource = initial_resource)
 }
 
 
@@ -164,10 +165,12 @@ setMultipleResources <- function(params,
 #' a resource capacity is calculated from `resource_params`. If this is NULL to
 #' it is taken from `params`.
 #' @param params A MizerParams object
+#' @param resource_params A data frame with the resource parameters
 #' @param resource_capacity Array (resource x size) of the
 #'   intrinsic resource carrying capacities
 #'
 #' @return An array (resource x size) with the resource capacities
+#' @keywords internal
 valid_resource_capacity <- function(params, resource_params = NULL,
                                     resource_capacity = NULL) {
     mr <- getComponent(params, "MR")
@@ -227,10 +230,12 @@ valid_resource_capacity <- function(params, resource_params = NULL,
 #' a resource rate is calculated from `resource_params`. If this is NULL to
 #' it is taken from `params`.
 #' @param params A MizerParams object
+#' @param resource_params A data frame with the resource parameters
 #' @param resource_rate Array (resource x size) of the
 #'   intrinsic resource replenishment rate
 #'
 #' @return An array (resource x size) with the resource capacities
+#' @keywords internal
 valid_resource_rate <- function(params, resource_params = NULL,
                                 resource_rate = NULL) {
     mr <- getComponent(params, "MR")
@@ -291,6 +296,7 @@ valid_resource_rate <- function(params, resource_params = NULL,
 #'   resources (predator species x prey resource). By default all entries are 1.
 #'
 #' @return An array (resource x size)
+#' @keywords internal
 valid_resource_interaction <- function(params, resource_interaction = NULL) {
     mr <- getComponent(params, "MR")
     if (is.null(mr)) {
@@ -326,6 +332,7 @@ valid_resource_interaction <- function(params, resource_interaction = NULL) {
 #' @param initial_resource Array (resource x size) of initial values
 #'
 #' @return An array (resource x size)
+#' @keywords internal
 valid_initial_resource <- function(params, initial_resource = NULL) {
     mr <- getComponent(params, "MR")
     if (is.null(mr)) {

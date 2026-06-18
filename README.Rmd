@@ -22,6 +22,9 @@ knitr::opts_chunk$set(
 This extension package for mizer allows you to work with multiple
 size-structured resources in the same way in which you work with multiple
 species in mizer.
+It uses mizer's extension chain for its projection-rate hooks, so models with
+multiple resources can be composed with other extension packages such as
+therMizer.
 
 # Installation
 

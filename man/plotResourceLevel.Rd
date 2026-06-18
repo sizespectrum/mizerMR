@@ -32,12 +32,12 @@ str(fr)
 }
 }
 \seealso{
-\link{plotting_functions}
+\link[mizer:plotting_functions]{plotting_functions}
 
-Other plotting functions: 
-\code{\link{animateSpectra}()},
-\code{\link{plotDiet}()},
-\code{\link{plotResourcePred}()},
-\code{\link{plotSpectra}()}
+Other plotting functions:
+\code{\link{animateSpectra}},
+\code{\link{plotDiet}},
+\code{\link[=plotResourcePred]{plotResourcePred()}},
+\code{\link{plotSpectra}}
 }
 \concept{plotting functions}

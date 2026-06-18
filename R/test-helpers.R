@@ -1,5 +1,12 @@
-# Often I need to test that a MizerParams or MizerSim object has not
-# changed except for the time_modified and n_pp slots
+#' Expect a mizer object to be unchanged
+#'
+#' Compares two mizer objects after normalising fields that are expected to
+#' change during setup or projection.
+#'
+#' @param object A \linkS4class{MizerParams} or \linkS4class{MizerSim} object.
+#' @param expected The expected object.
+#' @return The expectation result from [testthat::expect_equal()].
+#' @keywords internal
 expect_unchanged <- function(object, expected) {
     if (is(object, "MizerParams")) {
         object@time_modified <- expected@time_modified

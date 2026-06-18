@@ -2,12 +2,13 @@
 % Please edit documentation in R/NResource.R
 \name{NResource}
 \alias{NResource}
-\alias{finalNResource}
+\alias{NResource.mizerMRSim}
+\alias{finalNResource.mizerMRSim}
 \title{Access resource abundances in simulation result}
 \usage{
-NResource(sim)
+\method{NResource}{mizerMRSim}(sim)
 
-finalNResource(sim)
+\method{finalNResource}{mizerMRSim}(sim)
 }
 \arguments{
 \item{sim}{A MizerSim object}

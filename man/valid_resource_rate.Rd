@@ -9,6 +9,8 @@ valid_resource_rate(params, resource_params = NULL, resource_rate = NULL)
 \arguments{
 \item{params}{A MizerParams object}
 
+\item{resource_params}{A data frame with the resource parameters}
+
 \item{resource_rate}{Array (resource x size) of the
 intrinsic resource replenishment rate}
 }
@@ -23,3 +25,4 @@ user and stored in \code{params} with a comment, then this is returned. Otherwis
 a resource rate is calculated from \code{resource_params}. If this is NULL to
 it is taken from \code{params}.
 }
+\keyword{internal}

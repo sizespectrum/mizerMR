@@ -1,5 +1,6 @@
 #' @keywords internal
 #' @import mizerExperimental ggplot2 methods assertthat
+#' @importFrom mizer addSpecies animateSpectra expandSizeGrid finalNResource getDiet getEncounter getPredRate getRates getResourceMort initialNResource initialNResource<- NResource plotDiet plotSpectra projectEncounter projectResourceMort removeSpecies renameSpecies
 #' @importFrom plotly ggplotly
 #' @importFrom stats mvfft
 #' @importFrom utils globalVariables
@@ -14,3 +15,15 @@
 NULL
 
 globalVariables(c("expect_equal"))
+
+#' Register mizerMR with mizer
+#'
+#' Registers the package as a mizer extension when the namespace is loaded.
+#'
+#' @param libname Library path supplied by R.
+#' @param pkgname Package name supplied by R.
+#' @return Called for its side effect.
+#' @keywords internal
+.onLoad <- function(libname, pkgname) {
+    mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerMR")
+}

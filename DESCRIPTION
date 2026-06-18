@@ -1,6 +1,6 @@
 Package: mizerMR
 Title: Add multiple size-structured resources to a mizer model
-Version: 0.2.4.0
+Version: 0.3.0
 Authors@R: c(
     person(given = "Gustav",
            family = "Delius",
@@ -17,10 +17,9 @@ Description: An add-on to the mizer package which allows multiple
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
 Depends:
-    R (>= 3.1),
-    mizer (>= 2.4.0),
+    R (>= 3.5),
+    mizer (>= 3.0.0),
     mizerExperimental (>= 2.4.0)
 Remotes:
     github::sizespectrum/mizerExperimental
@@ -32,6 +31,7 @@ Imports:
     plotly,
     rlang
 Collate:
+    mizerMR-class.R
     animateSpectra.R
     mizerMR-package.R
     newMRParams.R
@@ -41,13 +41,19 @@ Collate:
     resource_dynamics.R
     resource_params.R
     setMultipleResources.R
+    params_methods.R
     test-helpers.R
     diet.R
     plotResource.R
-URL: http://sizespectrum.org/mizerMR/, https://github.com/sizespectrum/mizerMR
+    species_utils.R
+URL: https://sizespectrum.org/mizerMR, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB
 Suggests: 
     testthat (>= 3.0.0),
-    vdiffr
+    vdiffr,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr
 Config/testthat/edition: 3
+Config/roxygen2/version: 8.0.0

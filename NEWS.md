@@ -1,6 +1,21 @@
-# mizerMR 0.2.4.0
+# mizerMR 0.3.0
 
-* Compatible with mizer version 2.4.0
+* Compatible with mizer version 3.0.0
+* `setMultipleResources()` now uses mizer's extension-chain methods for
+  encounter and resource mortality instead of replacing entries in
+  `params@rates_funcs`, allowing composition with other extension packages.
+* Accessors and plots that need multiple-resource behaviour are now registered
+  as methods for mizer's generics. `plotlySpectra()` has been removed.
+* The resource encounter rate is now computed with a single Fourier transform
+  for all resources combined instead of one per resource, so the encounter cost
+  no longer grows with the number of resources. A per-resource fallback is
+  retained for models with a custom (non-Fourier) predation kernel.
+* `scaleModel()`, `scaleRates()`, `setResource()` and `summary()` now have
+  multiple-resource methods. `scaleModel()` and `scaleRates()` rescale all
+  resource capacities, abundances and rates consistently (previously
+  `scaleModel()` errored); `setResource()` warns that it only affects the
+  silenced built-in resource; and `summary()` reports the combined resource
+  size range instead of the empty built-in resource.
 
 # mizerMR 0.0.3
 

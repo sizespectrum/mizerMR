@@ -2,10 +2,28 @@
 % Please edit documentation in R/plotSpectra.R
 \name{plotSpectra}
 \alias{plotSpectra}
-\alias{plotlySpectra}
+\alias{plotSpectra.mizerMRSim}
+\alias{plotSpectra.mizerMR}
 \title{Plot the abundance spectra}
 \usage{
-plotSpectra(
+\method{plotSpectra}{mizerMRSim}(
+  object,
+  species = NULL,
+  resources = NULL,
+  time_range,
+  geometric_mean = FALSE,
+  wlim = c(NA, NA),
+  ylim = c(NA, NA),
+  power = 1,
+  biomass = TRUE,
+  total = FALSE,
+  background = TRUE,
+  highlight = NULL,
+  return_data = FALSE,
+  ...
+)
+
+\method{plotSpectra}{mizerMR}(
   object,
   species = NULL,
   resources = NULL,
@@ -16,22 +34,6 @@ plotSpectra(
   background = TRUE,
   highlight = NULL,
   return_data = FALSE,
-  ...
-)
-
-plotlySpectra(
-  object,
-  species = NULL,
-  resources = NULL,
-  time_range,
-  wlim = c(NA, NA),
-  ylim = c(NA, NA),
-  power = 1,
-  biomass = TRUE,
-  total = FALSE,
-  resource = TRUE,
-  background = TRUE,
-  highlight = NULL,
   ...
 )
 }
@@ -49,6 +51,12 @@ resources are selected. A vector of resource names, or a numeric vector
 with the resource indices, or a logical vector indicating for each resource
 whether it is to be selected (TRUE) or not.}
 
+\item{time_range}{The time range to average over when called with a
+\linkS4class{MizerSim} object.}
+
+\item{geometric_mean}{Whether to average abundances using a geometric mean
+when called with a \linkS4class{MizerSim} object.}
+
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
 
@@ -60,6 +68,9 @@ values below 1e-20 are always cut off.}
 raised to \code{power}. The default \code{power = 1} gives the biomass
 density, whereas \code{power = 2} gives the biomass density with respect
 to logarithmic size bins.}
+
+\item{biomass}{Deprecated compatibility argument. If \code{power} is missing,
+\code{power} is set to \code{as.numeric(biomass)}.}
 
 \item{total}{A boolean value that determines whether the total over all
 species and resources in the system is plotted as well. Note that even if
@@ -93,12 +104,12 @@ to plot a single time step). When called with a \linkS4class{MizerParams}
 object the initial abundance is plotted.
 }
 \seealso{
-\link{plotting_functions}
+\link[mizer:plotting_functions]{plotting_functions}
 
-Other plotting functions: 
-\code{\link{animateSpectra}()},
-\code{\link{plotDiet}()},
-\code{\link{plotResourceLevel}()},
-\code{\link{plotResourcePred}()}
+Other plotting functions:
+\code{\link{animateSpectra}},
+\code{\link{plotDiet}},
+\code{\link[=plotResourceLevel]{plotResourceLevel()}},
+\code{\link[=plotResourcePred]{plotResourcePred()}}
 }
 \concept{plotting functions}

@@ -3,6 +3,15 @@
 home:
   title: Multiple size-structured resources in mizer
   description: An add-on to the mizer package which allows multiple resource spectra to be added to any mizer model.
+  sidebar:
+    structure: [source_links, license, authors, dev]
+    components:
+      source_links:
+        title: Links
+        text: |
+          [Browse source code](https://github.com/sizespectrum/mizerMR)
+
+          [Report a bug](https://github.com/sizespectrum/mizerMR/issues)
 
 url: https://sizespectrum.org/mizerMR
 
@@ -11,8 +20,8 @@ authors:
     href: https://www.york.ac.uk/maths/staff/gustav-delius/
 
 template:
-  params:
-    bootswatch: cerulean
+  bootstrap: 5
+  bootswatch: cerulean
   opengraph:
     image:
       src: man/figures/logo.png
@@ -23,9 +32,15 @@ template:
 toc:
   depth: 3
 
+articles:
+- title: Articles
+  navbar: Articles
+  contents:
+  - extension-mechanism
+
 navbar:
   structure:
-    left: [intro, reference, news]
+    left: [intro, reference, articles, news]
     right: [blog, twitter, github]
   components:
     home: ~
@@ -34,6 +49,7 @@ navbar:
       href: https://blog.mizer.sizespectrum.org
     twitter:
        icon: "fab fa-twitter fa-lg"
+       aria-label: Twitter
        href: https://twitter.com/mizer_model
 
 reference:
@@ -51,7 +67,21 @@ reference:
   - plotResourceLevel
   - plotResourcePred
   - animateSpectra
+  - params_methods
+- title: Species utilities
+- contents:
+  - addSpecies
+  - removeSpecies
+  - renameSpecies
+  - expandSizeGrid
 - title: Internal helper functions
 - contents:
   - starts_with("valid")
   - ends_with("default")
+  - mizerMR-class
+  - project_methods
+  - mizerMR_dynamics
+  - plotDietData
+  - expect_unchanged
+  - .onLoad
+  - .strip_mr

@@ -2,17 +2,21 @@
 % Please edit documentation in R/animateSpectra.R
 \name{animateSpectra}
 \alias{animateSpectra}
+\alias{animateSpectra.mizerMRSim}
 \title{Animation of the abundance spectra}
 \usage{
-animateSpectra(
+animateSpectra.mizerMRSim(
   sim,
   species = NULL,
-  resources = NULL,
   time_range,
   wlim = c(NA, NA),
   ylim = c(NA, NA),
   power = 1,
-  total = FALSE
+  total = FALSE,
+  resource = TRUE,
+  background = TRUE,
+  ...,
+  resources = NULL
 )
 }
 \arguments{
@@ -20,9 +24,6 @@ animateSpectra(
 
 \item{species}{Name or vector of names of the species to be plotted. By
 default all species are plotted.}
-
-\item{resources}{Name or vector of names of the resources to be plotted. By
-default all resources are plotted.}
 
 \item{time_range}{The time range to animate over. Either a vector of values
 or a vector of min and max time. Default is the entire time range of the
@@ -42,6 +43,15 @@ to logarithmic size bins.}
 
 \item{total}{A boolean value that determines whether the total over all
 species in the system is plotted as well. Default is FALSE.}
+
+\item{resource}{Deprecated compatibility argument from mizer's generic.}
+
+\item{background}{Deprecated compatibility argument from mizer's generic.}
+
+\item{...}{Other arguments (currently unused).}
+
+\item{resources}{Name or vector of names of the resources to be plotted. By
+default all resources are plotted.}
 }
 \value{
 A plotly object
@@ -50,10 +60,10 @@ A plotly object
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
 }
 \seealso{
-Other plotting functions: 
-\code{\link{plotDiet}()},
-\code{\link{plotResourceLevel}()},
-\code{\link{plotResourcePred}()},
-\code{\link{plotSpectra}()}
+Other plotting functions:
+\code{\link{plotDiet}},
+\code{\link[=plotResourceLevel]{plotResourceLevel()}},
+\code{\link[=plotResourcePred]{plotResourcePred()}},
+\code{\link{plotSpectra}}
 }
 \concept{plotting functions}

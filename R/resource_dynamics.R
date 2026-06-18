@@ -1,3 +1,8 @@
+#' Multiple-resource dynamics
+#'
+#' Internal rate hook registered by [setMultipleResources()].
+#'
+#' @keywords internal
 #' @export
 mizerMR_dynamics <- function(params, n_other, n_pp, rates, ...) {
     n_res <- n_other[["MR"]]
@@ -20,7 +25,3 @@ mizerMR_dynamics <- function(params, n_other, n_pp, rates, ...) {
     new_n_res
 }
 
-#' @export
-mizerMRResourceMort <- function(params, n, n_pp, n_other, t, pred_rate, ...) {
-    t(params@other_params[["MR"]]$interaction) %*% pred_rate
-}

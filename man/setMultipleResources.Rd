@@ -8,8 +8,8 @@
 \alias{resource_rate<-}
 \alias{resource_interaction}
 \alias{resource_interaction<-}
-\alias{initialNResource}
-\alias{initialNResource<-}
+\alias{initialNResource.mizerMR}
+\alias{initialNResource<-.mizerMR}
 \title{Set up multiple resources}
 \usage{
 setMultipleResources(
@@ -33,9 +33,9 @@ resource_interaction(params)
 
 resource_interaction(params) <- value
 
-initialNResource(params)
+\method{initialNResource}{mizerMR}(object)
 
-initialNResource(params) <- value
+\method{initialNResource}{mizerMR}(params) <- value
 }
 \arguments{
 \item{params}{A MizerParams object}
@@ -54,6 +54,8 @@ resource growth rates}
 \item{initial_resource}{Optional. Array (resource x size) of initial values}
 
 \item{value}{Value to assign}
+
+\item{object}{A mizerMR object}
 }
 \description{
 Set up multiple resources
