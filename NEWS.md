@@ -1,6 +1,6 @@
-# mizerMR 0.2.4.0
+# mizerMR 0.3.0
 
-* Compatible with mizer version 2.5.4.9124.
+* Compatible with mizer version 3.0.0
 * `setMultipleResources()` now uses mizer's extension-chain methods for
   encounter and resource mortality instead of replacing entries in
   `params@rates_funcs`, allowing composition with other extension packages.
