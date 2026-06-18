@@ -10,7 +10,8 @@ NResource.mizerMRSim <- function(sim) {
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
     dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
     names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
-    n_res
+    MRArrayTimeByResourceBySize(n_res, value_name = "Number density",
+                                units = "1/g", params = sim@params)
 }
 
 #' @rdname NResource
@@ -19,5 +20,7 @@ NResource.mizerMRSim <- function(sim) {
 #' @export
 finalNResource.mizerMRSim <- function(sim) {
     NextMethod()
-    NOther(sim)[[idxFinalT(sim), "MR"]]
+    MRArrayResourceBySize(NOther(sim)[[idxFinalT(sim), "MR"]],
+                          value_name = "Number density", units = "1/g",
+                          params = sim@params)
 }

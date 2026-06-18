@@ -19,7 +19,7 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 3.5),
-    mizer (>= 3.0.0),
+    mizer (>= 3.0.0.9002),
     mizerExperimental (>= 2.4.0)
 Remotes:
     github::sizespectrum/mizerExperimental
@@ -32,6 +32,7 @@ Imports:
     rlang
 Collate:
     mizerMR-class.R
+    ArrayResource-class.R
     animateSpectra.R
     mizerMR-package.R
     newMRParams.R

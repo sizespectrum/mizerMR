@@ -1,3 +1,13 @@
+# mizerMR (development version)
+
+* The resource accessors (`getResourceMort()`, `initialNResource()`,
+  `finalNResource()` and `NResource()`) now return classed objects
+  (`MRArrayResourceBySize` and `MRArrayTimeByResourceBySize`) that support
+  `print()`, `summary()`, `plot()` and `as.data.frame()` methods, so you can
+  do e.g. `plot(getResourceMort(params))` or `plot(NResource(sim))` with one
+  coloured line per resource. This mirrors the corresponding classes added for
+  the single resource in mizer. Requires mizer (>= 3.0.0.9002).
+
 # mizerMR 0.3.0
 
 * Compatible with mizer version 3.0.0
