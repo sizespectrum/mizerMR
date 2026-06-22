@@ -174,3 +174,86 @@ test_that("Multiple resources compose with outer encounter methods", {
     resource_rate(params) <- resource_rate(params)
     expect_identical(params@extensions, old_extensions)
 })
+
+test_that("power_law_bin_average handles a two-sided cutoff", {
+    w <- c(1, 2, 4, 8)
+    dw <- c(1, 2, 4, 8)
+    avg <- power_law_bin_average(w, dw, -2.05, w_min = 2, w_max = 8)
+    # Bin [1, 2) is entirely below w_min and bin [8, 16) is at/above w_max.
+    expect_equal(avg[[1]], 0)
+    expect_equal(avg[[4]], 0)
+    expect_true(all(avg[2:3] > 0))
+    # An interior in-range bin equals the exact integral over the full bin
+    # width.
+    num <- integrate(function(x) x^(-2.05), 2, 4)$value / dw[[2]]
+    expect_equal(avg[[2]], num, tolerance = 1e-6)
+    # The straddling bin gets the partial average over the in-range part only.
+    avg_lo <- power_law_bin_average(c(1), c(2), -2.05, w_min = 2, w_max = 8)
+    part <- integrate(function(x) x^(-2.05), 2, 3)$value / 2
+    expect_equal(avg_lo[[1]], part, tolerance = 1e-6)
+    # The exponent == -1 branch.
+    expect_equal(power_law_bin_average(w, dw, -1), log((w + dw) / w) / dw)
+    # No cutoff reproduces the plain bin average (lower edge at w).
+    expect_equal(power_law_bin_average(w, dw, -2),
+                 ((w + dw)^(-1) - w^(-1)) / (-1 * dw))
+})
+
+test_that("second_order_w bin-averages the multiple resources", {
+    skip_if_not("second_order_w" %in% getNamespaceExports("mizer"),
+                "installed mizer has no second_order_w support")
+    rp <- data.frame(resource = c("res1", "res2"),
+                     kappa = c(0.1, 0.05), lambda = c(2.05, 2.1),
+                     r_pp = c(4, 2), w_min = c(1e-4, 1e-2),
+                     w_max = c(1, 10), n = c(2 / 3, 0.7),
+                     stringsAsFactors = FALSE)
+    p1 <- setMultipleResources(NS_params, resource_params = rp)
+    p2 <- NS_params
+    second_order_w(p2) <- c(bin_average = TRUE)
+    p2 <- setMultipleResources(p2, resource_params = rp)
+
+    wf <- w_full(NS_params)
+    dwf <- dw_full(NS_params)
+    cap1 <- getComponent(p1, "MR")$component_params$capacity
+    cap2 <- getComponent(p2, "MR")$component_params$capacity
+    rate1 <- getComponent(p1, "MR")$component_params$rate
+    rate2 <- getComponent(p2, "MR")$component_params$rate
+
+    for (i in 1:2) {
+        sel <- wf >= rp$w_min[i] & wf <= rp$w_max[i]
+        # First order: point-sampled within the size range, zero outside.
+        cap_pt <- numeric(length(wf))
+        cap_pt[sel] <- rp$kappa[i] * wf[sel] ^ (-rp$lambda[i])
+        expect_equal(unname(cap1[i, ]), cap_pt)
+        # Second order: exact two-sided bin average.
+        cap_ba <- rp$kappa[i] * power_law_bin_average(
+            wf, dwf, -rp$lambda[i], w_min = rp$w_min[i], w_max = rp$w_max[i])
+        expect_equal(unname(cap2[i, ]), cap_ba)
+        rate_ba <- rp$r_pp[i] * power_law_bin_average(
+            wf, dwf, rp$n[i] - 1, w_min = rp$w_min[i], w_max = rp$w_max[i])
+        expect_equal(unname(rate2[i, ]), rate_ba)
+    }
+    # Bin-averaging actually changes the resource (steep power laws).
+    expect_false(isTRUE(all.equal(unname(cap1), unname(cap2))))
+    expect_false(isTRUE(all.equal(unname(rate1), unname(rate2))))
+})
+
+test_that("newMRParams accepts second_order_w", {
+    skip_if_not("second_order_w" %in% getNamespaceExports("mizer"),
+                "installed mizer has no second_order_w support")
+    sp <- data.frame(species = c("A", "B"), w_max = c(100, 1000),
+                     stringsAsFactors = FALSE)
+    rp <- data.frame(resource = c("res1", "res2"), kappa = c(0.1, 0.05),
+                     lambda = c(2.05, 2.1), r_pp = c(4, 2),
+                     w_min = c(1e-4, 1e-2), w_max = c(1, 10),
+                     stringsAsFactors = FALSE)
+    p <- suppressWarnings(suppressMessages(
+        newMRParams(sp, resource_params = rp, no_w = 50,
+                    second_order_w = TRUE)))
+    expect_true(second_order_w(p)[["bin_average"]])
+    cap <- getComponent(p, "MR")$component_params$capacity
+    expect_true(all(is.finite(cap)))
+    expect_true(any(cap > 0))
+    # The initial resource inherits the bin-averaged capacity.
+    expect_equal(unname(getComponent(p, "MR")$initial_value), unname(cap))
+    expect_error(suppressWarnings(suppressMessages(project(p, t_max = 1))), NA)
+})

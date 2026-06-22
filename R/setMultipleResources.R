@@ -221,13 +221,25 @@ valid_resource_capacity <- function(params, resource_params = NULL,
     rp <- resource_params
     resource_capacity <- mr$component_params$capacity
     resource_capacity[] <- 0
+    bin_average <- mr_bin_average(params)
+    wf <- w_full(params)
+    dwf <- dw_full(params)
     # TODO: vectorise this
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- w_full(params) >= rp$w_min[[i]] &
-            w_full(params) <= rp$w_max[[i]]
-        resource_capacity[i, w_sel] <- rp$kappa[[i]] *
-            w_full(params)[w_sel] ^ -rp$lambda[[i]]
+        if (bin_average) {
+            # Exact bin average of kappa * w^(-lambda) over each bin, restricted
+            # to the resource size range, so the capacity is the finite-volume
+            # cell average consumed by the bin-integrated encounter convolution.
+            resource_capacity[i, ] <- rp$kappa[[i]] *
+                power_law_bin_average(wf, dwf, -rp$lambda[[i]],
+                                      w_min = rp$w_min[[i]],
+                                      w_max = rp$w_max[[i]])
+        } else {
+            w_sel <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
+            resource_capacity[i, w_sel] <- rp$kappa[[i]] *
+                wf[w_sel] ^ -rp$lambda[[i]]
+        }
     }
 
     resource_capacity
@@ -286,13 +298,25 @@ valid_resource_rate <- function(params, resource_params = NULL,
     rp <- resource_params
     resource_rate <- mr$component_params$rate
     resource_rate[] <- 0
+    bin_average <- mr_bin_average(params)
+    wf <- w_full(params)
+    dwf <- dw_full(params)
     # TODO: vectorise this
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- w_full(params) >= rp$w_min[[i]] &
-            w_full(params) <= rp$w_max[[i]]
-        resource_rate[i, w_sel] <- rp$r_pp[[i]] *
-            w_full(params)[w_sel] ^ (rp$n[[i]] - 1)
+        if (bin_average) {
+            # Exact bin average of r_pp * w^(n-1) over each bin, restricted to
+            # the resource size range, so the relaxation rate is consistent with
+            # the finite-volume cell-average resource density.
+            resource_rate[i, ] <- rp$r_pp[[i]] *
+                power_law_bin_average(wf, dwf, rp$n[[i]] - 1,
+                                      w_min = rp$w_min[[i]],
+                                      w_max = rp$w_max[[i]])
+        } else {
+            w_sel <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
+            resource_rate[i, w_sel] <- rp$r_pp[[i]] *
+                wf[w_sel] ^ (rp$n[[i]] - 1)
+        }
     }
 
     resource_rate

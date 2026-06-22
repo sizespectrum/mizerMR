@@ -1,5 +1,15 @@
 # mizerMR (development version)
 
+* mizerMR now respects mizer's `second_order_w` flag. When second-order
+  bin-averaging is switched on, each resource's carrying capacity and
+  replenishment rate are built from the exact bin averages of their power laws
+  over the resource's size range (with the bins straddling `w_min`/`w_max`
+  getting the partial average) rather than point-sampled at the left bin edge,
+  and the initial resource inherits the bin-averaged capacity. `newMRParams()`
+  gains a `second_order_w` argument that is passed through to mizer's
+  constructor. The default (first-order) behaviour is unchanged and the package
+  still works against mizer versions without the `second_order_w` slot.
+
 * The resource accessors (`getResourceMort()`, `initialNResource()`,
   `finalNResource()` and `NResource()`) now return classed objects
   (`MRArrayResourceBySize` and `MRArrayTimeByResourceBySize`) that support

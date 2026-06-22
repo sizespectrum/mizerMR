@@ -204,3 +204,48 @@ expandSizeGrid.mizerMR <- function(params,
 
     p
 }
+
+#' Whether second-order bin-averaging is switched on
+#'
+#' Internal helper reading the `bin_average` entry of the model's
+#' `second_order_w` slot via mizer's accessor. Returns `FALSE` for mizer
+#' versions that predate the slot, so that mizerMR keeps its first-order
+#' behaviour against older mizer.
+#'
+#' @param params A \linkS4class{MizerParams} object.
+#' @return `TRUE` or `FALSE`.
+#' @keywords internal
+mr_bin_average <- function(params) {
+    isTRUE(tryCatch(second_order_w(params)[["bin_average"]],
+                    error = function(e) FALSE))
+}
+
+#' Bin-average of a power law over a restricted size range
+#'
+#' Internal helper. Returns the exact average of \eqn{w^d} over each grid bin
+#' \eqn{[w_j, w_{j+1}]}, restricted to the size range \eqn{[w_{min}, w_{max}]}
+#' (the power law is taken to be zero outside it) and divided by the full bin
+#' width \eqn{\Delta w_j}. A bin straddling either knife edge gets the partial
+#' average over the in-range part of the bin; bins entirely outside the range
+#' get zero. This is the same finite-volume convention mizer uses internally,
+#' extended with a lower cutoff for mizerMR's per-resource size ranges.
+#'
+#' @param w Numeric vector of left bin edges \eqn{w_j}.
+#' @param dw Numeric vector of bin widths \eqn{\Delta w_j} (same length as `w`).
+#' @param d Single numeric exponent of the power law.
+#' @param w_min,w_max Lower and upper cutoffs of the size range. Default to no
+#'   cutoff (`-Inf` and `Inf`).
+#' @return A numeric vector (same length as `w`) of the restricted bin averages.
+#' @keywords internal
+power_law_bin_average <- function(w, dw, d, w_min = -Inf, w_max = Inf) {
+    w_right <- w + dw
+    # In-range integration limits for each bin, clipped to [w_min, w_max] and
+    # kept within the bin so that bins outside the range collapse to zero width.
+    lo <- pmin(pmax(w, w_min), w_right)
+    hi <- pmax(pmin(w_right, w_max), lo)
+    if (d == -1) {
+        log(hi / lo) / dw
+    } else {
+        (hi ^ (d + 1) - lo ^ (d + 1)) / ((d + 1) * dw)
+    }
+}
