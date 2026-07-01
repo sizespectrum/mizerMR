@@ -30,13 +30,11 @@ expandSizeGrid(
 
 - new_min_w:
 
-  The new minimum size in the grid. Must not be larger than the current
-  minimum size.
+  The new minimum size in the grid. Defaults to the current minimum.
 
 - new_max_w:
 
-  The new maximum size in the grid. Must not be smaller than the current
-  maximum size.
+  The new maximum size in the grid. Defaults to the current maximum.
 
 - preserve_species:
 

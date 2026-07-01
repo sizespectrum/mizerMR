@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerMR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -52,7 +52,8 @@
 <span>  gear_params <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  no_w <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  min_w <span class="op">=</span> <span class="fl">0.001</span>,</span>
-<span>  max_w <span class="op">=</span> <span class="cn">NA</span></span>
+<span>  max_w <span class="op">=</span> <span class="cn">NA</span>,</span>
+<span>  second_order_w <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -98,6 +99,15 @@ given in the <code>w_min</code> column of the <code>species_params</code> datafr
 <dd><p>The largest size of the consumer spectrum. By default this is
 set to the largest <code>w_max specified in the </code>species_params` data
 frame.</p></dd>
+
+
+<dt id="arg-second-order-w">second_order_w<a class="anchor" aria-label="anchor" href="#arg-second-order-w"></a></dt>
+<dd><p><a href="https://lifecycle.r-lib.org/articles/stages.html#experimental" class="external-link"><img src="figures/lifecycle-experimental.svg" alt="[Experimental]"></a> Selects the
+second-order numerical scheme for the new model, passed through to
+<code><a href="https://sizespectrum.org/mizer/reference/newMultispeciesParams.html" class="external-link">mizer::newMultispeciesParams()</a></code>. When second-order bin-averaging is
+switched on, the multiple-resource capacities, rates and initial
+abundances are built from the exact bin averages of their power laws rather
+than point-sampled at the left bin edge. Defaults to <code>FALSE</code>.</p></dd>
 
 </dl></div>
     <div class="section level2">
