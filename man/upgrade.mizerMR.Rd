@@ -15,8 +15,9 @@
 The upgraded object.
 }
 \description{
-This is the \code{mizerMR} method of mizer's \code{\link[mizer:upgrade]{mizer::upgrade()}} generic. It
-performs only the mizerMR-specific migration and is invoked by mizer's
+This is the \code{mizerMR} method of the \code{utils::upgrade()} generic (on which
+mizer registers its own methods). It performs only the mizerMR-specific
+migration and is invoked by mizer's
 upgrade orchestrator (from \code{validParams()} / \code{readParams()}) when the version
 stamp recorded in \code{params@extensions[["mizerMR"]]} is older than the installed
 mizerMR, or is missing. The orchestrator records the new stamp afterwards, so

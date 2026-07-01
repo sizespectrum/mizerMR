@@ -46,8 +46,7 @@ second-order numerical scheme for the new model, passed through to
 \code{\link[mizer:newMultispeciesParams]{mizer::newMultispeciesParams()}}. When second-order bin-averaging is
 switched on, the multiple-resource capacities, rates and initial
 abundances are built from the exact bin averages of their power laws rather
-than point-sampled at the left bin edge. Defaults to \code{FALSE}. Requires a
-mizer version that supports the \code{second_order_w} slot.}
+than point-sampled at the left bin edge. Defaults to \code{FALSE}.}
 }
 \value{
 An object of class MizerMRParams
