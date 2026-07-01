@@ -28,7 +28,6 @@ size on mizer’s full size grid.
 registers this component:
 
 ``` r
-
 params <- setComponent(
     params      = params,
     component   = "MR",
@@ -60,7 +59,6 @@ mizerMR defines the S4 marker classes `mizerMR` and `mizerMRSim`. The
 package registers itself with mizer when it is loaded:
 
 ``` r
-
 .onLoad <- function(libname, pkgname) {
     mizer::registerExtensions(
         stats::setNames("sizespectrum/mizerMR", pkgname))
@@ -74,7 +72,6 @@ session extension chain in the object and coerces the object to the
 appropriate dispatch class:
 
 ``` r
-
 params@extensions <- mizer::getRegisteredExtensions()
 mizer::coerceToExtensionClass(params)
 ```
@@ -104,12 +101,9 @@ resources share mizer’s full size grid. So the contributions of the
 individual resources do not need a separate Fourier transform each: they
 can be summed into a single combined prey spectrum for each predator and
 transformed once. With the species × resource interaction matrix
-$`\Theta`$ and the resource state $`N`$ (an array with one row per
+$\Theta$ and the resource state $N$ (an array with one row per
 resource),
-``` math
-\sum_r \mathrm{FFT}\bigl(\Theta_{\cdot r}\,N_r\bigr)
-   = \mathrm{FFT}\bigl(\Theta\,N\bigr),
-```
+$$\sum\limits_{r}{FFT}(\Theta_{\cdot r}\, N_{r}) = {FFT}(\Theta\, N),$$
 so a single transform of `interaction %*% n_other[["MR"]]` gives the
 whole resource encounter. This is what
 [`mizerMRResourceEncounter()`](https://sizespectrum.org/mizerMR/reference/project_methods.md)
@@ -119,7 +113,6 @@ this fast path whenever the model uses mizer’s default Fourier predation
 kernel:
 
 ``` r
-
 projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
     n_pp <- mizerMRValidBaseResource(params, n_pp)
     encounter <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
@@ -167,7 +160,6 @@ matrix `(resource × size)` by multiplying the predation rate matrix by
 the species–resource interaction:
 
 ``` r
-
 projectResourceMort.mizerMR <- function(params, n, n_pp, n_other, t,
                                         pred_rate, ...) {
     NextMethod()
@@ -190,21 +182,21 @@ built-in mizer resource must not interfere.
 does two things to achieve this:
 
 ``` r
-
 mizer::initialNResource(params) <- 0         # abundance set to zero
 resource_dynamics(params) <- "resource_constant"  # kept at zero forever
 ```
 
-### Resource parameters live in two places
+### Resource parameters live in the component
 
-Resource-level parameters (kappa, lambda, r_pp, w_min, w_max) are stored
-as a data frame in `other_params(params)[["MR"]]$resource_params`. The
-per-size arrays derived from those parameters (carrying capacity and
-replenishment rate) live inside the component’s own `component_params`.
-This split reflects the two-level structure recommended by mizer:
-[`other_params()`](https://sizespectrum.org/mizer/reference/setRateFunction.html)
-for model-wide state, `component_params` for data belonging to a single
-component.
+All of the data belonging to the multiple-resource component is stored
+in its `component_params`, accessible at `params@other_params[["MR"]]`.
+This holds the resource-level parameter data frame (`resource_params`,
+with columns kappa, lambda, r_pp, w_min, w_max, …) alongside the
+per-size arrays derived from those parameters (the carrying `capacity`
+and replenishment `rate`) and the species-resource `interaction` matrix.
+Keeping everything in one place under the component keeps the MR state
+self-contained and consistent with how mizer stores a component’s
+`component_params`.
 
 ### Accessors, plots and species utilities are methods
 
@@ -223,7 +215,6 @@ multiple-resource component. Those methods still call
 extension packages can participate in the same generic.
 
 ``` r
-
 NResource.mizerMRSim <- function(sim) {
     NextMethod()
     n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
@@ -282,12 +273,12 @@ correct methods fire without the user having to do anything special.
 
 ### Summary of benefits
 
-| Aspect | Method approach |
-|----|----|
-| Dispatch logic | R method dispatch, with no repeated component guards |
+| Aspect            | Method approach                                                                             |
+|-------------------|---------------------------------------------------------------------------------------------|
+| Dispatch logic    | R method dispatch, with no repeated component guards                                        |
 | Fallback to mizer | Methods call [`NextMethod()`](https://rdrr.io/r/base/UseMethod.html) to keep the chain live |
-| Extensibility | Rate hooks, accessors, plots and species utilities follow standard R generic behaviour |
-| Correctness risk | MR-specific code is tied to the `mizerMR` class membership |
+| Extensibility     | Rate hooks, accessors, plots and species utilities follow standard R generic behaviour      |
+| Correctness risk  | MR-specific code is tied to the `mizerMR` class membership                                  |
 
 The extension mechanism in mizer is designed with this kind of layering
 in mind. Using methods for projection hooks, accessors and plots keeps

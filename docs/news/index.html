@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerMR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -37,6 +37,11 @@
       <small>Source: <a href="https://github.com/sizespectrum/mizerMR/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="development version" id="mizermr-development-version">mizerMR (development version)<a class="anchor" aria-label="anchor" href="#mizermr-development-version"></a></h2>
+<ul><li><p>mizerMR now respects mizer’s <code>second_order_w</code> flag. When second-order bin-averaging is switched on, each resource’s carrying capacity and replenishment rate are built from the exact bin averages of their power laws over the resource’s size range (with the bins straddling <code>w_min</code>/<code>w_max</code> getting the partial average) rather than point-sampled at the left bin edge, and the initial resource inherits the bin-averaged capacity. <code><a href="../reference/newMRParams.html">newMRParams()</a></code> gains a <code>second_order_w</code> argument that is passed through to mizer’s constructor. The default (first-order) behaviour is unchanged and the package still works against mizer versions without the <code>second_order_w</code> slot.</p></li>
+<li><p>The resource accessors (<code><a href="https://sizespectrum.org/mizer/reference/getResourceMort.html" class="external-link">getResourceMort()</a></code>, <code><a href="https://sizespectrum.org/mizer/reference/initialNResource-set.html" class="external-link">initialNResource()</a></code>, <code><a href="https://sizespectrum.org/mizer/reference/finalN.html" class="external-link">finalNResource()</a></code> and <code><a href="../reference/NResource.html">NResource()</a></code>) now return classed objects (<code>MRArrayResourceBySize</code> and <code>MRArrayTimeByResourceBySize</code>) that support <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code>, <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code>, <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code> and <code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> methods, so you can do e.g. <code>plot(getResourceMort(params))</code> or <code>plot(NResource(sim))</code> with one coloured line per resource. This mirrors the corresponding classes added for the single resource in mizer. Requires mizer (&gt;= 3.0.0.9002).</p></li>
+</ul></div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.3.0" id="mizermr-030">mizerMR 0.3.0<a class="anchor" aria-label="anchor" href="#mizermr-030"></a></h2>
 <ul><li>Compatible with mizer version 3.0.0</li>

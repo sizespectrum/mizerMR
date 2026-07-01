@@ -12,7 +12,8 @@ newMRParams(
   gear_params = data.frame(),
   no_w = 100,
   min_w = 0.001,
-  max_w = NA
+  max_w = NA,
+  second_order_w = FALSE
 )
 }
 \arguments{
@@ -39,6 +40,13 @@ given in the \code{w_min} column of the \code{species_params} dataframe.}
 \item{max_w}{The largest size of the consumer spectrum. By default this is
 set to the largest \verb{w_max specified in the }species_params` data
 frame.}
+
+\item{second_order_w}{\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}} Selects the
+second-order numerical scheme for the new model, passed through to
+\code{\link[mizer:newMultispeciesParams]{mizer::newMultispeciesParams()}}. When second-order bin-averaging is
+switched on, the multiple-resource capacities, rates and initial
+abundances are built from the exact bin averages of their power laws rather
+than point-sampled at the left bin edge. Defaults to \code{FALSE}.}
 }
 \value{
 An object of class MizerMRParams

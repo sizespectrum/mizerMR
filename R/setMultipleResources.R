@@ -28,7 +28,8 @@ setMultipleResources <- function(params,
 
     # If there is no MR component yet then we need to create it. We'll
     # fill it in properly later
-    if (is.null(getComponent(params, "MR"))) {
+    creating <- is.null(getComponent(params, "MR"))
+    if (creating) {
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0
         # and keep it zero
@@ -44,14 +45,14 @@ setMultipleResources <- function(params,
             array(1, dim = c(no_sp, no_res),
                   dimnames = list(sp = sp_names, resource = r_names))
 
-        other_params(params)[["MR"]]$resource_params <- rp
         params <- setComponent(
             params = params, component = "MR",
             initial_value = template,
             dynamics_fun =  "mizerMR_dynamics",
             component_params = list(rate = template,
                                     capacity = template,
-                                    interaction = interaction_default))
+                                    interaction = interaction_default,
+                                    resource_params = rp))
     }
 
     resource_capacity <-
@@ -75,16 +76,26 @@ setMultipleResources <- function(params,
     names(linetypes) <- rp$resource
     params <- setLinetypes(params, linetypes)
 
-    other_params(params)[["MR"]]$resource_params <- rp
     params <- setComponent(
         params = params, component = "MR",
         initial_value = initial_resource,
         dynamics_fun =  "mizerMR_dynamics",
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
-                                interaction = resource_interaction))
+                                interaction = resource_interaction,
+                                resource_params = rp))
 
-    params@extensions <- mizer::getRegisteredExtensions()
+    # Record mizerMR in the object's extension chain. The version stamp is set
+    # only when the component is first created (the object then conforms to the
+    # installed mizerMR); ordinary modifications preserve the existing stamp so
+    # that a pending upgrade is not masked. See mizer::recordExtension().
+    if (creating) {
+        params <- mizer::recordExtension(
+            params, "mizerMR",
+            version = as.character(utils::packageVersion("mizerMR")))
+    } else {
+        params <- mizer::recordExtension(params, "mizerMR")
+    }
     mizer::coerceToExtensionClass(params)
 }
 
@@ -140,7 +151,8 @@ initialNResource.mizerMR <- function(object) {
     if (is.null(mr)) {
         return(NextMethod())
     }
-    mr$initial_value
+    MRArrayResourceBySize(mr$initial_value, value_name = "Number density",
+                          units = "1/g", params = object)
 }
 
 #' @rdname setMultipleResources
@@ -209,13 +221,25 @@ valid_resource_capacity <- function(params, resource_params = NULL,
     rp <- resource_params
     resource_capacity <- mr$component_params$capacity
     resource_capacity[] <- 0
+    bin_average <- mr_bin_average(params)
+    wf <- w_full(params)
+    dwf <- dw_full(params)
     # TODO: vectorise this
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- w_full(params) >= rp$w_min[[i]] &
-            w_full(params) <= rp$w_max[[i]]
-        resource_capacity[i, w_sel] <- rp$kappa[[i]] *
-            w_full(params)[w_sel] ^ -rp$lambda[[i]]
+        if (bin_average) {
+            # Exact bin average of kappa * w^(-lambda) over each bin, restricted
+            # to the resource size range, so the capacity is the finite-volume
+            # cell average consumed by the bin-integrated encounter convolution.
+            resource_capacity[i, ] <- rp$kappa[[i]] *
+                power_law_bin_average(wf, dwf, -rp$lambda[[i]],
+                                      w_min = rp$w_min[[i]],
+                                      w_max = rp$w_max[[i]])
+        } else {
+            w_sel <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
+            resource_capacity[i, w_sel] <- rp$kappa[[i]] *
+                wf[w_sel] ^ -rp$lambda[[i]]
+        }
     }
 
     resource_capacity
@@ -274,13 +298,25 @@ valid_resource_rate <- function(params, resource_params = NULL,
     rp <- resource_params
     resource_rate <- mr$component_params$rate
     resource_rate[] <- 0
+    bin_average <- mr_bin_average(params)
+    wf <- w_full(params)
+    dwf <- dw_full(params)
     # TODO: vectorise this
     no_res <- nrow(rp)
     for (i in seq_len(no_res)) {
-        w_sel <- w_full(params) >= rp$w_min[[i]] &
-            w_full(params) <= rp$w_max[[i]]
-        resource_rate[i, w_sel] <- rp$r_pp[[i]] *
-            w_full(params)[w_sel] ^ (rp$n[[i]] - 1)
+        if (bin_average) {
+            # Exact bin average of r_pp * w^(n-1) over each bin, restricted to
+            # the resource size range, so the relaxation rate is consistent with
+            # the finite-volume cell-average resource density.
+            resource_rate[i, ] <- rp$r_pp[[i]] *
+                power_law_bin_average(wf, dwf, rp$n[[i]] - 1,
+                                      w_min = rp$w_min[[i]],
+                                      w_max = rp$w_max[[i]])
+        } else {
+            w_sel <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
+            resource_rate[i, w_sel] <- rp$r_pp[[i]] *
+                wf[w_sel] ^ (rp$n[[i]] - 1)
+        }
     }
 
     resource_rate

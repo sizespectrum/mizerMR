@@ -13,7 +13,8 @@ newMRParams(
   gear_params = data.frame(),
   no_w = 100,
   min_w = 0.001,
-  max_w = NA
+  max_w = NA,
+  second_order_w = FALSE
 )
 ```
 
@@ -57,6 +58,16 @@ newMRParams(
 
   The largest size of the consumer spectrum. By default this is set to
   the largest `w_max specified in the `species_params\` data frame.
+
+- second_order_w:
+
+  **\[experimental\]** Selects the second-order numerical scheme for the
+  new model, passed through to
+  [`mizer::newMultispeciesParams()`](https://sizespectrum.org/mizer/reference/newMultispeciesParams.html).
+  When second-order bin-averaging is switched on, the multiple-resource
+  capacities, rates and initial abundances are built from the exact bin
+  averages of their power laws rather than point-sampled at the left bin
+  edge. Defaults to `FALSE`.
 
 ## Value
 

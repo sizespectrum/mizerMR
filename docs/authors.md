@@ -14,13 +14,13 @@ Source:
 [`DESCRIPTION`](https://github.com/sizespectrum/mizerMR/blob/HEAD/DESCRIPTION)
 
 Delius G, Forestier R (2026). *mizerMR: Add multiple size-structured
-resources to a mizer model*. R package version 0.3.0.0,
+resources to a mizer model*. R package version 0.3.1,
 <https://sizespectrum.org/mizerMR>.
 
     @Manual{,
       title = {mizerMR: Add multiple size-structured resources to a mizer model},
       author = {Gustav Delius and Romain Forestier},
       year = {2026},
-      note = {R package version 0.3.0.0},
+      note = {R package version 0.3.1},
       url = {https://sizespectrum.org/mizerMR},
     }

@@ -47,6 +47,19 @@
   [`setResource(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/params_methods.md)
   [`summary(`*`<mizerMR>`*`)`](https://sizespectrum.org/mizerMR/reference/params_methods.md)
   : Multiple-resource methods for model rescaling and reporting
+- [`MRArrayResourceBySize()`](https://sizespectrum.org/mizerMR/reference/MRArrayResourceBySize.md)
+  : S3 class for multiple-resource size spectra
+- [`MRArrayTimeByResourceBySize()`](https://sizespectrum.org/mizerMR/reference/MRArrayTimeByResourceBySize.md)
+  : S3 class for time x resource x size arrays
+- [`is.MRArrayResourceBySize()`](https://sizespectrum.org/mizerMR/reference/is.MRArrayResourceBySize.md)
+  : Test if an object is an MRArrayResourceBySize
+- [`is.MRArrayTimeByResourceBySize()`](https://sizespectrum.org/mizerMR/reference/is.MRArrayTimeByResourceBySize.md)
+  : Test if an object is an MRArrayTimeByResourceBySize
+- [`plot(`*`<MRArrayResourceBySize>`*`)`](https://sizespectrum.org/mizerMR/reference/plot.MRArrayResourceBySize.md)
+  [`plotHover(`*`<MRArrayResourceBySize>`*`)`](https://sizespectrum.org/mizerMR/reference/plot.MRArrayResourceBySize.md)
+  [`plot(`*`<MRArrayTimeByResourceBySize>`*`)`](https://sizespectrum.org/mizerMR/reference/plot.MRArrayResourceBySize.md)
+  [`plotHover(`*`<MRArrayTimeByResourceBySize>`*`)`](https://sizespectrum.org/mizerMR/reference/plot.MRArrayResourceBySize.md)
+  : Plot mizerMR resource arrays
 
 ## Species utilities
 

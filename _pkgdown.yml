@@ -68,6 +68,11 @@ reference:
   - plotResourcePred
   - animateSpectra
   - params_methods
+  - MRArrayResourceBySize
+  - MRArrayTimeByResourceBySize
+  - is.MRArrayResourceBySize
+  - is.MRArrayTimeByResourceBySize
+  - plot.MRArrayResourceBySize
 - title: Species utilities
 - contents:
   - addSpecies

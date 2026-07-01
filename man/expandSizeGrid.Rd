@@ -16,11 +16,9 @@
 \arguments{
 \item{params}{A \linkS4class{mizerMR} object.}
 
-\item{new_min_w}{The new minimum size in the grid. Must not be larger than
-the current minimum size.}
+\item{new_min_w}{The new minimum size in the grid. Defaults to the current minimum.}
 
-\item{new_max_w}{The new maximum size in the grid. Must not be smaller than
-the current maximum size.}
+\item{new_max_w}{The new maximum size in the grid. Defaults to the current maximum.}
 
 \item{preserve_species}{A vector of species names for which all rate arrays
 should be copied over to the new params object rather than being

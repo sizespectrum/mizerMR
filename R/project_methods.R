@@ -69,7 +69,14 @@ getResourceMort.mizerMR <- function(params, n = initialN(params),
                                     n_other = initialNOther(params),
                                     t = 0, ...) {
     n_pp <- mizerMRValidBaseResource(params, n_pp)
-    NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
+    # With mizer's leniency fix, NextMethod() returns the plain resource x size
+    # matrix unwrapped, so we can wrap it in our own multi-resource class.
+    mort <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
+    if (is.matrix(mort)) {
+        mort <- MRArrayResourceBySize(mort, value_name = "Resource mortality",
+                                      units = "1/year", params = params)
+    }
+    mort
 }
 
 #' Extend [mizer::getRates()] for mizerMR params.

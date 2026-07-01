@@ -14,6 +14,12 @@
 #' @param max_w The largest size of the consumer spectrum. By default this is
 #'   set to the largest `w_max specified in the `species_params` data
 #'   frame.
+#' @param second_order_w `r lifecycle::badge("experimental")` Selects the
+#'   second-order numerical scheme for the new model, passed through to
+#'   [mizer::newMultispeciesParams()]. When second-order bin-averaging is
+#'   switched on, the multiple-resource capacities, rates and initial
+#'   abundances are built from the exact bin averages of their power laws rather
+#'   than point-sampled at the left bin edge. Defaults to `FALSE`.
 #'
 #' @return An object of class MizerMRParams
 #' @export
@@ -24,12 +30,14 @@ newMRParams <- function(species_params,
                         gear_params = data.frame(),
                         no_w = 100,
                         min_w = 0.001,
-                        max_w = NA) {
+                        max_w = NA,
+                        second_order_w = FALSE) {
     params <- newMultispeciesParams(
         species_params = species_params,
         gear_params = gear_params,
         interaction = interaction,
-        no_w = no_w, min_w = min_w, max_w = max_w)
+        no_w = no_w, min_w = min_w, max_w = max_w,
+        second_order_w = second_order_w)
 
     resource_params <- validResourceParams(resource_params,
                                            w_full(params)[[1]])

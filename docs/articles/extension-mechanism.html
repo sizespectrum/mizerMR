@@ -25,7 +25,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">mizerMR</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.3.1</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -160,11 +160,11 @@ all resources share mizer’s full size grid. So the contributions of the
 individual resources do not need a separate Fourier transform each: they
 can be summed into a single combined prey spectrum for each predator and
 transformed once. With the species × resource interaction matrix
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi mathvariant="normal">Θ</mi><annotation encoding="application/x-tex">\Theta</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>Θ</mi><annotation encoding="application/x-tex">\Theta</annotation></semantics></math>
 and the resource state
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>
 (an array with one row per resource),
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mi>r</mi></munder><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><msub><mi mathvariant="normal">Θ</mi><mrow><mi>⋅</mi><mi>r</mi></mrow></msub><mspace width="0.167em"></mspace><msub><mi>N</mi><mi>r</mi></msub><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mo minsize="120%" maxsize="120%" stretchy="true" form="prefix">(</mo><mi mathvariant="normal">Θ</mi><mspace width="0.167em"></mspace><mi>N</mi><mo minsize="120%" maxsize="120%" stretchy="true" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><munder><mo>∑</mo><mi>r</mi></munder><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">(</mo><msub><mi>Θ</mi><mrow><mo>⋅</mo><mi>r</mi></mrow></msub><mspace width="0.167em"></mspace><msub><mi>N</mi><mi>r</mi></msub><mo minsize="1.2" maxsize="1.2" stretchy="false" form="postfix">)</mo><mo>=</mo><mrow><mi mathvariant="normal">F</mi><mi mathvariant="normal">F</mi><mi mathvariant="normal">T</mi></mrow><mo minsize="1.2" maxsize="1.2" stretchy="false" form="prefix">(</mo><mi>Θ</mi><mspace width="0.167em"></mspace><mi>N</mi><mo minsize="1.2" maxsize="1.2" stretchy="false" form="postfix">)</mo><mo>,</mo></mrow><annotation encoding="application/x-tex">
 \sum_r \mathrm{FFT}\bigl(\Theta_{\cdot r}\,N_r\bigr)
    = \mathrm{FFT}\bigl(\Theta\,N\bigr),
 </annotation></semantics></math> so a single transform of
@@ -241,17 +241,18 @@ the built-in mizer resource must not interfere.
 <span><span class="fu"><a href="https://sizespectrum.org/mizer/reference/setResource.html" class="external-link">resource_dynamics</a></span><span class="op">(</span><span class="va">params</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="st">"resource_constant"</span>  <span class="co"># kept at zero forever</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="resource-parameters-live-in-two-places">Resource parameters live in two places<a class="anchor" aria-label="anchor" href="#resource-parameters-live-in-two-places"></a>
+<h3 id="resource-parameters-live-in-the-component">Resource parameters live in the component<a class="anchor" aria-label="anchor" href="#resource-parameters-live-in-the-component"></a>
 </h3>
-<p>Resource-level parameters (kappa, lambda, r_pp, w_min, w_max) are
-stored as a data frame in
-<code>other_params(params)[["MR"]]$resource_params</code>. The per-size
-arrays derived from those parameters (carrying capacity and
-replenishment rate) live inside the component’s own
-<code>component_params</code>. This split reflects the two-level
-structure recommended by mizer: <code><a href="https://sizespectrum.org/mizer/reference/setRateFunction.html" class="external-link">other_params()</a></code> for
-model-wide state, <code>component_params</code> for data belonging to a
-single component.</p>
+<p>All of the data belonging to the multiple-resource component is
+stored in its <code>component_params</code>, accessible at
+<code>params@other_params[["MR"]]</code>. This holds the resource-level
+parameter data frame (<code>resource_params</code>, with columns kappa,
+lambda, r_pp, w_min, w_max, …) alongside the per-size arrays derived
+from those parameters (the carrying <code>capacity</code> and
+replenishment <code>rate</code>) and the species-resource
+<code>interaction</code> matrix. Keeping everything in one place under
+the component keeps the MR state self-contained and consistent with how
+mizer stores a component’s <code>component_params</code>.</p>
 </div>
 <div class="section level3">
 <h3 id="accessors-plots-and-species-utilities-are-methods">Accessors, plots and species utilities are methods<a class="anchor" aria-label="anchor" href="#accessors-plots-and-species-utilities-are-methods"></a>

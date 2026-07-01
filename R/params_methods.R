@@ -44,9 +44,9 @@ scaleModel.mizerMR <- function(params, factor, ...) {
         comment(cap) <- co
         op[["MR"]]$capacity <- cap
     }
-    if (!is.null(op$other$MR$resource_params)) {
-        op$other$MR$resource_params$kappa <-
-            op$other$MR$resource_params$kappa * factor
+    if (!is.null(op[["MR"]]$resource_params)) {
+        op[["MR"]]$resource_params$kappa <-
+            op[["MR"]]$resource_params$kappa * factor
     }
     params@other_params <- op
 
