@@ -2,10 +2,10 @@
 % Please edit documentation in R/animateSpectra.R
 \name{animateSpectra}
 \alias{animateSpectra}
-\alias{animateSpectra.mizerMRSim}
+\alias{animate.mizerMRSim}
 \title{Animation of the abundance spectra}
 \usage{
-animateSpectra.mizerMRSim(
+\method{animate}{mizerMRSim}(
   sim,
   species = NULL,
   time_range,

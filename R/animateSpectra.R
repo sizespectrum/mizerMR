@@ -27,9 +27,10 @@
 #'
 #' @return A plotly object
 #' @family plotting functions
+#' @method animate mizerMRSim
 #' @export
 #' @name animateSpectra
-animateSpectra.mizerMRSim <- function(sim,
+animate.mizerMRSim <- function(sim,
                                       species = NULL,
                                       time_range,
                                       wlim = c(NA, NA),
