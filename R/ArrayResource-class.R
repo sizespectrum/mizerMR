@@ -147,6 +147,13 @@ plot.MRArrayResourceBySize <- function(x, resources = NULL, return_data = FALSE,
         x, resources = resources, wlim = wlim)
     if (return_data) return(plot_dat)
 
+    if (log_axes$log_y) {
+        plot_dat <- plot_dat[plot_dat$value > 0 & !is.na(plot_dat$value), ]
+    }
+    if (log_axes$log_x) {
+        plot_dat <- plot_dat[plot_dat$w > 0 & !is.na(plot_dat$w), ]
+    }
+
     y_label <- value_name
     if (!is.null(units_str) && nzchar(units_str)) {
         y_label <- paste0(value_name, " [", units_str, "]")
