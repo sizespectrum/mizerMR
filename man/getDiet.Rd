@@ -6,25 +6,28 @@
 \title{Get diet of predator at size, resolved by prey species}
 \usage{
 \method{getDiet}{mizerMR}(
-  params,
-  n = initialN(params),
+  object,
+  proportion = TRUE,
+  ...,
+  n = initialN(object),
   n_pp = NULL,
-  n_other = initialNOther(params),
-  proportion = TRUE
+  n_other = initialNOther(object)
 )
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object}
+\item{object}{A \link[mizer:MizerParams-class]{mizer::MizerParams} object}
+
+\item{proportion}{If TRUE (default) the function returns the diet as a
+proportion of the total consumption rate. If FALSE it returns the
+consumption rate in grams per year.}
+
+\item{...}{Other arguments (currently unused).}
 
 \item{n}{A matrix of species abundances (species x size).}
 
 \item{n_pp}{A vector of the resource abundance by size}
 
 \item{n_other}{A list of abundances for other dynamical components of the}
-
-\item{proportion}{If TRUE (default) the function returns the diet as a
-proportion of the total consumption rate. If FALSE it returns the
-consumption rate in grams per year.}
 }
 \value{
 An array (predator species  x predator size x

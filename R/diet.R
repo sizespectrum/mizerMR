@@ -26,13 +26,14 @@
 #' available biomass. Outside the range of sizes for a predator species the
 #' returned rate is zero.
 #'
-#' @param params A \linkS4class{MizerParams} object
+#' @param object A [mizer::MizerParams-class] object
 #' @param n A matrix of species abundances (species x size).
 #' @param n_pp A vector of the resource abundance by size
 #' @param n_other A list of abundances for other dynamical components of the
 #' @param proportion If TRUE (default) the function returns the diet as a
 #'   proportion of the total consumption rate. If FALSE it returns the
 #'   consumption rate in grams per year.
+#' @param ... Other arguments (currently unused).
 #'
 #' @return An array (predator species  x predator size x
 #'   (prey species + resource + other components) )
@@ -45,10 +46,11 @@
 #' str(diet)
 #' @export
 #' @name getDiet
-getDiet.mizerMR <- function(params, n = initialN(params),
+getDiet.mizerMR <- function(object, proportion = TRUE, ...,
+                            n = initialN(object),
                             n_pp = NULL,
-                            n_other = initialNOther(params),
-                            proportion = TRUE) {
+                            n_other = initialNOther(object)) {
+    params <- object
     base_n_pp <- if (is.null(n_pp)) {
         mizerMRBaseResource(params)
     } else {
@@ -130,18 +132,23 @@ getDiet.mizerMR <- function(params, n = initialN(params),
 #' Prey species that contribute less than 1 permille to the diet are suppressed
 #' in the plot.
 #'
-#' @param object An object of class \linkS4class{MizerSim} or
-#'   \linkS4class{MizerParams}.
+#' @param object An object of class [mizer::MizerSim-class] or
+#'   [mizer::MizerParams-class].
 #' @param species The name of the predator species for which to plot the diet.
-#' @param time_range The time range (either a vector of values, a vector of min
-#'   and max time, or a single value) to average the abundances over. Default is
-#'   the final time step. Ignored when called with a \linkS4class{MizerParams}
-#'   object.
 #' @param wlim A numeric vector of length two providing lower and upper limits
 #'   for the w axis. Use NA to refer to the existing minimum or maximum.
+#' @param llim Ignored (compatibility argument from mizer's generic).
+#' @param size_axis Ignored (compatibility argument from mizer's generic).
 #' @param return_data A boolean value that determines whether the formatted data
-#' used for the plot is returned instead of the plot itself. Default value is FALSE
-#' @param ... Other arguments (currently unused)
+#'   used for the plot is returned instead of the plot itself. Default value is FALSE.
+#' @param log_x Ignored (compatibility argument from mizer's generic).
+#' @param log_y Ignored (compatibility argument from mizer's generic).
+#' @param log Ignored (compatibility argument from mizer's generic).
+#' @param ... Other arguments (currently unused).
+#' @param time_range The time range (either a vector of values, a vector of min
+#'   and max time, or a single value) to average the abundances over. Default is
+#'   the final time step. Only used when called with a [mizer::MizerSim-class]
+#'   object.
 #'
 #' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
 #'   frame with the three variables 'w', 'Proportion', 'Prey' is returned.
@@ -149,8 +156,13 @@ getDiet.mizerMR <- function(params, n = initialN(params),
 #' @family plotting functions
 #' @export
 #' @name plotDiet
-plotDiet.mizerMR <- function(object, species = NULL, time_range,
-                             wlim = c(1, NA), return_data = FALSE, ...) {
+plotDiet.mizerMR <- function(object, species = NULL,
+                             wlim = c(1, NA), llim = c(NA, NA),
+                             size_axis = c("w", "l"),
+                             return_data = FALSE,
+                             log_x = TRUE, log_y = FALSE, log = NULL,
+                             ...,
+                             time_range) {
     suppressWarnings(try(NextMethod(return_data = TRUE, ...), silent = TRUE))
     assert_that(is.flag(return_data))
     params <- validParams(object)
@@ -161,8 +173,13 @@ plotDiet.mizerMR <- function(object, species = NULL, time_range,
 
 #' @rdname plotDiet
 #' @export
-plotDiet.mizerMRSim <- function(object, species = NULL, time_range,
-                                wlim = c(1, NA), return_data = FALSE, ...) {
+plotDiet.mizerMRSim <- function(object, species = NULL,
+                                wlim = c(1, NA), llim = c(NA, NA),
+                                size_axis = c("w", "l"),
+                                return_data = FALSE,
+                                log_x = TRUE, log_y = FALSE, log = NULL,
+                                ...,
+                                time_range) {
     suppressWarnings(try(NextMethod(return_data = TRUE, ...), silent = TRUE))
     assert_that(is.flag(return_data))
     if (missing(time_range)) time_range <- max(as.numeric(dimnames(object@n)$time))

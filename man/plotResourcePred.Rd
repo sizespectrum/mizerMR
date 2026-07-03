@@ -11,8 +11,8 @@ plotResourcePred(object, proportion = TRUE, return_data = FALSE)
 plotlyResourcePred(object, proportion = TRUE, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerSim} or
-\linkS4class{MizerParams}.}
+\item{object}{An object of class \link[mizer:MizerSim-class]{mizer::MizerSim} or
+\link[mizer:MizerParams-class]{mizer::MizerParams}.}
 
 \item{proportion}{A boolean value that determines whether values should be
 displayed as proportions from 0 to 1 or with their actual values. Default is TRUE.}

@@ -8,8 +8,8 @@ their carrying capacity}
 plotResourceLevel(object, return_data = FALSE)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerSim} or
-\linkS4class{MizerParams}.}
+\item{object}{An object of class \link[mizer:MizerSim-class]{mizer::MizerSim} or
+\link[mizer:MizerParams-class]{mizer::MizerParams}.}
 
 \item{return_data}{A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE}

@@ -1,7 +1,7 @@
 #' @keywords internal
 #' @import mizerExperimental ggplot2 methods assertthat
-#' @importFrom mizer addSpecies animateSpectra expandSizeGrid finalNResource getDiet getEncounter getPredRate getRates getResourceMort initialNResource initialNResource<- NResource plotDiet plotSpectra projectEncounter projectResourceMort removeSpecies renameSpecies
-#' @importFrom mizer plotDataFrame plotHover parsePlotLog apply_wlim
+#' @importFrom mizer addSpecies animateSpectra animate expandSizeGrid finalNResource getDiet getEncounter getPredRate getRates getResourceMort initialNResource NResource plotDiet plotSpectra projectEncounter projectResourceMort removeSpecies renameSpecies scaleModel scaleRates setResource plotDataFrame plotHover parsePlotLog apply_wlim validParams w_full dw_full getComponent setComponent setInitialValues species_params initialN initialNOther NOther idxFinalT get_time_elements valid_species_arg getFeedingLevel melt mizerEncounter newMultispeciesParams second_order_w setColours setLinetypes
+#' @importFrom mizer "initialNResource<-" "resource_dynamics<-"
 #' @importFrom plotly ggplotly
 #' @importFrom stats mvfft
 #' @importFrom utils globalVariables
@@ -15,7 +15,8 @@
 ## usethis namespace: end
 NULL
 
-globalVariables(c("expect_equal"))
+globalVariables(c("expect_equal", "sp", "value", "w", "resource",
+                  "Predator", "Species", "time"))
 
 #' Register mizerMR with mizer
 #'

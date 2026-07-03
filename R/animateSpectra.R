@@ -2,46 +2,67 @@
 #'
 #' `r lifecycle::badge("experimental")`
 #'
-#' @param sim A MizerSim object
+#' @param x A [mizerMRSim-class] object.
 #' @param species Name or vector of names of the species to be plotted. By
 #'   default all species are plotted.
+#' @param log_x Whether to use a logarithmic x axis. Default TRUE.
+#' @param log_y Whether to use a logarithmic y axis. Default TRUE.
+#' @param log Deprecated. Use `log_x` and `log_y` instead.
+#' @param wlim A numeric vector of length two providing lower and upper limits
+#'   for the w axis. Use NA to refer to the existing minimum or maximum.
+#' @param llim Ignored (compatibility argument from mizer's generic).
+#' @param ylim A numeric vector of length two providing lower and upper limits
+#'   for the y axis. Use NA to refer to the existing minimum or maximum. Any
+#'   values below 1e-20 are always cut off.
+#' @param tlim Ignored (compatibility argument from mizer's generic).
+#' @param size_axis Ignored (compatibility argument from mizer's generic).
+#' @param total A boolean value that determines whether the total over all
+#'   species in the system is plotted as well. Default is FALSE.
+#' @param background Ignored (compatibility argument from mizer's generic).
+#' @param frame_duration Duration of each animation frame in milliseconds.
+#'   Default 500.
+#' @param transition_duration Duration of the transition between frames in
+#'   milliseconds. Default equals `frame_duration`.
+#' @param easing The easing function for transitions. Default "linear".
+#' @param resource Ignored (compatibility argument from mizer's generic).
+#' @param ... Other arguments (currently unused).
 #' @param resources Name or vector of names of the resources to be plotted. By
 #'   default all resources are plotted.
 #' @param time_range The time range to animate over. Either a vector of values
 #'   or a vector of min and max time. Default is the entire time range of the
 #'   simulation.
-#' @param wlim A numeric vector of length two providing lower and upper limits
-#'   for the w axis. Use NA to refer to the existing minimum or maximum.
-#' @param ylim A numeric vector of length two providing lower and upper limits
-#'   for the y axis. Use NA to refer to the existing minimum or maximum. Any
-#'   values below 1e-20 are always cut off.
 #' @param power The abundance is plotted as the number density times the weight
-#' raised to \code{power}. The default \code{power = 1} gives the biomass
-#' density, whereas \code{power = 2} gives the biomass density with respect
-#' to logarithmic size bins.
-#' @param total A boolean value that determines whether the total over all
-#'   species in the system is plotted as well. Default is FALSE.
-#' @param resource Deprecated compatibility argument from mizer's generic.
-#' @param background Deprecated compatibility argument from mizer's generic.
-#' @param ... Other arguments (currently unused).
+#'   raised to \code{power}. The default \code{power = 1} gives the biomass
+#'   density, whereas \code{power = 2} gives the biomass density with respect
+#'   to logarithmic size bins.
 #'
 #' @return A plotly object
 #' @family plotting functions
 #' @method animate mizerMRSim
+#' @importFrom mizer animate
 #' @export
 #' @name animateSpectra
-animate.mizerMRSim <- function(sim,
-                                      species = NULL,
-                                      time_range,
-                                      wlim = c(NA, NA),
-                                      ylim = c(NA, NA),
-                                      power = 1,
-                                      total = FALSE,
-                                      resource = TRUE,
-                                      background = TRUE,
-                                      ...,
-                                      resources = NULL) {
-    NextMethod(resource = FALSE, background = background, ...)
+animate.mizerMRSim <- function(x,
+                               species = NULL,
+                               log_x = TRUE,
+                               log_y = TRUE,
+                               log = NULL,
+                               wlim = c(NA, NA),
+                               llim = c(NA, NA),
+                               ylim = c(NA, NA),
+                               tlim = c(NA, NA),
+                               size_axis = c("w", "l"),
+                               total = FALSE,
+                               background = TRUE,
+                               frame_duration = 500,
+                               transition_duration = frame_duration,
+                               easing = "linear",
+                               resource = TRUE,
+                               ...,
+                               resources = NULL,
+                               time_range,
+                               power = 1) {
+    sim <- x
     species <- valid_species_arg(sim, species)
     resources <- valid_resources_arg(sim, resources)
     if (missing(time_range)) {
@@ -102,3 +123,4 @@ animate.mizerMRSim <- function(sim,
                        yaxis = list(type = "log", exponentformat = "power",
                                     title = y_label))
 }
+

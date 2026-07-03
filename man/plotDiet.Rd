@@ -10,41 +10,61 @@
 \method{plotDiet}{mizerMR}(
   object,
   species = NULL,
-  time_range,
   wlim = c(1, NA),
+  llim = c(NA, NA),
+  size_axis = c("w", "l"),
   return_data = FALSE,
-  ...
+  log_x = TRUE,
+  log_y = FALSE,
+  log = NULL,
+  ...,
+  time_range
 )
 
 \method{plotDiet}{mizerMRSim}(
   object,
   species = NULL,
-  time_range,
   wlim = c(1, NA),
+  llim = c(NA, NA),
+  size_axis = c("w", "l"),
   return_data = FALSE,
-  ...
+  log_x = TRUE,
+  log_y = FALSE,
+  log = NULL,
+  ...,
+  time_range
 )
 
 plotDietMR(object, ...)
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerSim} or
-\linkS4class{MizerParams}.}
+\item{object}{An object of class \link[mizer:MizerSim-class]{mizer::MizerSim} or
+\link[mizer:MizerParams-class]{mizer::MizerParams}.}
 
 \item{species}{The name of the predator species for which to plot the diet.}
-
-\item{time_range}{The time range (either a vector of values, a vector of min
-and max time, or a single value) to average the abundances over. Default is
-the final time step. Ignored when called with a \linkS4class{MizerParams}
-object.}
 
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
 
-\item{return_data}{A boolean value that determines whether the formatted data
-used for the plot is returned instead of the plot itself. Default value is FALSE}
+\item{llim}{Ignored (compatibility argument from mizer's generic).}
 
-\item{...}{Other arguments (currently unused)}
+\item{size_axis}{Ignored (compatibility argument from mizer's generic).}
+
+\item{return_data}{A boolean value that determines whether the formatted data
+used for the plot is returned instead of the plot itself. Default value is FALSE.}
+
+\item{log_x}{Ignored (compatibility argument from mizer's generic).}
+
+\item{log_y}{Ignored (compatibility argument from mizer's generic).}
+
+\item{log}{Ignored (compatibility argument from mizer's generic).}
+
+\item{...}{Other arguments (currently unused).}
+
+\item{time_range}{The time range (either a vector of values, a vector of min
+and max time, or a single value) to average the abundances over. Default is
+the final time step. Only used when called with a \link[mizer:MizerSim-class]{mizer::MizerSim}
+object.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data

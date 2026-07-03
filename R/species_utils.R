@@ -178,7 +178,7 @@ expandSizeGrid.mizerMR <- function(params,
 #' valid single-resource spectrum.
 #'
 #' @param params A \linkS4class{mizerMR} object.
-#' @return A \linkS4class{MizerParams} object without the MR extension.
+#' @return A [mizer::MizerParams-class] object without the MR extension.
 #' @keywords internal
 .strip_mr <- function(params) {
     p <- as(params, "MizerParams")
@@ -212,7 +212,7 @@ expandSizeGrid.mizerMR <- function(params,
 #' versions that predate the slot, so that mizerMR keeps its first-order
 #' behaviour against older mizer.
 #'
-#' @param params A \linkS4class{MizerParams} object.
+#' @param params A [mizer::MizerParams-class] object.
 #' @return `TRUE` or `FALSE`.
 #' @keywords internal
 mr_bin_average <- function(params) {

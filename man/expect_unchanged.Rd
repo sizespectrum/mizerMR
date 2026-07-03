@@ -7,7 +7,7 @@
 expect_unchanged(object, expected)
 }
 \arguments{
-\item{object}{A \linkS4class{MizerParams} or \linkS4class{MizerSim} object.}
+\item{object}{A \link[mizer:MizerParams-class]{mizer::MizerParams} or \link[mizer:MizerSim-class]{mizer::MizerSim} object.}
 
 \item{expected}{The expected object.}
 }

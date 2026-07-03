@@ -3,7 +3,7 @@
 #' Compares two mizer objects after normalising fields that are expected to
 #' change during setup or projection.
 #'
-#' @param object A \linkS4class{MizerParams} or \linkS4class{MizerSim} object.
+#' @param object A [mizer::MizerParams-class] or [mizer::MizerSim-class] object.
 #' @param expected The expected object.
 #' @return The expectation result from [testthat::expect_equal()].
 #' @keywords internal

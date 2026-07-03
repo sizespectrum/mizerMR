@@ -3,13 +3,13 @@
 #' Plots the number density multiplied by a power of the weight, with the power
 #' specified by the `power` argument.
 #'
-#' When called with a \linkS4class{MizerSim} object, the abundance is averaged
+#' When called with a [mizer::MizerSim-class] object, the abundance is averaged
 #' over the specified time range (a single value for the time range can be used
-#' to plot a single time step). When called with a \linkS4class{MizerParams}
+#' to plot a single time step). When called with a [mizer::MizerParams-class]
 #' object the initial abundance is plotted.
 #'
-#' @param object An object of class \linkS4class{MizerSim} or
-#'   \linkS4class{MizerParams}.
+#' @param object An object of class [mizer::MizerSim-class] or
+#'   [mizer::MizerParams-class].
 #' @param species The species to be selected. Optional. By default all target
 #'   species are selected. A vector of species names, or a
 #'   numeric vector with the species indices, or a logical vector indicating for
@@ -21,9 +21,9 @@
 #'   for the y axis. Use NA to refer to the existing minimum or maximum. Any
 #'   values below 1e-20 are always cut off.
 #' @param time_range The time range to average over when called with a
-#'   \linkS4class{MizerSim} object.
+#'   [mizer::MizerSim-class] object.
 #' @param geometric_mean Whether to average abundances using a geometric mean
-#'   when called with a \linkS4class{MizerSim} object.
+#'   when called with a [mizer::MizerSim-class] object.
 #' @param power The abundance is plotted as the number density times the weight
 #' raised to `power`. The default \code{power = 1} gives the biomass
 #' density, whereas \code{power = 2} gives the biomass density with respect
@@ -40,6 +40,12 @@
 #' @param highlight Name or vector of names of the species to be highlighted.
 #' @param return_data A boolean value that determines whether the formatted data
 #' used for the plot is returned instead of the plot itself. Default value is FALSE
+#' @param llim Ignored (compatibility argument from mizer's generic).
+#' @param resource Ignored (replaced by `resources` in mizerMR).
+#' @param log_x Whether to use a logarithmic x axis. Default TRUE.
+#' @param log_y Whether to use a logarithmic y axis. Default TRUE.
+#' @param log Deprecated. Use `log_x` and `log_y` instead.
+#' @param size_axis Ignored (compatibility argument from mizer's generic).
 #' @param ... Other arguments (currently unused)
 #'
 #' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
@@ -49,15 +55,22 @@
 #' @seealso [plotting_functions]
 #' @export
 #' @name plotSpectra
-plotSpectra.mizerMRSim <- function(object, species = NULL, resources = NULL,
-                                   time_range,
-                                   geometric_mean = FALSE,
-                                   wlim = c(NA, NA), ylim = c(NA, NA),
+plotSpectra.mizerMRSim <- function(object, species = NULL,
+                                   wlim = c(NA, NA), llim = c(NA, NA),
+                                   ylim = c(NA, NA),
                                    power = 1, biomass = TRUE,
                                    total = FALSE,
+                                   resource = TRUE,
                                    background = TRUE,
-                                   highlight = NULL, return_data = FALSE,
-                                   ...) {
+                                   highlight = NULL,
+                                   log_x = TRUE, log_y = TRUE,
+                                   log = NULL,
+                                   size_axis = c("w", "l"),
+                                   return_data = FALSE,
+                                   ...,
+                                   resources = NULL,
+                                   time_range,
+                                   geometric_mean = FALSE) {
     if (missing(power)) {
         power <- as.numeric(biomass)
     }
@@ -120,12 +133,20 @@ plotSpectra.mizerMRSim <- function(object, species = NULL, resources = NULL,
 
 #' @rdname plotSpectra
 #' @export
-plotSpectra.mizerMR <- function(object, species = NULL, resources = NULL,
-                                wlim = c(NA, NA), ylim = c(NA, NA),
-                                power = 1,
+plotSpectra.mizerMR <- function(object, species = NULL,
+                                wlim = c(NA, NA), llim = c(NA, NA),
+                                ylim = c(NA, NA),
+                                power = 1, biomass = TRUE,
                                 total = FALSE,
+                                resource = TRUE,
                                 background = TRUE,
-                                highlight = NULL, return_data = FALSE, ...) {
+                                highlight = NULL,
+                                log_x = TRUE, log_y = TRUE,
+                                log = NULL,
+                                size_axis = c("w", "l"),
+                                return_data = FALSE,
+                                ...,
+                                resources = NULL) {
     params <- object
 
     # set n_pp to total plankton abundance so that the total in mizer's

@@ -19,19 +19,19 @@ mizerMRBaseResource(params)
 mizerMRValidBaseResource(params, n_pp)
 
 \method{getEncounter}{mizerMR}(
-  params,
-  n = initialN(params),
-  n_pp = mizerMRBaseResource(params),
-  n_other = initialNOther(params),
+  object,
+  n = initialN(object),
+  n_pp = mizerMRBaseResource(object),
+  n_other = initialNOther(object),
   t = 0,
   ...
 )
 
 \method{getPredRate}{mizerMR}(
-  params,
-  n = initialN(params),
-  n_pp = mizerMRBaseResource(params),
-  n_other = initialNOther(params),
+  object,
+  n = initialN(object),
+  n_pp = mizerMRBaseResource(object),
+  n_other = initialNOther(object),
   t = 0,
   ...
 )

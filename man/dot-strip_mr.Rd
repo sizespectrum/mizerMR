@@ -10,7 +10,7 @@
 \item{params}{A \linkS4class{mizerMR} object.}
 }
 \value{
-A \linkS4class{MizerParams} object without the MR extension.
+A \link[mizer:MizerParams-class]{mizer::MizerParams} object without the MR extension.
 }
 \description{
 Removes the MR extension state so that mizer's own methods can run without

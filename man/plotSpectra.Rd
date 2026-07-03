@@ -9,56 +9,60 @@
 \method{plotSpectra}{mizerMRSim}(
   object,
   species = NULL,
-  resources = NULL,
-  time_range,
-  geometric_mean = FALSE,
   wlim = c(NA, NA),
+  llim = c(NA, NA),
   ylim = c(NA, NA),
   power = 1,
   biomass = TRUE,
   total = FALSE,
+  resource = TRUE,
   background = TRUE,
   highlight = NULL,
+  log_x = TRUE,
+  log_y = TRUE,
+  log = NULL,
+  size_axis = c("w", "l"),
   return_data = FALSE,
-  ...
+  ...,
+  resources = NULL,
+  time_range,
+  geometric_mean = FALSE
 )
 
 \method{plotSpectra}{mizerMR}(
   object,
   species = NULL,
-  resources = NULL,
   wlim = c(NA, NA),
+  llim = c(NA, NA),
   ylim = c(NA, NA),
   power = 1,
+  biomass = TRUE,
   total = FALSE,
+  resource = TRUE,
   background = TRUE,
   highlight = NULL,
+  log_x = TRUE,
+  log_y = TRUE,
+  log = NULL,
+  size_axis = c("w", "l"),
   return_data = FALSE,
-  ...
+  ...,
+  resources = NULL
 )
 }
 \arguments{
-\item{object}{An object of class \linkS4class{MizerSim} or
-\linkS4class{MizerParams}.}
+\item{object}{An object of class \link[mizer:MizerSim-class]{mizer::MizerSim} or
+\link[mizer:MizerParams-class]{mizer::MizerParams}.}
 
 \item{species}{The species to be selected. Optional. By default all target
 species are selected. A vector of species names, or a
 numeric vector with the species indices, or a logical vector indicating for
 each species whether it is to be selected (TRUE) or not.}
 
-\item{resources}{The resources to be selected. Optional. By default all
-resources are selected. A vector of resource names, or a numeric vector
-with the resource indices, or a logical vector indicating for each resource
-whether it is to be selected (TRUE) or not.}
-
-\item{time_range}{The time range to average over when called with a
-\linkS4class{MizerSim} object.}
-
-\item{geometric_mean}{Whether to average abundances using a geometric mean
-when called with a \linkS4class{MizerSim} object.}
-
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
+
+\item{llim}{Ignored (compatibility argument from mizer's generic).}
 
 \item{ylim}{A numeric vector of length two providing lower and upper limits
 for the y axis. Use NA to refer to the existing minimum or maximum. Any
@@ -77,16 +81,37 @@ species and resources in the system is plotted as well. Note that even if
 the plot only shows a selection of species, the total is including all
 species. Default is FALSE.}
 
+\item{resource}{Ignored (replaced by \code{resources} in mizerMR).}
+
 \item{background}{A boolean value that determines whether background species
 are included. Ignored if the model does not contain background species.
 Default is TRUE.}
 
 \item{highlight}{Name or vector of names of the species to be highlighted.}
 
+\item{log_x}{Whether to use a logarithmic x axis. Default TRUE.}
+
+\item{log_y}{Whether to use a logarithmic y axis. Default TRUE.}
+
+\item{log}{Deprecated. Use \code{log_x} and \code{log_y} instead.}
+
+\item{size_axis}{Ignored (compatibility argument from mizer's generic).}
+
 \item{return_data}{A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE}
 
 \item{...}{Other arguments (currently unused)}
+
+\item{resources}{The resources to be selected. Optional. By default all
+resources are selected. A vector of resource names, or a numeric vector
+with the resource indices, or a logical vector indicating for each resource
+whether it is to be selected (TRUE) or not.}
+
+\item{time_range}{The time range to average over when called with a
+\link[mizer:MizerSim-class]{mizer::MizerSim} object.}
+
+\item{geometric_mean}{Whether to average abundances using a geometric mean
+when called with a \link[mizer:MizerSim-class]{mizer::MizerSim} object.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
@@ -98,9 +123,9 @@ Plots the number density multiplied by a power of the weight, with the power
 specified by the \code{power} argument.
 }
 \details{
-When called with a \linkS4class{MizerSim} object, the abundance is averaged
+When called with a \link[mizer:MizerSim-class]{mizer::MizerSim} object, the abundance is averaged
 over the specified time range (a single value for the time range can be used
-to plot a single time step). When called with a \linkS4class{MizerParams}
+to plot a single time step). When called with a \link[mizer:MizerParams-class]{mizer::MizerParams}
 object the initial abundance is plotted.
 }
 \seealso{

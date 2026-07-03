@@ -6,52 +6,81 @@
 \title{Animation of the abundance spectra}
 \usage{
 \method{animate}{mizerMRSim}(
-  sim,
+  x,
   species = NULL,
-  time_range,
+  log_x = TRUE,
+  log_y = TRUE,
+  log = NULL,
   wlim = c(NA, NA),
+  llim = c(NA, NA),
   ylim = c(NA, NA),
-  power = 1,
+  tlim = c(NA, NA),
+  size_axis = c("w", "l"),
   total = FALSE,
-  resource = TRUE,
   background = TRUE,
+  frame_duration = 500,
+  transition_duration = frame_duration,
+  easing = "linear",
+  resource = TRUE,
   ...,
-  resources = NULL
+  resources = NULL,
+  time_range,
+  power = 1
 )
 }
 \arguments{
-\item{sim}{A MizerSim object}
+\item{x}{A \link[=mizerMRSim-class]{mizerMRSim} object.}
 
 \item{species}{Name or vector of names of the species to be plotted. By
 default all species are plotted.}
 
-\item{time_range}{The time range to animate over. Either a vector of values
-or a vector of min and max time. Default is the entire time range of the
-simulation.}
+\item{log_x}{Whether to use a logarithmic x axis. Default TRUE.}
+
+\item{log_y}{Whether to use a logarithmic y axis. Default TRUE.}
+
+\item{log}{Deprecated. Use \code{log_x} and \code{log_y} instead.}
 
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
+
+\item{llim}{Ignored (compatibility argument from mizer's generic).}
 
 \item{ylim}{A numeric vector of length two providing lower and upper limits
 for the y axis. Use NA to refer to the existing minimum or maximum. Any
 values below 1e-20 are always cut off.}
 
-\item{power}{The abundance is plotted as the number density times the weight
-raised to \code{power}. The default \code{power = 1} gives the biomass
-density, whereas \code{power = 2} gives the biomass density with respect
-to logarithmic size bins.}
+\item{tlim}{Ignored (compatibility argument from mizer's generic).}
+
+\item{size_axis}{Ignored (compatibility argument from mizer's generic).}
 
 \item{total}{A boolean value that determines whether the total over all
 species in the system is plotted as well. Default is FALSE.}
 
-\item{resource}{Deprecated compatibility argument from mizer's generic.}
+\item{background}{Ignored (compatibility argument from mizer's generic).}
 
-\item{background}{Deprecated compatibility argument from mizer's generic.}
+\item{frame_duration}{Duration of each animation frame in milliseconds.
+Default 500.}
+
+\item{transition_duration}{Duration of the transition between frames in
+milliseconds. Default equals \code{frame_duration}.}
+
+\item{easing}{The easing function for transitions. Default "linear".}
+
+\item{resource}{Ignored (compatibility argument from mizer's generic).}
 
 \item{...}{Other arguments (currently unused).}
 
 \item{resources}{Name or vector of names of the resources to be plotted. By
 default all resources are plotted.}
+
+\item{time_range}{The time range to animate over. Either a vector of values
+or a vector of min and max time. Default is the entire time range of the
+simulation.}
+
+\item{power}{The abundance is plotted as the number density times the weight
+raised to \code{power}. The default \code{power = 1} gives the biomass
+density, whereas \code{power = 2} gives the biomass density with respect
+to logarithmic size bins.}
 }
 \value{
 A plotly object

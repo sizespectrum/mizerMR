@@ -2,8 +2,8 @@
 
 #' Plot the mortality applied on the resource spectrum(s)
 #'
-#' @param object An object of class \linkS4class{MizerSim} or
-#'   \linkS4class{MizerParams}.
+#' @param object An object of class [mizer::MizerSim-class] or
+#'   [mizer::MizerParams-class].
 #' @param proportion A boolean value that determines whether values should be
 #' displayed as proportions from 0 to 1 or with their actual values. Default is TRUE.
 #' @param return_data A boolean value that determines whether the formatted data

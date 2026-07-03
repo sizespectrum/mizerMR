@@ -7,7 +7,7 @@
 mr_bin_average(params)
 }
 \arguments{
-\item{params}{A \linkS4class{MizerParams} object.}
+\item{params}{A \link[mizer:MizerParams-class]{mizer::MizerParams} object.}
 }
 \value{
 \code{TRUE} or \code{FALSE}.

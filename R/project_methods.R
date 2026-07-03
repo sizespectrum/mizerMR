@@ -40,11 +40,11 @@ mizerMRValidBaseResource <- function(params, n_pp) {
 #'
 #' @rdname project_methods
 #' @export
-getEncounter.mizerMR <- function(params, n = initialN(params),
-                                 n_pp = mizerMRBaseResource(params),
-                                 n_other = initialNOther(params),
+getEncounter.mizerMR <- function(object, n = initialN(object),
+                                 n_pp = mizerMRBaseResource(object),
+                                 n_other = initialNOther(object),
                                  t = 0, ...) {
-    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    n_pp <- mizerMRValidBaseResource(object, n_pp)
     NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
 }
 
@@ -52,11 +52,11 @@ getEncounter.mizerMR <- function(params, n = initialN(params),
 #'
 #' @rdname project_methods
 #' @export
-getPredRate.mizerMR <- function(params, n = initialN(params),
-                                n_pp = mizerMRBaseResource(params),
-                                n_other = initialNOther(params),
+getPredRate.mizerMR <- function(object, n = initialN(object),
+                                n_pp = mizerMRBaseResource(object),
+                                n_other = initialNOther(object),
                                 t = 0, ...) {
-    n_pp <- mizerMRValidBaseResource(params, n_pp)
+    n_pp <- mizerMRValidBaseResource(object, n_pp)
     NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
 }
 
