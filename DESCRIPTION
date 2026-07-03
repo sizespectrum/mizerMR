@@ -48,6 +48,7 @@ Collate:
     plotResource.R
     species_utils.R
     upgrade.R
+    data.R
 URL: https://sizespectrum.org/mizerMR, https://github.com/sizespectrum/mizerMR
 BugReports: https://github.com/sizespectrum/mizerMR/issues
 Language: en-GB
