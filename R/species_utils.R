@@ -90,10 +90,9 @@ removeSpecies.mizerMR <- function(params, species, ...) {
     initial_resource <- initialNResource(params)
     old_interaction <- resource_interaction(params)
 
-    # Provide initial resource values so the MR encounter function works
-    # during any internal validation inside mizer's removeSpecies
-    params <- as(params, "MizerParams")
-    params@initial_n_other[["MR"]] <- initial_resource
+    # Strip MR entirely so the rebuilt params do not carry a stale
+    # 12-species interaction matrix into setMultipleResources below.
+    params <- .strip_mr(params)
 
     p <- NextMethod()
 
@@ -125,10 +124,9 @@ renameSpecies.mizerMR <- function(params, replace, ...) {
     initial_resource <- initialNResource(params)
     old_interaction <- resource_interaction(params)
 
-    # Provide initial resource values so the MR encounter function works
-    # during any internal validation inside mizer's renameSpecies
-    params <- as(params, "MizerParams")
-    params@initial_n_other[["MR"]] <- initial_resource
+    # Strip MR entirely so the rebuilt params do not carry stale row-names
+    # into setMultipleResources below.
+    params <- .strip_mr(params)
 
     p <- NextMethod()
 
