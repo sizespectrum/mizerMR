@@ -92,6 +92,9 @@ plotSpectra.mizerMRSim <- function(object, species = NULL,
                      resource = FALSE, background = background,
                      highlight = highlight, return_data = TRUE, ...) %>%
         dplyr::rename(Spectra = Species)
+    # mizer names the value column after the y-axis label; normalise to "value"
+    # so that rbind with the resource data frame (which uses "value") works.
+    names(df)[!names(df) %in% c("w", "Spectra", "Legend")] <- "value"
     params <- object@params
     resources <- valid_resources_arg(params, resources)
 
@@ -160,6 +163,9 @@ plotSpectra.mizerMR <- function(object, species = NULL,
                      resource = FALSE,
                      return_data = TRUE, ...) %>%
         dplyr::rename(Spectra = Species)
+    # mizer names the value column after the y-axis label; normalise to "value"
+    # so that rbind with the resource data frame (which uses "value") works.
+    names(df)[!names(df) %in% c("w", "Spectra", "Legend")] <- "value"
 
     resources <- valid_resources_arg(params, resources)
 
@@ -169,7 +175,7 @@ plotSpectra.mizerMR <- function(object, species = NULL,
     if (is.na(wlim[2])) {
         wlim[2] <- max(params@w_full)
     }
-    rf <- melt(initialNResource(params)) %>%
+    rf <- melt(initialNResource(params)[resources, , drop = FALSE]) %>%
         dplyr::filter(value > 0,
                       w >= wlim[[1]], w <= wlim[[2]]) %>%
         dplyr::mutate(Legend = resource) %>%
