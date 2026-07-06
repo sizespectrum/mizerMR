@@ -20,7 +20,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 3.5),
-    mizer (>= 3.1),
+    mizer (>= 3.1.0.9001),
     mizerExperimental (>= 2.4.0)
 Remotes:
     github::sizespectrum/mizerExperimental
