@@ -12,4 +12,15 @@ for MR-specific methods.
 Objects of class \code{mizerMR} are created by \code{\link[=setMultipleResources]{setMultipleResources()}}.
 Objects of class \code{mizerMRSim} are returned automatically by \code{\link[mizer:project]{project()}}
 when called on a \code{mizerMR} params object.
+
+The classes are \strong{not} defined statically. Instead mizer creates them when
+the package is loaded: \code{.onLoad()} calls \code{\link[mizer:registerExtension]{mizer::registerExtension()}}, which
+recognises mizerMR as a dispatching extension from the S3 methods it
+registers for its marker class and inserts \code{mizerMR} at the correct place in
+the S4 hierarchy relative to any other extension packages loaded in the same
+session. This lets mizerMR be chained with other extensions (for example
+mizerReef) in either load order. A static \code{contains = "MizerParams"}
+definition would fix mizerMR as a direct sibling of every other extension and
+prevent such chaining, because a sealed class cannot be re-parented.
 }
+\keyword{internal}
