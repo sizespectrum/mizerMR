@@ -28,4 +28,11 @@ globalVariables(c("expect_equal", "sp", "value", "w", "resource",
 #' @keywords internal
 .onLoad <- function(libname, pkgname) {
     mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerMR")
+    if (exists("SEAmodel", envir = asNamespace(pkgname), inherits = FALSE)) {
+        ns <- asNamespace(pkgname)
+        raw_SEAmodel <- get("SEAmodel", envir = ns)
+        makeActiveBinding("SEAmodel",
+                          fun = function() mizer::coerceToExtensionClass(raw_SEAmodel),
+                          env = ns)
+    }
 }

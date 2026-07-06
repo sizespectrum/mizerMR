@@ -14,7 +14,7 @@ Created with \code{\link[=setMultipleResources]{setMultipleResources()}}.
 Original parameter derivations: \url{https://github.com/astaaudzi/SEAmodel}.
 }
 \usage{
-data(SEAmodel)
+SEAmodel
 }
 \description{
 A mizerMR model object representing a size-structured multispecies

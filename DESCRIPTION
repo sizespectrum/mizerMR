@@ -1,6 +1,6 @@
 Package: mizerMR
 Title: Add multiple size-structured resources to a mizer model
-Version: 0.3.1
+Version: 0.3.1.1
 Authors@R: c(
     person(given = "Gustav",
            family = "Delius",
@@ -16,6 +16,7 @@ Description: An add-on to the mizer package which allows multiple
     size-structured resource spectra to be added to any mizer model.
 License: GPL (>= 3)
 Encoding: UTF-8
+LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 3.5),
