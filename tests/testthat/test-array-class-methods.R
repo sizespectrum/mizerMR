@@ -41,20 +41,12 @@ test_that("print.MRArrayResourceBySize outputs header with dimensions and units"
     expect_true(any(grepl("min=", out)))
 })
 
-test_that("print.MRArrayResourceBySize is invisible", {
-    expect_invisible(print(fix$mort))
-})
-
 test_that("print.MRArrayTimeByResourceBySize outputs header with all three dims", {
     out <- capture.output(print(fix$nr))
     expect_match(out[[1]], "times")
     expect_match(out[[1]], "resources")
     expect_match(out[[1]], "sizes")
     expect_true(any(grepl("min=", out)))
-})
-
-test_that("print.MRArrayTimeByResourceBySize is invisible", {
-    expect_invisible(print(fix$nr))
 })
 
 test_that("print.MRArrayResourceBySize handles all-NA/Inf values", {

@@ -12,7 +12,7 @@ test_that("validResourceParams errors on duplicate resource names", {
     rp <- data.frame(resource = c("r1", "r1"), stringsAsFactors = FALSE)
     # The error may come either from R's own row.names check or from the
     # explicit stop() in validResourceParams — both are acceptable.
-    expect_error(validResourceParams(rp, min_w = 1e-4))
+    expect_error(suppressWarnings(validResourceParams(rp, min_w = 1e-4)))
 })
 
 test_that("validResourceParams errors when w_min >= w_max", {
