@@ -109,10 +109,16 @@ setResource.mizerMR <- function(params, ...) {
     if (length(touches) > 0 &&
         any(!vapply(args[touches], is.null, logical(1))) &&
         !is.null(getComponent(params, "MR"))) {
-        warning("This is a multiple-resource model. `setResource()` changes ",
-                "only the silenced built-in resource and does not affect the ",
-                "dynamics. Use `setMultipleResources()`, `resource_rate<-` or ",
-                "`resource_capacity<-` instead.", call. = FALSE)
+        # The user asked for something that is not going to happen, so this is
+        # reported at severity "warning" and shown even when nothing is
+        # collecting reports. See mizer::signal_info().
+        mizer::signal_info(
+            "resource",
+            paste0("This is a multiple-resource model. `setResource()` ",
+                   "changes only the silenced built-in resource and does not ",
+                   "affect the dynamics. Use `setMultipleResources()`, ",
+                   "`resource_rate<-` or `resource_capacity<-` instead."),
+            level = 1, severity = "warning", unhandled = "show")
     }
     ext <- params@extensions
     base <- methods::as(params, "MizerParams")

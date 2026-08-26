@@ -137,13 +137,16 @@ getDiet.mizerMR <- function(object, proportion = TRUE, ...,
 #' @param species The name of the predator species for which to plot the diet.
 #' @param wlim A numeric vector of length two providing lower and upper limits
 #'   for the w axis. Use NA to refer to the existing minimum or maximum.
-#' @param llim Ignored (compatibility argument from mizer's generic).
-#' @param size_axis Ignored (compatibility argument from mizer's generic).
+#' @param llim A numeric vector of length two providing lower and upper limits
+#'   for the length axis, used when `size_axis = "l"`. Use NA to refer to the
+#'   existing minimum or maximum.
+#' @param size_axis Whether to plot against predator weight (`"w"`, the
+#'   default) or against predator length (`"l"`).
 #' @param return_data A boolean value that determines whether the formatted data
 #'   used for the plot is returned instead of the plot itself. Default value is FALSE.
-#' @param log_x Ignored (compatibility argument from mizer's generic).
-#' @param log_y Ignored (compatibility argument from mizer's generic).
-#' @param log Ignored (compatibility argument from mizer's generic).
+#' @param log_x Whether to use a logarithmic x axis. Default TRUE.
+#' @param log_y Whether to use a logarithmic y axis. Default FALSE.
+#' @param log Deprecated. Use `log_x` and `log_y` instead.
 #' @param ... Other arguments (currently unused).
 #' @param time_range The time range (either a vector of values, a vector of min
 #'   and max time, or a single value) to average the abundances over. Default is
@@ -157,7 +160,7 @@ getDiet.mizerMR <- function(object, proportion = TRUE, ...,
 #' @export
 #' @name plotDiet
 plotDiet.mizerMR <- function(object, species = NULL,
-                             wlim = c(1, NA), llim = c(NA, NA),
+                             wlim = c(NA, NA), llim = c(NA, NA),
                              size_axis = c("w", "l"),
                              return_data = FALSE,
                              log_x = TRUE, log_y = FALSE, log = NULL,
@@ -168,13 +171,15 @@ plotDiet.mizerMR <- function(object, species = NULL,
     params <- validParams(object)
     diet <- getDiet(params)
 
-    plotDietData(params, diet, species = species, return_data = return_data)
+    plotDietData(params, diet, species = species, wlim = wlim, llim = llim,
+                 size_axis = size_axis, log_x = log_x, log_y = log_y, log = log,
+                 return_data = return_data)
 }
 
 #' @rdname plotDiet
 #' @export
 plotDiet.mizerMRSim <- function(object, species = NULL,
-                                wlim = c(1, NA), llim = c(NA, NA),
+                                wlim = c(NA, NA), llim = c(NA, NA),
                                 size_axis = c("w", "l"),
                                 return_data = FALSE,
                                 log_x = TRUE, log_y = FALSE, log = NULL,
@@ -191,7 +196,9 @@ plotDiet.mizerMRSim <- function(object, species = NULL,
                         1:2, mean)
     diet <- getDiet(params, n = n, n_other = n_other)
 
-    plotDietData(params, diet, species = species, return_data = return_data)
+    plotDietData(params, diet, species = species, wlim = wlim, llim = llim,
+                 size_axis = size_axis, log_x = log_x, log_y = log_y, log = log,
+                 return_data = return_data)
 }
 
 #' @rdname plotDiet
@@ -208,10 +215,23 @@ plotDietMR <- function(object, ...) {
 #' @param params A \linkS4class{mizerMR} object.
 #' @param diet A diet array as returned by [getDiet()].
 #' @param species Optional predator species selection.
+#' @param wlim,llim Limits on the predator size, on the weight and the length
+#'   axis respectively.
+#' @param size_axis Whether to plot against predator weight ("w") or predator
+#'   length ("l").
+#' @param log_x,log_y,log How the axes are scaled, see
+#'   [mizer::parsePlotLog()].
 #' @param return_data Whether to return the plotting data instead of a plot.
 #' @return A ggplot2 object or, if `return_data = TRUE`, a data frame.
 #' @keywords internal
-plotDietData <- function(params, diet, species = NULL, return_data = FALSE) {
+plotDietData <- function(params, diet, species = NULL,
+                         wlim = c(NA, NA), llim = c(NA, NA),
+                         size_axis = c("w", "l"),
+                         log_x = TRUE, log_y = FALSE, log = NULL,
+                         return_data = FALSE) {
+    size_axis <- mizer_fn("plot_size_axis")(size_axis)
+    log_axes <- parsePlotLog(log, log_x = log_x, log_y = log_y)
+    assert_that(length(wlim) == 2, length(llim) == 2)
     SpIdx <- factor(params@species_params$species,
                     levels = params@species_params$species)
     if(is.null(species)) species <- SpIdx
@@ -222,10 +242,24 @@ plotDietData <- function(params, diet, species = NULL, return_data = FALSE) {
     plot_dat$Prey <- factor(plot_dat$Prey, levels = rev(unique(plot_dat$Prey)))
     plot_dat <- plot_dat[, c("w","Proportion","Prey","Predator")]
     plot_dat <- dplyr::filter(plot_dat, Predator %in% species)
+    if (!is.na(wlim[1])) plot_dat <- plot_dat[plot_dat$w >= wlim[1], ]
+    if (!is.na(wlim[2])) plot_dat <- plot_dat[plot_dat$w <= wlim[2], ]
+
+    # The x axis is the predator size, so each row is converted with the
+    # weight-length relationship of its predator species. A diet proportion is
+    # not a density, so it picks up no Jacobian.
+    plot_dat <- mizer_fn("convert_plot_size_axis")(plot_dat, params, size_axis,
+                                                   species_col = "Predator")
+    if (identical(size_axis, "l")) {
+        plot_dat <- mizer_fn("filter_plot_length_limits")(plot_dat, llim)
+    }
 
     if (return_data)  return(plot_dat)
 
-    plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator", xtrans = "log10",
-                  xlab = "Size [g]",
+    plotDataFrame(plot_dat, params, style = "area", wrap_var = "Predator",
+                  xtrans = if (log_axes$log_x) "log10" else "identity",
+                  ytrans = if (log_axes$log_y) "log10" else "identity",
+                  xlab = mizer_fn("plot_size_xlab")(size_axis),
+                  xlim = mizer_fn("plot_size_xlim")(wlim, size_axis, llim),
                   wrap_scale = "free")
 }

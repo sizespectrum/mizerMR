@@ -16,6 +16,7 @@
   ylim = c(NA, NA),
   tlim = c(NA, NA),
   size_axis = c("w", "l"),
+  per_log_size = NULL,
   total = FALSE,
   background = TRUE,
   frame_duration = 500,
@@ -25,7 +26,8 @@
   ...,
   resources = NULL,
   time_range,
-  power = 1
+  power = NULL,
+  biomass = NULL
 )
 }
 \arguments{
@@ -43,20 +45,29 @@ default all species are plotted.}
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
 
-\item{llim}{Ignored (compatibility argument from mizer's generic).}
+\item{llim}{A numeric vector of length two providing lower and upper limits
+for the length axis, used when \code{size_axis = "l"}. Use NA to refer to the
+existing minimum or maximum.}
 
 \item{ylim}{A numeric vector of length two providing lower and upper limits
-for the y axis. Use NA to refer to the existing minimum or maximum. Any
-values below 1e-20 are always cut off.}
+for the y axis. Use NA to refer to the existing minimum or maximum.}
 
-\item{tlim}{Ignored (compatibility argument from mizer's generic).}
+\item{tlim}{A numeric vector of length two providing lower and upper limits
+for the time axis. Use NA to refer to the existing minimum or maximum.}
 
-\item{size_axis}{Ignored (compatibility argument from mizer's generic).}
+\item{size_axis}{Whether to plot against weight (\code{"w"}, the default) or
+against length (\code{"l"}).}
+
+\item{per_log_size}{Whether to plot the density with respect to logarithmic
+size rather than with respect to size. Default FALSE.}
 
 \item{total}{A boolean value that determines whether the total over all
-species in the system is plotted as well. Default is FALSE.}
+species and resources in the system is plotted as well. On a length axis
+the total is summed at equal length, as in mizer. Default is FALSE.}
 
-\item{background}{Ignored (compatibility argument from mizer's generic).}
+\item{background}{A boolean value that determines whether background species
+are included. Ignored if the model does not contain background species.
+Default is TRUE.}
 
 \item{frame_duration}{Duration of each animation frame in milliseconds.
 Default 500.}
@@ -66,7 +77,9 @@ milliseconds. Default equals \code{frame_duration}.}
 
 \item{easing}{The easing function for transitions. Default "linear".}
 
-\item{resource}{Ignored (compatibility argument from mizer's generic).}
+\item{resource}{A boolean value that determines whether the resources are
+included. Default is TRUE. Which of the resources are shown is determined
+by the \code{resources} argument.}
 
 \item{...}{Other arguments (currently unused).}
 
@@ -78,15 +91,24 @@ or a vector of min and max time. Default is the entire time range of the
 simulation.}
 
 \item{power}{The abundance is plotted as the number density times the weight
-raised to \code{power}. The default \code{power = 1} gives the biomass
-density, whereas \code{power = 2} gives the biomass density with respect
-to logarithmic size bins.}
+raised to \code{power}. Usually left unset, in which case it is
+\code{biomass + per_log_size}. Giving a \code{power} that contradicts the flags is an
+error.}
+
+\item{biomass}{Whether to animate the biomass density rather than the number
+density. Default TRUE.}
 }
 \value{
 A plotly object
 }
 \description{
 \ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+}
+\details{
+As for \code{\link[=plotSpectra]{plotSpectra()}}, the quantity that is animated is chosen with the two
+independent flags \code{biomass} and \code{per_log_size}, following mizer since version
+3.3. The resources are converted to a length axis with the same
+weight-length relationship that mizer uses for its own resource.
 }
 \seealso{
 Other plotting functions:

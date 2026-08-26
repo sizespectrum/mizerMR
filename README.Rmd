@@ -28,7 +28,7 @@ therMizer.
 
 # Installation
 
-```{r message=FALSE, warning=FALSE}
+```{r eval=FALSE}
 remotes::install_github("sizespectrum/mizerMR")
 library(mizerMR)
 ```
@@ -43,6 +43,7 @@ frame with the information about the species, for multiple resources we need a
 artificial example with two resources:
 
 ```{r message=FALSE}
+library(mizerMR)
 library(tibble)
 resource_params <- tribble(
     ~resource,  ~kappa, ~lambda, ~r_pp, ~w_min, ~w_max,
@@ -72,7 +73,7 @@ sim <- project(params, t_max = 2, t_save = 0.2)
 and plot the resulting spectra:
 
 ```{r}
-plotSpectra(sim, power = 2)
+plotSpectra(sim, per_log_size = TRUE)
 ```
 
 We can also animate the spectra with `animateSpectra(sim)`. Most mizer

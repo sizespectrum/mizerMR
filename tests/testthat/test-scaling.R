@@ -73,3 +73,16 @@ test_that("summary reports the combined resource extent without warnings", {
     # report -Inf for the silenced built-in resource).
     expect_false(any(grepl("-Inf", res_line)))
 })
+
+test_that("the setResource report obeys info_level", {
+    params <- make_mr_params()
+    # The report is a warning because the user asked for something that is not
+    # going to happen, and it is collected by an enclosing `with_info_level()`.
+    expect_warning(
+        mizer::with_info_level(info_level = 3,
+                               setResource(params, resource_rate = 5)),
+        "multiple-resource model")
+    expect_no_warning(
+        mizer::with_info_level(info_level = 0,
+                               setResource(params, resource_rate = 5)))
+})

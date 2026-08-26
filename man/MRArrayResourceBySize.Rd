@@ -4,7 +4,13 @@
 \alias{MRArrayResourceBySize}
 \title{S3 class for multiple-resource size spectra}
 \usage{
-MRArrayResourceBySize(x, value_name = NULL, units = NULL, params = NULL)
+MRArrayResourceBySize(
+  x,
+  value_name = NULL,
+  units = NULL,
+  type = NULL,
+  params = NULL
+)
 }
 \arguments{
 \item{x}{A matrix (resource x size), with resource names as row names.}
@@ -12,6 +18,11 @@ MRArrayResourceBySize(x, value_name = NULL, units = NULL, params = NULL)
 \item{value_name}{A string giving the human-readable name for the value.}
 
 \item{units}{A string giving the units (e.g. "1/year").}
+
+\item{type}{The kind of quantity the values are, as introduced in mizer 3.3:
+\code{"value"} for a rate or an amount, \code{"density"} for an amount per gram of
+body weight, \code{"proportion"} for a fraction. If not given it is deduced from
+\code{value_name} and \code{units}, as it is in mizer.}
 
 \item{params}{A MizerParams object. Used for the resource colours and the
 size grid in the \code{plot()} method.}
@@ -29,8 +40,8 @@ methods. It is the multiple-resource analogue of mizer's
 }
 \details{
 An \code{MRArrayResourceBySize} object behaves just like a regular matrix for
-arithmetic and subsetting. It carries \code{value_name}, \code{units} and \code{params}
-attributes, mirroring the mizer array classes.
+arithmetic and subsetting. It carries \code{value_name}, \code{units}, \code{type} and
+\code{params} attributes, mirroring the mizer array classes.
 }
 \seealso{
 \code{\link[mizer:ArrayResourceBySize]{mizer::ArrayResourceBySize()}}

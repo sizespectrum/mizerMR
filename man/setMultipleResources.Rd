@@ -2,6 +2,7 @@
 % Please edit documentation in R/setMultipleResources.R
 \name{setMultipleResources}
 \alias{setMultipleResources}
+\alias{setMultipleResourcesInternal}
 \alias{resource_capacity}
 \alias{resource_capacity<-}
 \alias{resource_rate}
@@ -18,7 +19,18 @@ setMultipleResources(
   resource_interaction = NULL,
   resource_capacity = NULL,
   resource_rate = NULL,
-  initial_resource = NULL
+  initial_resource = NULL,
+  info_level = mizer::default_info_level()
+)
+
+setMultipleResourcesInternal(
+  params,
+  resource_params = NULL,
+  resource_interaction = NULL,
+  resource_capacity = NULL,
+  resource_rate = NULL,
+  initial_resource = NULL,
+  info_level = mizer::default_info_level()
 )
 
 resource_capacity(params)
@@ -53,6 +65,9 @@ resource growth rates}
 
 \item{initial_resource}{Optional. Array (resource x size) of initial values}
 
+\item{info_level}{Controls the amount of information the function reports
+about the choices it makes, see \code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
+
 \item{value}{Value to assign}
 
 \item{object}{A mizerMR object}
@@ -60,3 +75,4 @@ resource growth rates}
 \description{
 Set up multiple resources
 }
+\keyword{internal}

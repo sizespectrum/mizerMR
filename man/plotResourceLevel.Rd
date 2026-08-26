@@ -19,8 +19,9 @@ A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
 frame with the three variables 'w', 'value', 'Resource' is returned.
 }
 \description{
-Plot the proportion of the resource spectrum(s) compared to
-their carrying capacity
+The values are proportions, so as in mizer since version 3.3 they are shown
+on a linear y axis covering the whole of the interval from 0 to 1, widened if
+any resource is above its carrying capacity.
 }
 \examples{
 \donttest{

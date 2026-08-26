@@ -1,12 +1,22 @@
 #' Plot the abundance spectra
 #'
-#' Plots the number density multiplied by a power of the weight, with the power
-#' specified by the `power` argument.
+#' Plots the number density multiplied by a power of the weight. As in mizer
+#' since version 3.3, the quantity that is plotted is chosen with the two
+#' independent flags `biomass` and `per_log_size`; the power of the weight
+#' multiplying the number density is their sum. The `power` argument is still
+#' accepted and is the only way to ask for a power that is not such a sum.
 #'
 #' When called with a [mizer::MizerSim-class] object, the abundance is averaged
 #' over the specified time range (a single value for the time range can be used
 #' to plot a single time step). When called with a [mizer::MizerParams-class]
 #' object the initial abundance is plotted.
+#'
+#' The resources are drawn on a length axis (`size_axis = "l"`) with the
+#' weight-length relationship that mizer uses for its own resource: the `a` and
+#' `b` entries of mizer's `resource_params` slot if they are given, and
+#' otherwise mizer's defaults. This is the same relationship with which the
+#' combined resource enters the total, so all lines can be read against each
+#' other.
 #'
 #' @param object An object of class [mizer::MizerSim-class] or
 #'   [mizer::MizerParams-class].
@@ -17,6 +27,9 @@
 #' @inheritParams valid_resources_arg
 #' @param wlim A numeric vector of length two providing lower and upper limits
 #'   for the w axis. Use NA to refer to the existing minimum or maximum.
+#' @param llim A numeric vector of length two providing lower and upper limits
+#'   for the length axis, used when `size_axis = "l"`. Use NA to refer to the
+#'   existing minimum or maximum.
 #' @param ylim A numeric vector of length two providing lower and upper limits
 #'   for the y axis. Use NA to refer to the existing minimum or maximum. Any
 #'   values below 1e-20 are always cut off.
@@ -25,11 +38,13 @@
 #' @param geometric_mean Whether to average abundances using a geometric mean
 #'   when called with a [mizer::MizerSim-class] object.
 #' @param power The abundance is plotted as the number density times the weight
-#' raised to `power`. The default \code{power = 1} gives the biomass
-#' density, whereas \code{power = 2} gives the biomass density with respect
-#' to logarithmic size bins.
-#' @param biomass Deprecated compatibility argument. If `power` is missing,
-#'   `power` is set to `as.numeric(biomass)`.
+#'   raised to `power`. Usually left unset, in which case it is
+#'   `biomass + per_log_size`. Giving a `power` that contradicts the flags is an
+#'   error.
+#' @param biomass Whether to plot the biomass density rather than the number
+#'   density. Default TRUE.
+#' @param per_log_size Whether to plot the density with respect to logarithmic
+#'   size rather than with respect to size. Default FALSE.
 #' @param total A boolean value that determines whether the total over all
 #'   species and resources in the system is plotted as well. Note that even if
 #'   the plot only shows a selection of species, the total is including all
@@ -40,17 +55,19 @@
 #' @param highlight Name or vector of names of the species to be highlighted.
 #' @param return_data A boolean value that determines whether the formatted data
 #' used for the plot is returned instead of the plot itself. Default value is FALSE
-#' @param llim Ignored (compatibility argument from mizer's generic).
-#' @param resource Ignored (replaced by `resources` in mizerMR).
+#' @param resource A boolean value that determines whether the resources are
+#'   included in the plot. Default is TRUE. Which of the resources are shown is
+#'   determined by the `resources` argument.
 #' @param log_x Whether to use a logarithmic x axis. Default TRUE.
 #' @param log_y Whether to use a logarithmic y axis. Default TRUE.
 #' @param log Deprecated. Use `log_x` and `log_y` instead.
-#' @param size_axis Ignored (compatibility argument from mizer's generic).
+#' @param size_axis Whether to plot against weight (`"w"`, the default) or
+#'   against length (`"l"`).
 #' @param ... Other arguments (currently unused)
 #'
 #' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
-#'   frame with the four variables 'w', 'value', 'Species', 'Legend' is
-#'   returned.
+#'   frame with the four variables 'w' (or 'l' for a length axis), 'value',
+#'   'Spectra' and 'Legend' is returned.
 #' @family plotting functions
 #' @seealso [plotting_functions]
 #' @export
@@ -58,7 +75,8 @@
 plotSpectra.mizerMRSim <- function(object, species = NULL,
                                    wlim = c(NA, NA), llim = c(NA, NA),
                                    ylim = c(NA, NA),
-                                   power = 1, biomass = TRUE,
+                                   power = NULL, biomass = NULL,
+                                   per_log_size = NULL,
                                    total = FALSE,
                                    resource = TRUE,
                                    background = TRUE,
@@ -71,9 +89,13 @@ plotSpectra.mizerMRSim <- function(object, species = NULL,
                                    resources = NULL,
                                    time_range,
                                    geometric_mean = FALSE) {
-    if (missing(power)) {
-        power <- as.numeric(biomass)
-    }
+    spectrum <- resolve_spectrum_power(power, biomass, per_log_size)
+    size_axis <- mizer_fn("plot_size_axis")(size_axis)
+    log_axes <- parsePlotLog(log, log_x = log_x, log_y = log_y)
+    log_x <- log_axes$log_x
+    log_y <- log_axes$log_y
+    log <- NULL
+
     if (missing(time_range)) {
         time_range  <- max(as.numeric(dimnames(object@n)$time))
     }
@@ -85,53 +107,45 @@ plotSpectra.mizerMRSim <- function(object, species = NULL,
         }
     }
 
+    params <- object@params
+    wlim <- mr_spectra_wlim(params, wlim)
+    # Present the combined resource as the built-in resource so that the total
+    # calculated by mizer's method includes all resources.
     object@n_pp <- apply(NResource(object), c(1, 3), sum)
     df <- NextMethod(species = species, time_range = time_range,
                      geometric_mean = geometric_mean,
-                     wlim = wlim, ylim = ylim, power = power, total = total,
+                     wlim = wlim, llim = llim, ylim = ylim,
+                     power = spectrum$power, biomass = spectrum$biomass,
+                     per_log_size = spectrum$per_log_size,
+                     total = total,
                      resource = FALSE, background = background,
-                     highlight = highlight, return_data = TRUE, ...) %>%
+                     highlight = highlight,
+                     log_x = log_x, log_y = log_y, log = NULL,
+                     size_axis = size_axis,
+                     return_data = TRUE, ...) %>%
         dplyr::rename(Spectra = Species)
-    # mizer names the value column after the y-axis label; normalise to "value"
-    # so that rbind with the resource data frame (which uses "value") works.
-    names(df)[!names(df) %in% c("w", "Spectra", "Legend")] <- "value"
-    params <- object@params
+    # mizer names the value column after the y-axis label; take the label from
+    # there so that it always agrees with mizer, and normalise the name to
+    # "value" so that rbind with the resource data frame works.
+    y_label <- names(df)[[2]]
+    names(df)[[2]] <- "value"
+
     resources <- valid_resources_arg(params, resources)
-
-    if (is.na(wlim[1])) {
-        wlim[1] <- min(params@w) / 100
+    if (resource && length(resources) > 0) {
+        n_res <- apply(NResource(object)[time_elements, resources, ,
+                                         drop = FALSE],
+                       c(2, 3), mean_fn)
+        rf <- mr_resource_spectra_data(params, n_res, spectrum = spectrum,
+                                       size_axis = size_axis, wlim = wlim,
+                                       llim = llim, ylim = ylim)
+        df <- rbind(df, rf[, names(df), drop = FALSE])
     }
-    if (is.na(wlim[2])) {
-        wlim[2] <- max(params@w_full)
-    }
-    n_res <- apply(NResource(object)[time_elements, resources, , drop = FALSE],
-                   c(2, 3), mean_fn)
-    rf <- melt(n_res) %>%
-        dplyr::filter(value > 0,
-                      w >= wlim[[1]], w <= wlim[[2]]) %>%
-        dplyr::mutate(Legend = resource) %>%
-        dplyr::rename(Spectra = resource)
-    if (!is.na(ylim[2])) {
-        rf <- rf[rf$value <= ylim[2], ]
-    }
-    if (is.na(ylim[1])) {
-        ylim[1] <- 1e-20
-    }
-    rf <- rf[rf$value > ylim[1], ]
-    rf <- dplyr::mutate(rf, value = value * w^power)
-
-    df <- rbind(df, rf)
     if (return_data) {
         return(df)
     }
-    if (power %in% c(0, 1, 2)) {
-        y_label <- c("Number density [1/g]", "Biomass density",
-                     "Biomass density [g]")[power + 1]
-    } else {
-        y_label <- paste0("Number density * w^", power)
-    }
-    plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
-                  ylab = y_label, xlab = "Size [g]")
+    mr_plot_spectra_data(df, params, y_label = y_label, size_axis = size_axis,
+                         wlim = wlim, llim = llim, ylim = ylim,
+                         log_x = log_x, log_y = log_y, highlight = highlight)
 }
 
 #' @rdname plotSpectra
@@ -139,7 +153,8 @@ plotSpectra.mizerMRSim <- function(object, species = NULL,
 plotSpectra.mizerMR <- function(object, species = NULL,
                                 wlim = c(NA, NA), llim = c(NA, NA),
                                 ylim = c(NA, NA),
-                                power = 1, biomass = TRUE,
+                                power = NULL, biomass = NULL,
+                                per_log_size = NULL,
                                 total = FALSE,
                                 resource = TRUE,
                                 background = TRUE,
@@ -151,59 +166,133 @@ plotSpectra.mizerMR <- function(object, species = NULL,
                                 ...,
                                 resources = NULL) {
     params <- object
+    spectrum <- resolve_spectrum_power(power, biomass, per_log_size)
+    size_axis <- mizer_fn("plot_size_axis")(size_axis)
+    log_axes <- parsePlotLog(log, log_x = log_x, log_y = log_y)
+    log_x <- log_axes$log_x
+    log_y <- log_axes$log_y
+    log <- NULL
 
-    # set n_pp to total plankton abundance so that the total in mizer's
-    # plotSpectra() gives the right curve
+    wlim <- mr_spectra_wlim(params, wlim)
+    # Present the combined resource as the built-in resource so that the total
+    # calculated by mizer's method includes all resources.
     object@initial_n_pp <- colSums(object@initial_n_other[["MR"]])
 
-    df <- NextMethod(species = species, wlim = wlim, ylim = ylim,
-                     power = power, total = total,
+    df <- NextMethod(species = species, wlim = wlim, llim = llim, ylim = ylim,
+                     power = spectrum$power, biomass = spectrum$biomass,
+                     per_log_size = spectrum$per_log_size,
+                     total = total,
                      background = background,
                      highlight = highlight,
                      resource = FALSE,
+                     log_x = log_x, log_y = log_y, log = NULL,
+                     size_axis = size_axis,
                      return_data = TRUE, ...) %>%
         dplyr::rename(Spectra = Species)
-    # mizer names the value column after the y-axis label; normalise to "value"
-    # so that rbind with the resource data frame (which uses "value") works.
-    names(df)[!names(df) %in% c("w", "Spectra", "Legend")] <- "value"
+    # mizer names the value column after the y-axis label; take the label from
+    # there so that it always agrees with mizer, and normalise the name to
+    # "value" so that rbind with the resource data frame works.
+    y_label <- names(df)[[2]]
+    names(df)[[2]] <- "value"
 
     resources <- valid_resources_arg(params, resources)
+    if (resource && length(resources) > 0) {
+        n_res <- initialNResource(params)[resources, , drop = FALSE]
+        rf <- mr_resource_spectra_data(params, n_res, spectrum = spectrum,
+                                       size_axis = size_axis, wlim = wlim,
+                                       llim = llim, ylim = ylim)
+        df <- rbind(df, rf[, names(df), drop = FALSE])
+    }
+    if (return_data) {
+        return(df)
+    }
+    mr_plot_spectra_data(df, params, y_label = y_label, size_axis = size_axis,
+                         wlim = wlim, llim = llim, ylim = ylim,
+                         log_x = log_x, log_y = log_y, highlight = highlight)
+}
 
+#' Default weight limits for a multiple-resource spectrum plot
+#'
+#' The same defaults that mizer uses when the resource is shown: from a
+#' hundredth of the smallest consumer size to the largest resource size.
+#'
+#' @param params A \linkS4class{mizerMR} object.
+#' @param wlim The weight limits supplied by the user.
+#' @return The weight limits with any NA replaced by the default.
+#' @keywords internal
+mr_spectra_wlim <- function(params, wlim) {
+    assert_that(length(wlim) == 2)
     if (is.na(wlim[1])) {
         wlim[1] <- min(params@w) / 100
     }
     if (is.na(wlim[2])) {
         wlim[2] <- max(params@w_full)
     }
-    rf <- melt(initialNResource(params)[resources, , drop = FALSE]) %>%
+    wlim
+}
+
+#' Assemble the resource part of a spectrum plot
+#'
+#' Turns an array of resource number densities into the same kind of plotting
+#' data frame that mizer's `plotSpectra()` returns for the species, with the
+#' size limits, the size axis and the value limits applied in the same order.
+#'
+#' @param params A \linkS4class{mizerMR} object.
+#' @param n_res An array (resource x size) of resource number densities.
+#' @param spectrum The list returned by [resolve_spectrum_power()].
+#' @param size_axis Either "w" or "l".
+#' @param wlim,llim,ylim Limits, with the weight limits already defaulted by
+#'   [mr_spectra_wlim()].
+#'
+#' @return A data frame with the variables 'w' (or 'l'), 'value', 'Spectra' and
+#'   'Legend'.
+#' @keywords internal
+mr_resource_spectra_data <- function(params, n_res, spectrum, size_axis,
+                                     wlim, llim, ylim) {
+    rf <- melt(n_res) %>%
         dplyr::filter(value > 0,
                       w >= wlim[[1]], w <= wlim[[2]]) %>%
-        dplyr::mutate(Legend = resource) %>%
         dplyr::rename(Spectra = resource)
-    # Impose ylim
+    rf$Spectra <- as.character(rf$Spectra)
+    rf$Legend <- rf$Spectra
+    rf$value <- rf$value * rf$w^spectrum$power
+    rf <- rf[, c("w", "value", "Spectra", "Legend"), drop = FALSE]
+    rf <- mr_convert_density_axis(rf, params, size_axis,
+                                  per_log_size = spectrum$per_log_size)
+    if (identical(size_axis, "l")) {
+        rf <- mizer_fn("filter_plot_length_limits")(rf, llim)
+    }
+    # Impose the limits on the displayed density, after its units have been
+    # converted for a length axis, exactly as mizer does.
     if (!is.na(ylim[2])) {
         rf <- rf[rf$value <= ylim[2], ]
     }
-    if (is.na(ylim[1])) {
-        ylim[1] <- 1e-20
-    }
-    rf <- rf[rf$value > ylim[1], ]
+    filter_min <- if (is.na(ylim[1])) 1e-20 else ylim[1]
+    rf[rf$value > filter_min, ]
+}
 
-    # Deal with power argument ----
-    if (power %in% c(0, 1, 2)) {
-        y_label <- c("Number density [1/g]", "Biomass density",
-                     "Biomass density [g]")[power + 1]
-    } else {
-        y_label <- paste0("Number density * w^", power)
-    }
-    rf <- dplyr::mutate(rf, value = value * w^power)
-
-    df <- rbind(df, rf)
-    if (return_data) {
-        return(df)
-    }
-    plotDataFrame(df, params, xtrans = "log10", ytrans = "log10",
-                  ylab = y_label, xlab = "Size [g]")
+#' Draw an assembled multiple-resource spectrum plot
+#'
+#' @param df The plotting data frame.
+#' @param params A \linkS4class{mizerMR} object.
+#' @param y_label The label for the y axis.
+#' @param size_axis Either "w" or "l".
+#' @param wlim,llim,ylim Limits.
+#' @param log_x,log_y Whether the axes are logarithmic.
+#' @param highlight Species to highlight.
+#' @return A ggplot object.
+#' @keywords internal
+mr_plot_spectra_data <- function(df, params, y_label, size_axis,
+                                 wlim, llim, ylim, log_x, log_y,
+                                 highlight = NULL) {
+    plotDataFrame(df, params,
+                  xlab = mizer_fn("plot_size_xlab")(size_axis),
+                  ylab = y_label,
+                  xtrans = if (log_x) "log10" else "identity",
+                  ytrans = if (log_y) "log10" else "identity",
+                  xlim = mizer_fn("plot_size_xlim")(wlim, size_axis, llim),
+                  ylim = ylim,
+                  highlight = highlight, legend_var = "Legend")
 }
 
 #' Helper function to assure validity of resources argument

@@ -14,8 +14,6 @@ mr_bin_average(params)
 }
 \description{
 Internal helper reading the \code{bin_average} entry of the model's
-\code{second_order_w} slot via mizer's accessor. Returns \code{FALSE} for mizer
-versions that predate the slot, so that mizerMR keeps its first-order
-behaviour against older mizer.
+\code{second_order_w} slot via mizer's accessor.
 }
 \keyword{internal}

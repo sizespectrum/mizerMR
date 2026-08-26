@@ -10,7 +10,7 @@
 \method{plotDiet}{mizerMR}(
   object,
   species = NULL,
-  wlim = c(1, NA),
+  wlim = c(NA, NA),
   llim = c(NA, NA),
   size_axis = c("w", "l"),
   return_data = FALSE,
@@ -24,7 +24,7 @@
 \method{plotDiet}{mizerMRSim}(
   object,
   species = NULL,
-  wlim = c(1, NA),
+  wlim = c(NA, NA),
   llim = c(NA, NA),
   size_axis = c("w", "l"),
   return_data = FALSE,
@@ -46,18 +46,21 @@ plotDietMR(object, ...)
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
 
-\item{llim}{Ignored (compatibility argument from mizer's generic).}
+\item{llim}{A numeric vector of length two providing lower and upper limits
+for the length axis, used when \code{size_axis = "l"}. Use NA to refer to the
+existing minimum or maximum.}
 
-\item{size_axis}{Ignored (compatibility argument from mizer's generic).}
+\item{size_axis}{Whether to plot against predator weight (\code{"w"}, the
+default) or against predator length (\code{"l"}).}
 
 \item{return_data}{A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE.}
 
-\item{log_x}{Ignored (compatibility argument from mizer's generic).}
+\item{log_x}{Whether to use a logarithmic x axis. Default TRUE.}
 
-\item{log_y}{Ignored (compatibility argument from mizer's generic).}
+\item{log_y}{Whether to use a logarithmic y axis. Default FALSE.}
 
-\item{log}{Ignored (compatibility argument from mizer's generic).}
+\item{log}{Deprecated. Use \code{log_x} and \code{log_y} instead.}
 
 \item{...}{Other arguments (currently unused).}
 

@@ -4,7 +4,18 @@
 \alias{plotDietData}
 \title{Format and plot MR diet data}
 \usage{
-plotDietData(params, diet, species = NULL, return_data = FALSE)
+plotDietData(
+  params,
+  diet,
+  species = NULL,
+  wlim = c(NA, NA),
+  llim = c(NA, NA),
+  size_axis = c("w", "l"),
+  log_x = TRUE,
+  log_y = FALSE,
+  log = NULL,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{params}{A \linkS4class{mizerMR} object.}
@@ -12,6 +23,15 @@ plotDietData(params, diet, species = NULL, return_data = FALSE)
 \item{diet}{A diet array as returned by \code{\link[=getDiet]{getDiet()}}.}
 
 \item{species}{Optional predator species selection.}
+
+\item{wlim, llim}{Limits on the predator size, on the weight and the length
+axis respectively.}
+
+\item{size_axis}{Whether to plot against predator weight ("w") or predator
+length ("l").}
+
+\item{log_x, log_y, log}{How the axes are scaled, see
+\code{\link[mizer:parsePlotLog]{mizer::parsePlotLog()}}.}
 
 \item{return_data}{Whether to return the plotting data instead of a plot.}
 }

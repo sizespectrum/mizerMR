@@ -206,16 +206,13 @@ expandSizeGrid.mizerMR <- function(params,
 #' Whether second-order bin-averaging is switched on
 #'
 #' Internal helper reading the `bin_average` entry of the model's
-#' `second_order_w` slot via mizer's accessor. Returns `FALSE` for mizer
-#' versions that predate the slot, so that mizerMR keeps its first-order
-#' behaviour against older mizer.
+#' `second_order_w` slot via mizer's accessor.
 #'
 #' @param params A [mizer::MizerParams-class] object.
 #' @return `TRUE` or `FALSE`.
 #' @keywords internal
 mr_bin_average <- function(params) {
-    isTRUE(tryCatch(second_order_w(params)[["bin_average"]],
-                    error = function(e) FALSE))
+    isTRUE(second_order_w(params)[["bin_average"]])
 }
 
 #' Bin-average of a power law over a restricted size range

@@ -10,17 +10,10 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 <!-- badges: end -->
 
 This extension package for mizer allows you to work with multiple
-size-structured background resources in the same way in which you work with
-multiple species in mizer. Modelled species can have different preferences for
-different resources, defined though maximum availability of resource available
-to species, in a similar way as setting species interaction matrix. Each
-background resource can have different minimum and maximum sizes, and different
-size spectrum slopes (lambda) or abundances (kappa). This allows the user to
-reproduce emergent onto-genetic dietary shifts, where a species feed in a
-plankton spectrum when it is small, then switches to benthic spectrum, and later
-to other fish species. It uses mizer's extension chain for its projection-rate
-hooks, so models with multiple resources can be composed with other extension
-packages such as therMizer.
+size-structured resources in the same way in which you work with
+multiple species in mizer. It uses mizer’s extension chain for its
+projection-rate hooks, so models with multiple resources can be composed
+with other extension packages such as therMizer.
 
 # Installation
 
@@ -38,6 +31,7 @@ multiple resources we need a `resource_params` data frame, with one row
 for each resource. Here is an artificial example with two resources:
 
 ``` r
+library(mizerMR)
 library(tibble)
 resource_params <- tribble(
     ~resource,  ~kappa, ~lambda, ~r_pp, ~w_min, ~w_max,
@@ -68,10 +62,10 @@ sim <- project(params, t_max = 2, t_save = 0.2)
 and plot the resulting spectra:
 
 ``` r
-plotSpectra(sim, power = 2)
+plotSpectra(sim, per_log_size = TRUE)
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" alt="" width="100%" />
 
 We can also animate the spectra with `animateSpectra(sim)`. Most mizer
 functions will work as usual.
@@ -81,11 +75,15 @@ We can access the simulation results for the resource with
 
 ``` r
 str(NResource(sim))
-#>  num [1:11, 1:2, 1:226] 9.87e+37 9.87e+37 9.87e+37 9.87e+37 9.87e+37 ...
+#>  'MRArrayTimeByResourceBySize' num [1:11, 1:2, 1:226] 9.87e+37 9.87e+37 9.87e+37 9.87e+37 9.87e+37 ...
 #>  - attr(*, "dimnames")=List of 3
 #>   ..$ time    : chr [1:11] "0" "0.2" "0.4" "0.6" ...
 #>   ..$ resource: chr [1:2] "Resource 1" "Resource 2"
 #>   ..$ w       : chr [1:226] "2.12e-13" "2.53e-13" "3.02e-13" "3.61e-13" ...
+#>  - attr(*, "value_name")= chr "Number density"
+#>  - attr(*, "units")= chr "1/g"
+#>  - attr(*, "type")= chr "density"
+#>  - attr(*, "params")=Formal class 'MizerParams' [package "mizer"] with 48 slots
 ```
 
 So the first dimension is the time, the second the resource and the

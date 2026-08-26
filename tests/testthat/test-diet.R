@@ -42,3 +42,42 @@ test_that("old plotDietMR() alias still works", {
     expect_equal(plotDietMR(params, return_data = TRUE),
                  plotDiet(params, return_data = TRUE))
 })
+
+test_that("the diet is consistent with the encounter rate", {
+    # Summed over prey, the diet must reproduce
+    # `getEncounter() * (1 - getFeedingLevel())` under both quadrature schemes,
+    # which is the identity mizer restored in version 3.3.
+    for (second_order in c(FALSE, TRUE)) {
+        p <- newMRParams(NS_species_params,
+                         resource_params = rp[, c("resource", "kappa",
+                                                  "lambda", "r_pp")],
+                         second_order_w = second_order, info_level = 0)
+        consumed <- rowSums(getDiet(p, proportion = FALSE), dims = 2)
+        expected <- getEncounter(p) * (1 - getFeedingLevel(p)) *
+            (initialN(p) > 0)
+        expect_equal(consumed, expected, ignore_attr = TRUE)
+    }
+})
+
+test_that("plotDiet can be drawn against a length axis", {
+    df_w <- plotDiet(params, species = "Cod", return_data = TRUE)
+    df_l <- plotDiet(params, species = "Cod", size_axis = "l",
+                     return_data = TRUE)
+    expect_named(df_l, c("l", "Proportion", "Prey", "Predator"))
+    sp <- params@species_params
+    cod <- sp[sp$species == "Cod", ]
+    expect_equal(as.numeric(df_l$l),
+                 (as.numeric(df_w$w) / cod$a)^(1 / cod$b))
+    # A proportion is not a density, so its values are unchanged.
+    expect_equal(df_l$Proportion, df_w$Proportion)
+    expect_s3_class(plotDiet(params, species = "Cod", size_axis = "l"), "gg")
+})
+
+test_that("plotDiet respects the size limits", {
+    df <- plotDiet(params, species = "Cod", wlim = c(10, 1000),
+                   return_data = TRUE)
+    expect_true(all(df$w >= 10 & df$w <= 1000))
+    df <- plotDiet(params, species = "Cod", size_axis = "l", llim = c(10, 50),
+                   return_data = TRUE)
+    expect_true(all(df$l >= 10 & df$l <= 50))
+})

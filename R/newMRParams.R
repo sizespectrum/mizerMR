@@ -14,6 +14,9 @@
 #' @param max_w The largest size of the consumer spectrum. By default this is
 #'   set to the largest `w_max specified in the `species_params` data
 #'   frame.
+#' @param info_level Controls the amount of information the function reports
+#'   about the choices it makes, see [mizer::default_info_level()]. Passed on to
+#'   [mizer::newMultispeciesParams()].
 #' @param second_order_w `r lifecycle::badge("experimental")` Selects the
 #'   second-order numerical scheme for the new model, passed through to
 #'   [mizer::newMultispeciesParams()]. When second-order bin-averaging is
@@ -31,17 +34,23 @@ newMRParams <- function(species_params,
                         no_w = 100,
                         min_w = 0.001,
                         max_w = NA,
-                        second_order_w = FALSE) {
-    params <- newMultispeciesParams(
-        species_params = species_params,
-        gear_params = gear_params,
-        interaction = interaction,
-        no_w = no_w, min_w = min_w, max_w = max_w,
-        second_order_w = second_order_w)
+                        second_order_w = FALSE,
+                        info_level = mizer::default_info_level()) {
+    # Collect the reports raised while the model is built, both mizer's and
+    # our own, so that the user gets them together at the end of the call.
+    mizer::with_info_level(info_level = info_level, {
+        params <- newMultispeciesParams(
+            species_params = species_params,
+            gear_params = gear_params,
+            interaction = interaction,
+            no_w = no_w, min_w = min_w, max_w = max_w,
+            second_order_w = second_order_w,
+            info_level = info_level)
 
-    resource_params <- validResourceParams(resource_params,
-                                           w_full(params)[[1]])
-    params <- setMultipleResources(params, resource_params = resource_params,
-                                   resource_interaction = resource_interaction)
-
+        resource_params <- validResourceParams(resource_params,
+                                               w_full(params)[[1]])
+        setMultipleResources(params, resource_params = resource_params,
+                             resource_interaction = resource_interaction,
+                             info_level = info_level)
+    })
 }

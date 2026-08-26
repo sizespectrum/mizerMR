@@ -12,8 +12,9 @@
   wlim = c(NA, NA),
   llim = c(NA, NA),
   ylim = c(NA, NA),
-  power = 1,
-  biomass = TRUE,
+  power = NULL,
+  biomass = NULL,
+  per_log_size = NULL,
   total = FALSE,
   resource = TRUE,
   background = TRUE,
@@ -35,8 +36,9 @@
   wlim = c(NA, NA),
   llim = c(NA, NA),
   ylim = c(NA, NA),
-  power = 1,
-  biomass = TRUE,
+  power = NULL,
+  biomass = NULL,
+  per_log_size = NULL,
   total = FALSE,
   resource = TRUE,
   background = TRUE,
@@ -62,26 +64,33 @@ each species whether it is to be selected (TRUE) or not.}
 \item{wlim}{A numeric vector of length two providing lower and upper limits
 for the w axis. Use NA to refer to the existing minimum or maximum.}
 
-\item{llim}{Ignored (compatibility argument from mizer's generic).}
+\item{llim}{A numeric vector of length two providing lower and upper limits
+for the length axis, used when \code{size_axis = "l"}. Use NA to refer to the
+existing minimum or maximum.}
 
 \item{ylim}{A numeric vector of length two providing lower and upper limits
 for the y axis. Use NA to refer to the existing minimum or maximum. Any
 values below 1e-20 are always cut off.}
 
 \item{power}{The abundance is plotted as the number density times the weight
-raised to \code{power}. The default \code{power = 1} gives the biomass
-density, whereas \code{power = 2} gives the biomass density with respect
-to logarithmic size bins.}
+raised to \code{power}. Usually left unset, in which case it is
+\code{biomass + per_log_size}. Giving a \code{power} that contradicts the flags is an
+error.}
 
-\item{biomass}{Deprecated compatibility argument. If \code{power} is missing,
-\code{power} is set to \code{as.numeric(biomass)}.}
+\item{biomass}{Whether to plot the biomass density rather than the number
+density. Default TRUE.}
+
+\item{per_log_size}{Whether to plot the density with respect to logarithmic
+size rather than with respect to size. Default FALSE.}
 
 \item{total}{A boolean value that determines whether the total over all
 species and resources in the system is plotted as well. Note that even if
 the plot only shows a selection of species, the total is including all
 species. Default is FALSE.}
 
-\item{resource}{Ignored (replaced by \code{resources} in mizerMR).}
+\item{resource}{A boolean value that determines whether the resources are
+included in the plot. Default is TRUE. Which of the resources are shown is
+determined by the \code{resources} argument.}
 
 \item{background}{A boolean value that determines whether background species
 are included. Ignored if the model does not contain background species.
@@ -95,7 +104,8 @@ Default is TRUE.}
 
 \item{log}{Deprecated. Use \code{log_x} and \code{log_y} instead.}
 
-\item{size_axis}{Ignored (compatibility argument from mizer's generic).}
+\item{size_axis}{Whether to plot against weight (\code{"w"}, the default) or
+against length (\code{"l"}).}
 
 \item{return_data}{A boolean value that determines whether the formatted data
 used for the plot is returned instead of the plot itself. Default value is FALSE}
@@ -115,18 +125,28 @@ when called with a \link[mizer:MizerSim-class]{mizer::MizerSim} object.}
 }
 \value{
 A ggplot2 object, unless \code{return_data = TRUE}, in which case a data
-frame with the four variables 'w', 'value', 'Species', 'Legend' is
-returned.
+frame with the four variables 'w' (or 'l' for a length axis), 'value',
+'Spectra' and 'Legend' is returned.
 }
 \description{
-Plots the number density multiplied by a power of the weight, with the power
-specified by the \code{power} argument.
+Plots the number density multiplied by a power of the weight. As in mizer
+since version 3.3, the quantity that is plotted is chosen with the two
+independent flags \code{biomass} and \code{per_log_size}; the power of the weight
+multiplying the number density is their sum. The \code{power} argument is still
+accepted and is the only way to ask for a power that is not such a sum.
 }
 \details{
 When called with a \link[mizer:MizerSim-class]{mizer::MizerSim} object, the abundance is averaged
 over the specified time range (a single value for the time range can be used
 to plot a single time step). When called with a \link[mizer:MizerParams-class]{mizer::MizerParams}
 object the initial abundance is plotted.
+
+The resources are drawn on a length axis (\code{size_axis = "l"}) with the
+weight-length relationship that mizer uses for its own resource: the \code{a} and
+\code{b} entries of mizer's \code{resource_params} slot if they are given, and
+otherwise mizer's defaults. This is the same relationship with which the
+combined resource enters the total, so all lines can be read against each
+other.
 }
 \seealso{
 \link[mizer:plotting_functions]{plotting_functions}

@@ -74,7 +74,8 @@ getResourceMort.mizerMR <- function(params, n = initialN(params),
     mort <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
     if (is.matrix(mort)) {
         mort <- MRArrayResourceBySize(mort, value_name = "Resource mortality",
-                                      units = "1/year", params = params)
+                                      units = "1/year", type = "value",
+                                      params = params)
     }
     mort
 }

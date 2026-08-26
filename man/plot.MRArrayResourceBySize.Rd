@@ -15,7 +15,10 @@
   log_y = TRUE,
   log = NULL,
   wlim = c(NA, NA),
+  llim = c(NA, NA),
   ylim = c(NA, NA),
+  size_axis = c("w", "l"),
+  per_log_size = NULL,
   y_ticks = 6,
   ...
 )
@@ -40,7 +43,14 @@ of the plot.}
 \item{log}{Alternative way to specify the log axes, see
 \code{\link[mizer:parsePlotLog]{mizer::parsePlotLog()}}.}
 
-\item{wlim, ylim}{Length-2 numeric vectors giving the weight and value limits.}
+\item{wlim, llim, ylim}{Length-2 numeric vectors giving the weight, length and
+value limits. The length limits are used when \code{size_axis = "l"}.}
+
+\item{size_axis}{Whether to plot against weight (\code{"w"}, the default) or
+against length (\code{"l"}). Only for an array of densities.}
+
+\item{per_log_size}{Whether to show the density with respect to logarithmic
+size rather than with respect to size. Only for an array of densities.}
 
 \item{y_ticks}{Approximate number of ticks on the y-axis.}
 
@@ -57,5 +67,12 @@ A ggplot object, or a data frame if \code{return_data = TRUE}.
 the values against size. It is the multiple-resource analogue of the
 \code{plot()} method for mizer's \code{ArrayResourceBySize} objects and reuses the same
 internal mizer plotting machinery, so resources are drawn in the colours
-registered in the \code{params} object.
+registered in the \code{params} object and the axes follow the same conventions.
+}
+\details{
+As in mizer since version 3.3, what is drawn depends on the kind of quantity
+the array holds, recorded in its \code{type} attribute. An array of proportions is
+drawn on a linear y axis covering the whole of the interval from 0 to 1, and
+only an array of densities can be converted to a length axis or shown per
+logarithmic size.
 }
