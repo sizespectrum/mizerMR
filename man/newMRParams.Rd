@@ -13,7 +13,8 @@ newMRParams(
   no_w = 100,
   min_w = 0.001,
   max_w = NA,
-  second_order_w = FALSE
+  second_order_w = FALSE,
+  info_level = mizer::default_info_level()
 )
 }
 \arguments{
@@ -47,6 +48,10 @@ second-order numerical scheme for the new model, passed through to
 switched on, the multiple-resource capacities, rates and initial
 abundances are built from the exact bin averages of their power laws rather
 than point-sampled at the left bin edge. Defaults to \code{FALSE}.}
+
+\item{info_level}{Controls the amount of information the function reports
+about the choices it makes, see \code{\link[mizer:default_info_level]{mizer::default_info_level()}}. Passed on to
+\code{\link[mizer:newMultispeciesParams]{mizer::newMultispeciesParams()}}.}
 }
 \value{
 An object of class MizerMRParams

@@ -79,3 +79,48 @@ test_that("plot methods produce a ggplot", {
     vdiffr::expect_doppelganger("NResource multi-resource final time",
                                 plot(NResource(mr_sim)))
 })
+
+# mizer 3.3 array conventions --------------------------------------------------
+
+test_that("the arrays declare what kind of value they hold", {
+    expect_identical(attr(initialNResource(mr_params), "type"), "density")
+    expect_identical(attr(NResource(mr_sim), "type"), "density")
+    expect_identical(attr(finalNResource(mr_sim), "type"), "density")
+    expect_identical(attr(getResourceMort(mr_params), "type"), "value")
+    # The type survives subsetting and slicing.
+    expect_identical(attr(initialNResource(mr_params)[1, , drop = FALSE],
+                          "type"), "density")
+    expect_identical(attr(NResource(mr_sim)[1, , , drop = FALSE], "type"),
+                     "density")
+})
+
+test_that("a density array can be drawn against a length axis", {
+    n <- initialNResource(mr_params)
+    df_w <- plot(n, return_data = TRUE)
+    df_l <- plot(n, size_axis = "l", return_data = TRUE)
+    expect_named(df_l, c("l", "value", "Spectra", "Legend"))
+    ab <- get("resource_length_params", envir = asNamespace("mizer"))(mr_params)
+    expect_equal(as.numeric(df_l$l), (as.numeric(df_w$w) / ab$a)^(1 / ab$b))
+    expect_equal(as.numeric(df_l$value),
+                 as.numeric(df_w$value) * ab$b * as.numeric(df_w$w) /
+                     as.numeric(df_l$l))
+})
+
+test_that("only a density can be shown per logarithmic size", {
+    n <- initialNResource(mr_params)
+    per_log <- plot(n, per_log_size = TRUE, return_data = TRUE)
+    plain <- plot(n, return_data = TRUE)
+    expect_equal(as.numeric(per_log$value),
+                 as.numeric(plain$value) * as.numeric(plain$w))
+    expect_error(plot(getResourceMort(mr_params), per_log_size = TRUE),
+                 "holds a value of type")
+})
+
+test_that("a rate keeps its values on a length axis", {
+    mort <- getResourceMort(mr_params)
+    df_w <- plot(mort, return_data = TRUE)
+    df_l <- plot(mort, size_axis = "l", return_data = TRUE)
+    # No Jacobian: a rate is the same number whichever size it is drawn against.
+    expect_equal(as.numeric(df_l$value), as.numeric(df_w$value))
+    expect_true("l" %in% names(df_l))
+})

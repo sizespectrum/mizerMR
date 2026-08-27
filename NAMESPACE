@@ -70,57 +70,63 @@ import(assertthat)
 import(ggplot2)
 import(methods)
 import(mizerExperimental)
-importFrom(dplyr,"%>%")
-importFrom(dplyr,filter)
-importFrom(mizer,"initialNResource<-")
-importFrom(mizer,"resource_dynamics<-")
-importFrom(mizer,NOther)
-importFrom(mizer,NResource)
-importFrom(mizer,addSpecies)
-importFrom(mizer,animate)
-importFrom(mizer,animateSpectra)
-importFrom(mizer,apply_wlim)
-importFrom(mizer,dw_full)
-importFrom(mizer,expandSizeGrid)
-importFrom(mizer,finalNResource)
-importFrom(mizer,getComponent)
-importFrom(mizer,getDiet)
-importFrom(mizer,getEncounter)
-importFrom(mizer,getFeedingLevel)
-importFrom(mizer,getPredRate)
-importFrom(mizer,getRates)
-importFrom(mizer,getResourceMort)
-importFrom(mizer,get_time_elements)
-importFrom(mizer,idxFinalT)
-importFrom(mizer,initialN)
-importFrom(mizer,initialNOther)
-importFrom(mizer,initialNResource)
-importFrom(mizer,melt)
-importFrom(mizer,mizerEncounter)
-importFrom(mizer,newMultispeciesParams)
-importFrom(mizer,parsePlotLog)
-importFrom(mizer,plotDataFrame)
-importFrom(mizer,plotDiet)
-importFrom(mizer,plotHover)
-importFrom(mizer,plotSpectra)
-importFrom(mizer,projectEncounter)
-importFrom(mizer,projectResourceMort)
-importFrom(mizer,removeSpecies)
-importFrom(mizer,renameSpecies)
-importFrom(mizer,scaleModel)
-importFrom(mizer,scaleRates)
-importFrom(mizer,second_order_w)
-importFrom(mizer,setColours)
-importFrom(mizer,setComponent)
-importFrom(mizer,setInitialValues)
-importFrom(mizer,setLinetypes)
-importFrom(mizer,setResource)
-importFrom(mizer,species_params)
-importFrom(mizer,validParams)
-importFrom(mizer,valid_species_arg)
-importFrom(mizer,w_full)
+importFrom(dplyr,
+  "%>%",
+  filter
+)
+importFrom(mizer,
+  "initialNResource<-",
+  "resource_dynamics<-",
+  NOther,
+  NResource,
+  addSpecies,
+  animate,
+  animateSpectra,
+  apply_wlim,
+  dw_full,
+  expandSizeGrid,
+  finalNResource,
+  getComponent,
+  getDiet,
+  getEncounter,
+  getFeedingLevel,
+  getPredRate,
+  getRates,
+  getResourceMort,
+  get_time_elements,
+  idxFinalT,
+  initialN,
+  initialNOther,
+  initialNResource,
+  melt,
+  mizerEncounter,
+  newMultispeciesParams,
+  parsePlotLog,
+  plotDataFrame,
+  plotDiet,
+  plotHover,
+  plotSpectra,
+  projectEncounter,
+  projectResourceMort,
+  removeSpecies,
+  renameSpecies,
+  scaleModel,
+  scaleRates,
+  second_order_w,
+  setColours,
+  setComponent,
+  setInitialValues,
+  setLinetypes,
+  setResource,
+  species_params,
+  validParams,
+  valid_species_arg,
+  w_full
+)
 importFrom(plotly,ggplotly)
-importFrom(rlang,"%||%")
-importFrom(rlang,signal)
+importFrom(rlang,
+  "%||%",
+  signal
+)
 importFrom(stats,mvfft)
 importFrom(utils,globalVariables)

@@ -100,6 +100,10 @@ plotlyResourcePred <- function(object,
 #' Plot the proportion of the resource spectrum(s) compared to
 #' their carrying capacity
 #'
+#' The values are proportions, so as in mizer since version 3.3 they are shown
+#' on a linear y axis covering the whole of the interval from 0 to 1, widened if
+#' any resource is above its carrying capacity.
+#'
 #' @inheritParams plotResourcePred
 #' @return A ggplot2 object, unless `return_data = TRUE`, in which case a data
 #'   frame with the three variables 'w', 'value', 'Resource' is returned.
@@ -148,5 +152,8 @@ plotResourceLevel <- function(object, return_data = FALSE)
     if(return_data) return(plot_dat)
 
     plotDataFrame(plot_dat, params, xtrans = "log10",
-                  xlab = "Resource size [g]", ylab = "Proportion of carrying capacity")
+                  ylim = mizer_fn("proportion_ylim")(c(NA, NA), FALSE,
+                                                     plot_dat$value),
+                  xlab = "Resource size [g]",
+                  ylab = "Proportion of carrying capacity")
 }

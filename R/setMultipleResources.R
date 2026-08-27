@@ -10,14 +10,40 @@
 #' @param resource_rate Optional. Array (resource x size) of intrinsic
 #'   resource growth rates
 #' @param initial_resource Optional. Array (resource x size) of initial values
+#' @param info_level Controls the amount of information the function reports
+#'   about the choices it makes, see [mizer::default_info_level()].
 #' @export
 setMultipleResources <- function(params,
                                  resource_params = NULL,
                                  resource_interaction = NULL,
                                  resource_capacity = NULL,
                                  resource_rate = NULL,
-                                 initial_resource = NULL) {
-    params <- validParams(params)
+                                 initial_resource = NULL,
+                                 info_level = mizer::default_info_level()) {
+    # Collect the reports raised here and in the mizer calls below so that the
+    # user gets them together at the end of the call.
+    mizer::with_info_level(info_level = info_level, {
+        setMultipleResourcesInternal(
+            params, resource_params = resource_params,
+            resource_interaction = resource_interaction,
+            resource_capacity = resource_capacity,
+            resource_rate = resource_rate,
+            initial_resource = initial_resource,
+            info_level = info_level)
+    })
+}
+
+#' @rdname setMultipleResources
+#' @keywords internal
+setMultipleResourcesInternal <- function(params,
+                                         resource_params = NULL,
+                                         resource_interaction = NULL,
+                                         resource_capacity = NULL,
+                                         resource_rate = NULL,
+                                         initial_resource = NULL,
+                                         info_level =
+                                             mizer::default_info_level()) {
+    params <- validParams(params, info_level = info_level)
     if (is.null(resource_params)) {
         resource_params <- resource_params(params)
     }
@@ -152,7 +178,7 @@ initialNResource.mizerMR <- function(object) {
         return(NextMethod())
     }
     MRArrayResourceBySize(mr$initial_value, value_name = "Number density",
-                          units = "1/g", params = object)
+                          units = "1/g", type = "density", params = object)
 }
 
 #' @rdname setMultipleResources

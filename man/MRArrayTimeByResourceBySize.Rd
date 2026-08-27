@@ -4,7 +4,13 @@
 \alias{MRArrayTimeByResourceBySize}
 \title{S3 class for time x resource x size arrays}
 \usage{
-MRArrayTimeByResourceBySize(x, value_name = NULL, units = NULL, params = NULL)
+MRArrayTimeByResourceBySize(
+  x,
+  value_name = NULL,
+  units = NULL,
+  type = NULL,
+  params = NULL
+)
 }
 \arguments{
 \item{x}{A three-dimensional array (time x resource x size).}
@@ -12,6 +18,9 @@ MRArrayTimeByResourceBySize(x, value_name = NULL, units = NULL, params = NULL)
 \item{value_name}{A string giving the human-readable name for the value.}
 
 \item{units}{A string giving the units (e.g. "1/g").}
+
+\item{type}{The kind of quantity the values are, see
+\code{\link[=MRArrayResourceBySize]{MRArrayResourceBySize()}}.}
 
 \item{params}{A MizerParams object. Used for the resource colours and the
 size grid in the \code{plot()} method.}

@@ -1,5 +1,42 @@
 # mizerMR (development version)
 
+* mizerMR now requires mizer (>= 3.3.0) and follows the plotting interface that
+  mizer introduced in that release. `plotSpectra()` and `animate()` take the
+  `biomass` and `per_log_size` flags, whose sum is the power of the weight
+  multiplying the number density; `power` is still accepted and is the only way
+  to ask for a power that is not such a sum, but a `power` that contradicts the
+  flags is now an error rather than being silently resolved.
+
+* `plotSpectra()`, `animate()` and the `plot()` methods of the resource array
+  classes now honour `size_axis = "l"`, `llim`, `log_x`, `log_y` and `log`,
+  which used to be ignored. On a length axis the resources are converted with
+  the weight-length relationship mizer uses for its own resource (`a` and `b`
+  from `resource_params()`, or mizer's defaults), which is the same one with
+  which the combined resource enters the total, and a density picks up the
+  `dw/dl` Jacobian. The total is summed on the axis it is plotted against.
+  `plotSpectra()` also honours `resource = FALSE` and now labels its axes and
+  places its legend exactly as mizer does.
+
+* The resource arrays returned by `initialNResource()`, `NResource()`,
+  `finalNResource()` and `getResourceMort()` carry mizer's new `type` attribute
+  saying what kind of quantity they hold, and their `plot()` method uses it: a
+  density can be converted to a length axis or shown per logarithmic size, a
+  rate cannot, and a proportion would be drawn on a linear axis from 0 to 1.
+  `MRArrayResourceBySize()` and `MRArrayTimeByResourceBySize()` gained a `type`
+  argument.
+
+* `plotDiet()` honours `size_axis`, `wlim`, `llim`, `log_x` and `log_y`, which
+  used to be ignored. Its `wlim` default is now `c(NA, NA)` as in mizer, rather
+  than the `c(1, NA)` that never took effect.
+
+* `plotResourceLevel()` shows the whole of the interval from 0 to 1 on its y
+  axis, as mizer now does for a proportion.
+
+* `newMRParams()` and `setMultipleResources()` gained an `info_level` argument
+  and report through mizer's reporting mechanism, so that everything mizerMR
+  says while building or changing a model obeys `info_level` and arrives
+  together with mizer's own reports at the end of the call.
+
 * mizerMR now respects mizer's `second_order_w` flag. When second-order
   bin-averaging is switched on, each resource's carrying capacity and
   replenishment rate are built from the exact bin averages of their power laws

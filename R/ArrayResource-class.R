@@ -20,12 +20,16 @@
 #' `ArrayResourceBySize` class.
 #'
 #' An `MRArrayResourceBySize` object behaves just like a regular matrix for
-#' arithmetic and subsetting. It carries `value_name`, `units` and `params`
-#' attributes, mirroring the mizer array classes.
+#' arithmetic and subsetting. It carries `value_name`, `units`, `type` and
+#' `params` attributes, mirroring the mizer array classes.
 #'
 #' @param x A matrix (resource x size), with resource names as row names.
 #' @param value_name A string giving the human-readable name for the value.
 #' @param units A string giving the units (e.g. "1/year").
+#' @param type The kind of quantity the values are, as introduced in mizer 3.3:
+#'   `"value"` for a rate or an amount, `"density"` for an amount per gram of
+#'   body weight, `"proportion"` for a fraction. If not given it is deduced from
+#'   `value_name` and `units`, as it is in mizer.
 #' @param params A MizerParams object. Used for the resource colours and the
 #'   size grid in the `plot()` method.
 #'
@@ -33,7 +37,7 @@
 #' @seealso [mizer::ArrayResourceBySize()]
 #' @export
 MRArrayResourceBySize <- function(x, value_name = NULL, units = NULL,
-                                  params = NULL) {
+                                  type = NULL, params = NULL) {
     if (!is.matrix(x)) {
         stop("`x` must be a matrix.")
     }
@@ -41,6 +45,7 @@ MRArrayResourceBySize <- function(x, value_name = NULL, units = NULL,
               class = c("MRArrayResourceBySize", "matrix", "array"),
               value_name = value_name,
               units = units,
+              type = mizer_fn("resolve_array_type")(type, value_name, units),
               params = params)
 }
 
@@ -117,7 +122,13 @@ print.summary.MRArrayResourceBySize <- function(x, ...) {
 #' the values against size. It is the multiple-resource analogue of the
 #' `plot()` method for mizer's `ArrayResourceBySize` objects and reuses the same
 #' internal mizer plotting machinery, so resources are drawn in the colours
-#' registered in the `params` object.
+#' registered in the `params` object and the axes follow the same conventions.
+#'
+#' As in mizer since version 3.3, what is drawn depends on the kind of quantity
+#' the array holds, recorded in its `type` attribute. An array of proportions is
+#' drawn on a linear y axis covering the whole of the interval from 0 to 1, and
+#' only an array of densities can be converted to a length axis or shown per
+#' logarithmic size.
 #'
 #' @param x An `MRArrayResourceBySize` or `MRArrayTimeByResourceBySize` object.
 #' @param resources Optional vector of resource names (or indices) to restrict
@@ -127,7 +138,12 @@ print.summary.MRArrayResourceBySize <- function(x, ...) {
 #' @param log_x,log_y Logical flags for logarithmic axes.
 #' @param log Alternative way to specify the log axes, see
 #'   [mizer::parsePlotLog()].
-#' @param wlim,ylim Length-2 numeric vectors giving the weight and value limits.
+#' @param wlim,llim,ylim Length-2 numeric vectors giving the weight, length and
+#'   value limits. The length limits are used when `size_axis = "l"`.
+#' @param size_axis Whether to plot against weight (`"w"`, the default) or
+#'   against length (`"l"`). Only for an array of densities.
+#' @param per_log_size Whether to show the density with respect to logarithmic
+#'   size rather than with respect to size. Only for an array of densities.
 #' @param y_ticks Approximate number of ticks on the y-axis.
 #' @param time For `MRArrayTimeByResourceBySize`, the time at which to plot the
 #'   spectrum. Defaults to the final time step.
@@ -136,38 +152,54 @@ print.summary.MRArrayResourceBySize <- function(x, ...) {
 #' @export
 plot.MRArrayResourceBySize <- function(x, resources = NULL, return_data = FALSE,
                                        log_x = TRUE, log_y = TRUE, log = NULL,
-                                       wlim = c(NA, NA), ylim = c(NA, NA),
+                                       wlim = c(NA, NA), llim = c(NA, NA),
+                                       ylim = c(NA, NA),
+                                       size_axis = c("w", "l"),
+                                       per_log_size = NULL,
                                        y_ticks = 6, ...) {
+    size_axis <- mizer_fn("plot_size_axis")(size_axis)
+    mizer_fn("check_per_log_size")(x, per_log_size)
+    # A proportion is shown on a linear axis unless the user says otherwise.
+    log_y <- mizer_fn("array_log_y")(x, log_y, log, !missing(log_y))
     log_axes <- mizer::parsePlotLog(log, log_x = log_x, log_y = log_y)
-    value_name <- attr(x, "value_name") %||% "value"
-    units_str <- attr(x, "units")
+    log_x <- log_axes$log_x
+    log_y <- log_axes$log_y
+    assert_that(length(wlim) == 2, length(llim) == 2, length(ylim) == 2)
     params <- attr(x, "params")
 
     plot_dat <- prepare_MRArrayResourceBySize_plot_data(
-        x, resources = resources, wlim = wlim)
+        x, resources = resources, wlim = wlim, llim = llim,
+        size_axis = size_axis, per_log_size = per_log_size)
     if (return_data) return(plot_dat)
 
-    if (log_axes$log_y) {
+    x_var <- mizer_fn("plot_size_x_var")(size_axis)
+    if (log_y) {
         plot_dat <- plot_dat[plot_dat$value > 0 & !is.na(plot_dat$value), ]
     }
-    if (log_axes$log_x) {
-        plot_dat <- plot_dat[plot_dat$w > 0 & !is.na(plot_dat$w), ]
+    if (log_x) {
+        plot_dat <- plot_dat[plot_dat[[x_var]] > 0 &
+                                 !is.na(plot_dat[[x_var]]), ]
     }
 
-    y_label <- value_name
-    if (!is.null(units_str) && nzchar(units_str)) {
-        y_label <- paste0(value_name, " [", units_str, "]")
-    }
+    y_label <- mizer_fn("array_y_label")(x, default = "value",
+                                         size_axis = size_axis,
+                                         per_log_size = per_log_size)
+    ylim <- mizer_fn("array_ylim")(x, ylim, log_y, plot_dat$value)
 
     mizer::plotDataFrame(
-        plot_dat, params, xlab = "Weight (g)", ylab = y_label,
-        xtrans = if (log_axes$log_x) "log10" else "identity",
-        ytrans = if (log_axes$log_y) "log10" else "identity",
-        xlim = wlim, ylim = ylim, y_ticks = y_ticks, legend_var = "Legend")
+        plot_dat, params,
+        xlab = mizer_fn("plot_size_xlab")(size_axis), ylab = y_label,
+        xtrans = if (log_x) "log10" else "identity",
+        ytrans = if (log_y) "log10" else "identity",
+        xlim = mizer_fn("plot_size_xlim")(wlim, size_axis, llim), ylim = ylim,
+        y_ticks = y_ticks, legend_var = "Legend")
 }
 
 prepare_MRArrayResourceBySize_plot_data <- function(x, resources = NULL,
-                                                    wlim = c(NA, NA)) {
+                                                    wlim = c(NA, NA),
+                                                    llim = c(NA, NA),
+                                                    size_axis = "w",
+                                                    per_log_size = NULL) {
     mat <- unclass(x)
     if (!is.null(resources)) {
         mat <- mat[resources, , drop = FALSE]
@@ -181,7 +213,21 @@ prepare_MRArrayResourceBySize_plot_data <- function(x, resources = NULL,
         Legend = rep(res_names, times = ncol(mat)),
         stringsAsFactors = FALSE
     )
-    mizer::apply_wlim(plot_dat, wlim)
+    plot_dat <- mizer::apply_wlim(plot_dat, wlim)
+    params <- attr(x, "params")
+    if (!is.null(params)) {
+        # Only a density picks up a Jacobian on a length axis; a rate or a
+        # proportion is the same number whichever size axis it is drawn
+        # against. `array_density_wrt()` says which of the two this array is.
+        plot_dat <- mr_convert_density_axis(
+            plot_dat, params, size_axis,
+            density_wrt = mizer_fn("array_density_wrt")(x),
+            per_log_size = per_log_size)
+    }
+    if (identical(size_axis, "l")) {
+        plot_dat <- mizer_fn("filter_plot_length_limits")(plot_dat, llim)
+    }
+    plot_dat
 }
 
 # Internal helper: the size grid for an MRArrayResourceBySize object.
@@ -222,6 +268,7 @@ as.data.frame.MRArrayResourceBySize <- function(x, row.names = NULL,
     if (is.matrix(result) && length(dim(result)) == 2) {
         attr(result, "value_name") <- attr(x, "value_name")
         attr(result, "units") <- attr(x, "units")
+        attr(result, "type") <- attr(x, "type")
         attr(result, "params") <- attr(x, "params")
         class(result) <- c("MRArrayResourceBySize", "matrix", "array")
     }
@@ -242,6 +289,7 @@ unclass_mr_resource <- function(x) {
     x <- unclass(x)
     attr(x, "value_name") <- NULL
     attr(x, "units") <- NULL
+    attr(x, "type") <- NULL
     attr(x, "params") <- NULL
     x
 }
@@ -276,6 +324,8 @@ str.MRArrayResourceBySize <- function(object, ...) {
 #' @param x A three-dimensional array (time x resource x size).
 #' @param value_name A string giving the human-readable name for the value.
 #' @param units A string giving the units (e.g. "1/g").
+#' @param type The kind of quantity the values are, see
+#'   [MRArrayResourceBySize()].
 #' @param params A MizerParams object. Used for the resource colours and the
 #'   size grid in the `plot()` method.
 #'
@@ -283,7 +333,7 @@ str.MRArrayResourceBySize <- function(object, ...) {
 #' @seealso [mizer::ArrayTimeByResourceBySize()]
 #' @export
 MRArrayTimeByResourceBySize <- function(x, value_name = NULL, units = NULL,
-                                        params = NULL) {
+                                        type = NULL, params = NULL) {
     if (!is.array(x) || length(dim(x)) != 3) {
         stop("`x` must be a three-dimensional array.")
     }
@@ -291,6 +341,7 @@ MRArrayTimeByResourceBySize <- function(x, value_name = NULL, units = NULL,
               class = c("MRArrayTimeByResourceBySize", "array"),
               value_name = value_name,
               units = units,
+              type = mizer_fn("resolve_array_type")(type, value_name, units),
               params = params)
 }
 
@@ -371,6 +422,7 @@ MRArrayTimeByResourceBySize_slice <- function(x, time = NULL) {
     params <- attr(x, "params")
     value_name <- attr(x, "value_name")
     units <- attr(x, "units")
+    type <- attr(x, "type")
     arr <- unclass(x)
 
     times <- as.numeric(dimnames(arr)[[1]])
@@ -383,7 +435,7 @@ MRArrayTimeByResourceBySize_slice <- function(x, time = NULL) {
                     nrow = dim(arr)[2],
                     dimnames = dimnames(arr)[2:3])
     MRArrayResourceBySize(slice, value_name = value_name,
-                          units = units, params = params)
+                          units = units, type = type, params = params)
 }
 
 #' @rdname plot.MRArrayResourceBySize
@@ -418,6 +470,7 @@ as.data.frame.MRArrayTimeByResourceBySize <- function(x, row.names = NULL,
     if (is.array(result) && length(dim(result)) == 3) {
         attr(result, "value_name") <- attr(x, "value_name")
         attr(result, "units") <- attr(x, "units")
+        attr(result, "type") <- attr(x, "type")
         attr(result, "params") <- attr(x, "params")
         class(result) <- c("MRArrayTimeByResourceBySize", "array")
     } else if (is.matrix(result) &&
@@ -426,6 +479,7 @@ as.data.frame.MRArrayTimeByResourceBySize <- function(x, row.names = NULL,
         result <- MRArrayResourceBySize(result,
                                         value_name = attr(x, "value_name"),
                                         units = attr(x, "units"),
+                                        type = attr(x, "type"),
                                         params = attr(x, "params"))
     }
     result
