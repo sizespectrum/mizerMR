@@ -13,6 +13,15 @@
   `resource_capacity(params, balance = FALSE) <- capacity`. The balancing is
   also available on its own as `balanceResources()`.
 
+* `tuneSteadyState()` now balances the resources of a multiple-resource model
+  automatically. They are held at their stored abundances while the consumer
+  spectra are solved for, exactly as mizer holds its own resource, and
+  afterwards their capacities are derived from their rates so that those held
+  abundances are a steady state of the resource dynamics under the new spectra.
+  The model you get back is therefore at a fixed point of the resource dynamics
+  as well as of the consumer dynamics, and mizer no longer reports the `MR`
+  component as one it is holding fixed without being able to handle.
+
 * `setMultipleResources()` gained a `reset` argument that recalculates the
   resource rate and capacity from the resource parameters even if they were
   previously set by hand or by balancing.

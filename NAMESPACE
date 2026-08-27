@@ -43,6 +43,7 @@ S3method(str,MRArrayTimeByResourceBySize)
 S3method(summary,MRArrayResourceBySize)
 S3method(summary,MRArrayTimeByResourceBySize)
 S3method(summary,mizerMR)
+S3method(tuneSteadyState,mizerMR)
 S3method(utils::upgrade,mizerMR)
 export("resource_capacity<-")
 export("resource_interaction<-")
@@ -123,6 +124,7 @@ importFrom(mizer,
   setLinetypes,
   setResource,
   species_params,
+  tuneSteadyState,
   validParams,
   valid_species_arg,
   w_full
