@@ -62,11 +62,11 @@ test_that("Test setting of single resource", {
                      setMultipleResources(params))
     rate <- resource_rate(params) / 2
     comment(rate) <- "set manually"
-    resource_rate(params) <- rate
+    resource_rate(params, balance = FALSE) <- rate
     expect_identical(resource_rate(params), rate)
     capacity <- resource_capacity(params) / 2
     comment(capacity) <- "set manually"
-    resource_capacity(params) <- capacity
+    resource_capacity(params, balance = FALSE) <- capacity
     expect_identical(resource_capacity(params), capacity)
     interaction <- resource_interaction(params) / 2
     resource_interaction(params) <- interaction
@@ -93,11 +93,11 @@ test_that("Test setting of two resources", {
                      setMultipleResources(NS_params, resource_params = rp))
     rate <- resource_rate(params) / 2
     comment(rate) <- "set manually"
-    resource_rate(params) <- rate
+    resource_rate(params, balance = FALSE) <- rate
     expect_identical(resource_rate(params), rate)
     capacity <- resource_capacity(params) / 2
     comment(capacity) <- "set manually"
-    resource_capacity(params) <- capacity
+    resource_capacity(params, balance = FALSE) <- capacity
     expect_identical(resource_capacity(params), capacity)
     interaction <- resource_interaction(params) / 2
     resource_interaction(params) <- interaction

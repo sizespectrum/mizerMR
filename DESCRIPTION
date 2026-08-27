@@ -45,6 +45,7 @@ Collate:
     project_methods.R
     resource_dynamics.R
     resource_params.R
+    balance.R
     setMultipleResources.R
     params_methods.R
     test-helpers.R

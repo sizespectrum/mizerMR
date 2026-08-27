@@ -117,7 +117,8 @@ setResource.mizerMR <- function(params, ...) {
             paste0("This is a multiple-resource model. `setResource()` ",
                    "changes only the silenced built-in resource and does not ",
                    "affect the dynamics. Use `setMultipleResources()`, ",
-                   "`resource_rate<-` or `resource_capacity<-` instead."),
+                   "`resource_rate<-`, `resource_capacity<-` or ",
+                   "`resource_level<-` instead."),
             level = 1, severity = "warning", unhandled = "show")
     }
     ext <- params@extensions

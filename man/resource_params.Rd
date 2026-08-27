@@ -36,5 +36,8 @@ supply them, see \code{\link[=validResourceParams]{validResourceParams()}}
 }
 \seealso{
 \code{\link[=validResourceParams]{validResourceParams()}}
+
+Other functions for setting parameters:
+\code{\link[=balanceResources]{balanceResources()}}
 }
 \concept{functions for setting parameters}
