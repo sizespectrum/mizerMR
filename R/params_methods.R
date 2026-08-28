@@ -64,7 +64,12 @@ scaleModel.mizerMR <- function(params, factor, ...) {
     # `initialNResource<-` dispatch back to the MR setter, expecting a
     # resource-by-size array rather than the base vector).
     ext <- params@extensions
-    base <- methods::as(params, "MizerParams")
+    if (isS4(params)) {
+        base <- mizer:::upgrade_s4_to_s3(params)
+    } else {
+        base <- params
+    }
+    class(base) <- "MizerParams"
     base@extensions <- character()
     base <- mizer::scaleModel(base, factor = factor, ...)
     base@extensions <- ext
@@ -129,7 +134,12 @@ setResource.mizerMR <- function(params, ...) {
             level = 1, severity = "warning", unhandled = "show")
     }
     ext <- params@extensions
-    base <- methods::as(params, "MizerParams")
+    if (isS4(params)) {
+        base <- mizer:::upgrade_s4_to_s3(params)
+    } else {
+        base <- params
+    }
+    class(base) <- "MizerParams"
     base@extensions <- character()
     base <- do.call(mizer::setResource, c(list(base), args))
     base@extensions <- ext

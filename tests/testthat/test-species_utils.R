@@ -18,7 +18,7 @@ test_that("addSpecies adds species with default resource_interaction of 1", {
     sp <- data.frame(species = "NewSp", w_max = 500, stringsAsFactors = FALSE)
     p2 <- suppressMessages(suppressWarnings(addSpecies(params, sp)))
 
-    expect_s4_class(p2, "mizerMR")
+    expect_s3_class(p2, "mizerMR")
     expect_true("NewSp" %in% p2@species_params$species)
     inter <- resource_interaction(p2)
     expect_equal(dim(inter), c(13L, 2L))
@@ -69,7 +69,7 @@ test_that("removeSpecies trims the resource interaction matrix", {
     params <- make_mr_params()
     p2 <- suppressMessages(suppressWarnings(removeSpecies(params, "Cod")))
 
-    expect_s4_class(p2, "mizerMR")
+    expect_s3_class(p2, "mizerMR")
     expect_false("Cod" %in% p2@species_params$species)
     inter <- resource_interaction(p2)
     expect_equal(nrow(inter), nrow(params@species_params) - 1L)
@@ -98,7 +98,7 @@ test_that("renameSpecies updates interaction matrix row names", {
     params <- make_mr_params()
     p2 <- suppressMessages(renameSpecies(params, c(Cod = "Bigfish")))
 
-    expect_s4_class(p2, "mizerMR")
+    expect_s3_class(p2, "mizerMR")
     expect_true("Bigfish" %in% p2@species_params$species)
     expect_false("Cod" %in% p2@species_params$species)
     inter <- resource_interaction(p2)
@@ -127,7 +127,7 @@ test_that("expandSizeGrid returns a mizerMR with recalculated arrays", {
         expandSizeGrid(params, new_max_w = max(params@w) * 2)
     )
 
-    expect_s4_class(p2, "mizerMR")
+    expect_s3_class(p2, "mizerMR")
     # Expanded grid must be larger
     expect_gt(length(w_full(p2)), length(w_full(params)))
     # Resource names are preserved

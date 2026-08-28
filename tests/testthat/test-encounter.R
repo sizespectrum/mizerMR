@@ -29,7 +29,12 @@ make_three_resource_params <- function() {
 # use mizerMRResourceEncounter(), so it genuinely checks the fast path.
 reference_encounter <- function(params, n = initialN(params),
                                 n_other = initialNOther(params)) {
-    pbase <- methods::as(params, "MizerParams")
+    if (isS4(params)) {
+        pbase <- mizer:::upgrade_s4_to_s3(params)
+    } else {
+        pbase <- params
+    }
+    class(pbase) <- "MizerParams"
     n_mr <- n_other[["MR"]]
     interaction <- params@other_params[["MR"]]$interaction
     zero_n <- n

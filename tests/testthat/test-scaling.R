@@ -19,7 +19,7 @@ test_that("scaleModel rescales resources consistently and preserves the steady s
     factor <- 3
     scaled <- scaleModel(params, factor = factor)
 
-    expect_s4_class(scaled, "mizerMR")
+    expect_s3_class(scaled, "mizerMR")
     # Capacities and abundances scale by the factor, the rate is unchanged.
     expect_equal(resource_capacity(scaled), resource_capacity(params) * factor,
                  ignore_attr = TRUE)
@@ -43,7 +43,7 @@ test_that("scaleRates rescales the resource replenishment rate", {
     factor <- 2
     scaled <- scaleRates(params, factor = factor)
 
-    expect_s4_class(scaled, "mizerMR")
+    expect_s3_class(scaled, "mizerMR")
     expect_equal(resource_rate(scaled), resource_rate(params) * factor,
                  ignore_attr = TRUE)
     # Consumer search volume is scaled by the base method.
@@ -58,7 +58,7 @@ test_that("setResource warns for resource changes but still works", {
     params <- make_mr_params()
     expect_warning(p2 <- setResource(params, resource_rate = 5),
                    "multiple-resource model")
-    expect_s4_class(p2, "mizerMR")
+    expect_s3_class(p2, "mizerMR")
     # The MR resources are untouched.
     expect_equal(resource_rate(p2), resource_rate(params), ignore_attr = TRUE)
     # A dynamics-only call (as used internally by mizer) does not warn.

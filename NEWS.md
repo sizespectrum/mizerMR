@@ -1,5 +1,9 @@
 # mizerMR (development version)
 
+* Updated for mizer's transition from S4 to S3: `mizerMR` and
+  `mizerMRResourceView` are now pure S3 classes, replacing S4 class definitions
+  and `methods::as()` coercions.
+
 * The resources can now be balanced, as mizer's single resource has always
   been: `setMultipleResources()` gained a `resource_level` argument and a
   `balance` argument, and there are new `resource_level()` and

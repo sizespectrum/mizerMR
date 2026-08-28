@@ -43,7 +43,7 @@ test_that("validParams upgrades an old-layout object", {
     # version stamp brought up to date and class preserved
     expect_equal(mizer:::extensionVersion(up, "mizerMR"),
                  as.character(utils::packageVersion("mizerMR")))
-    expect_s4_class(up, "mizerMR")
+    expect_s3_class(up, "mizerMR")
 })
 
 test_that("upgrade.mizerMR is idempotent and pure", {

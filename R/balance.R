@@ -8,11 +8,11 @@
 
 #' A single-resource view of one resource of a mizerMR model
 #'
-#' An S4 subclass of [mizer::MizerParams-class] that presents one resource of a
+#' An S3 class based on [mizer::MizerParams-class] that presents one resource of a
 #' multiple-resource model in the way mizer presents its single built-in
 #' resource: the `rr_pp`, `cc_pp` and `initial_n_pp` slots hold the
 #' replenishment rate, the capacity and the abundance of that one resource, and
-#' the extra `resource_mort` slot holds the mortality that this resource
+#' the extra `resource_mort` element holds the mortality that this resource
 #' experiences.
 #'
 #' The class exists so that the balancing functions mizer provides for its
@@ -29,12 +29,10 @@
 #' multiple-resource model and the `getResourceMort()` method for this class
 #' simply hands it back.
 #'
-#' @slot resource_mort The predation mortality on the resource, as calculated in
-#'   the full multiple-resource model.
 #' @seealso [balanceResources()]
 #' @keywords internal
-setClass("mizerMRResourceView", contains = "MizerParams",
-         slots = c(resource_mort = "numeric"))
+#' @name mizerMRResourceView-class
+NULL
 
 #' Resource mortality of a single-resource view
 #'
@@ -69,13 +67,17 @@ getResourceMort.mizerMRResourceView <- function(params, n = initialN(params),
 #' @keywords internal
 mrResourceView <- function(base, resource_mort, abundance, resource_rate,
                            resource_capacity) {
+    if (isS4(base)) {
+        base <- mizer:::upgrade_s4_to_s3(base)
+    }
     base@initial_n_pp[] <- abundance
     base@rr_pp[] <- resource_rate
     base@cc_pp[] <- resource_capacity
     comment(base@rr_pp) <- NULL
     comment(base@cc_pp) <- NULL
-    methods::new("mizerMRResourceView", base,
-                 resource_mort = as.numeric(resource_mort))
+    base$resource_mort <- as.numeric(resource_mort)
+    class(base) <- c("mizerMRResourceView", "MizerParams")
+    base
 }
 
 #' Balance the resources
@@ -170,7 +172,12 @@ balanceResources <- function(params, resource_rate = NULL,
     # The view is built from the model without its extension classes so that
     # the mizer accessors called by the balancing functions see a single
     # resource rather than the multiple-resource arrays.
-    base <- methods::as(params, "MizerParams")
+    if (isS4(params)) {
+        base <- mizer:::upgrade_s4_to_s3(params)
+    } else {
+        base <- params
+    }
+    class(base) <- "MizerParams"
     base@extensions <- character()
 
     unbalanced <- character()
