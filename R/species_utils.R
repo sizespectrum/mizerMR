@@ -179,7 +179,12 @@ expandSizeGrid.mizerMR <- function(params,
 #' @return A [mizer::MizerParams-class] object without the MR extension.
 #' @keywords internal
 .strip_mr <- function(params) {
-    p <- as(params, "MizerParams")
+    if (isS4(params)) {
+        p <- mizer:::upgrade_s4_to_s3(params)
+    } else {
+        p <- params
+    }
+    class(p) <- "MizerParams"
 
     # Remove all MR-specific registrations
     p@extensions <- p@extensions[names(p@extensions) != "mizerMR"]

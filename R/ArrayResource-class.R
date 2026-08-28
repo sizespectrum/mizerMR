@@ -303,8 +303,9 @@ str.MRArrayResourceBySize <- function(object, ...) {
     out[1] <- paste0(" 'MRArrayResourceBySize' ", sub("^ ", "", out[1]))
     cat(paste0(out, collapse = "\n"), "\n", sep = "")
     if (!is.null(params)) {
+        n_slots <- if (isS4(params)) length(methods::slotNames(params)) else length(params)
         cat(" - attr(*, \"params\")=Formal class 'MizerParams' [package \"mizer\"] with ",
-            length(methods::slotNames(params)), " slots\n", sep = "")
+            n_slots, " slots\n", sep = "")
     }
     invisible(NULL)
 }
@@ -504,8 +505,9 @@ str.MRArrayTimeByResourceBySize <- function(object, ...) {
     out[1] <- paste0(" 'MRArrayTimeByResourceBySize' ", sub("^ ", "", out[1]))
     cat(paste0(out, collapse = "\n"), "\n", sep = "")
     if (!is.null(params)) {
+        n_slots <- if (isS4(params)) length(methods::slotNames(params)) else length(params)
         cat(" - attr(*, \"params\")=Formal class 'MizerParams' [package \"mizer\"] with ",
-            length(methods::slotNames(params)), " slots\n", sep = "")
+            n_slots, " slots\n", sep = "")
     }
     invisible(NULL)
 }

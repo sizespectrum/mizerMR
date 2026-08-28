@@ -5,7 +5,7 @@
 \alias{mizerMRSim-class}
 \title{mizerMR marker classes}
 \description{
-S4 marker subclasses of \link[mizer:MizerParams]{MizerParams} and \link[mizer:MizerSim]{MizerSim} that enable S3 dispatch
+S3 marker classes for \link[mizer:MizerParams]{MizerParams} and \link[mizer:MizerSim]{MizerSim} that enable S3 dispatch
 for MR-specific methods.
 }
 \details{
@@ -13,14 +13,10 @@ Objects of class \code{mizerMR} are created by \code{\link[=setMultipleResources
 Objects of class \code{mizerMRSim} are returned automatically by \code{\link[mizer:project]{project()}}
 when called on a \code{mizerMR} params object.
 
-The classes are \strong{not} defined statically. Instead mizer creates them when
-the package is loaded: \code{.onLoad()} calls \code{\link[mizer:registerExtension]{mizer::registerExtension()}}, which
-recognises mizerMR as a dispatching extension from the S3 methods it
-registers for its marker class and inserts \code{mizerMR} at the correct place in
-the S4 hierarchy relative to any other extension packages loaded in the same
-session. This lets mizerMR be chained with other extensions (for example
-mizerReef) in either load order. A static \code{contains = "MizerParams"}
-definition would fix mizerMR as a direct sibling of every other extension and
-prevent such chaining, because a sealed class cannot be re-parented.
+The classes are managed by mizer when the package is loaded: \code{.onLoad()} calls
+\code{\link[mizer:registerExtension]{mizer::registerExtension()}}, which recognises mizerMR as a dispatching
+extension from the S3 methods it registers for its marker class and inserts
+\code{mizerMR} into the S3 class vector in dispatch order relative to any other
+extension packages loaded in the same session.
 }
 \keyword{internal}

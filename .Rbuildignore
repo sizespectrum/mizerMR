@@ -9,3 +9,4 @@
 ^\.claude$
 ^\.codex$
 ^AGENTS\.md$
+^\.posit/assistant$
