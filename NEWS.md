@@ -1,5 +1,31 @@
 # mizerMR (development version)
 
+* The resources can now be balanced, as mizer's single resource has always
+  been: `setMultipleResources()` gained a `resource_level` argument and a
+  `balance` argument, and there are new `resource_level()` and
+  `resource_level<-()` accessors. Giving exactly one of `resource_rate`,
+  `resource_capacity` or `resource_level` now by default determines the other
+  one from the requirement that each resource replenishes at exactly the rate
+  at which it is consumed, so that the current resource abundances are a steady
+  state. Each resource is balanced with the balancing function belonging to its
+  own dynamics, and resources whose dynamics has no such function are left
+  alone. Pass `balance = FALSE` to switch this off, for example
+  `resource_capacity(params, balance = FALSE) <- capacity`. The balancing is
+  also available on its own as `balanceResources()`.
+
+* `tuneSteadyState()` now balances the resources of a multiple-resource model
+  automatically. They are held at their stored abundances while the consumer
+  spectra are solved for, exactly as mizer holds its own resource, and
+  afterwards their capacities are derived from their rates so that those held
+  abundances are a steady state of the resource dynamics under the new spectra.
+  The model you get back is therefore at a fixed point of the resource dynamics
+  as well as of the consumer dynamics, and mizer no longer reports the `MR`
+  component as one it is holding fixed without being able to handle.
+
+* `setMultipleResources()` gained a `reset` argument that recalculates the
+  resource rate and capacity from the resource parameters even if they were
+  previously set by hand or by balancing.
+
 * mizerMR now requires mizer (>= 3.3.0) and follows the plotting interface that
   mizer introduced in that release. `plotSpectra()` and `animate()` take the
   `biomass` and `per_log_size` flags, whose sum is the power of the weight

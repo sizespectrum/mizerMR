@@ -57,6 +57,7 @@ reference:
 - contents:
   - resource_params
   - setMultipleResources
+  - balanceResources
   - newMRParams
 - title: Accessing results of simulations
 - contents:
@@ -84,6 +85,12 @@ reference:
   - starts_with("valid")
   - ends_with("default")
   - mizerMR-class
+  - mizerMRResourceView-class
+  - getResourceMort.mizerMRResourceView
+  - mrResourceView
+  - mrCapacityFromLevel
+  - mrBalanceFunction
+  - balanceComponent
   - project_methods
   - mizerMR_dynamics
   - plotDietData

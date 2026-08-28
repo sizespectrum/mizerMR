@@ -7,6 +7,8 @@
 \alias{resource_capacity<-}
 \alias{resource_rate}
 \alias{resource_rate<-}
+\alias{resource_level}
+\alias{resource_level<-}
 \alias{resource_interaction}
 \alias{resource_interaction<-}
 \alias{initialNResource.mizerMR}
@@ -19,7 +21,10 @@ setMultipleResources(
   resource_interaction = NULL,
   resource_capacity = NULL,
   resource_rate = NULL,
+  resource_level = NULL,
   initial_resource = NULL,
+  balance = NULL,
+  reset = FALSE,
   info_level = mizer::default_info_level()
 )
 
@@ -29,17 +34,24 @@ setMultipleResourcesInternal(
   resource_interaction = NULL,
   resource_capacity = NULL,
   resource_rate = NULL,
+  resource_level = NULL,
   initial_resource = NULL,
+  balance = NULL,
+  reset = FALSE,
   info_level = mizer::default_info_level()
 )
 
 resource_capacity(params)
 
-resource_capacity(params) <- value
+resource_capacity(params, balance = NULL) <- value
 
 resource_rate(params)
 
-resource_rate(params) <- value
+resource_rate(params, balance = NULL) <- value
+
+resource_level(params)
+
+resource_level(params, balance = NULL) <- value
 
 resource_interaction(params)
 
@@ -63,7 +75,26 @@ intrinsic resource carrying capacities}
 \item{resource_rate}{Optional. Array (resource x size) of intrinsic
 resource growth rates}
 
+\item{resource_level}{Optional. The ratio between the current resource
+abundance and the resource capacity. Either a single number, a vector with
+one value for each resource or an array (resource x size). Must be greater
+than 0 and at most 1, except at sizes where a resource vanishes, where it
+can be \code{NaN}. This determines the resource capacity, so do not specify both
+this and \code{resource_capacity}.}
+
 \item{initial_resource}{Optional. Array (resource x size) of initial values}
+
+\item{balance}{By default the resource parameters are set so that each
+resource replenishes at the same rate at which it is consumed whenever you
+supply exactly one of \code{resource_rate}, \code{resource_capacity} or
+\code{resource_level}. Set to FALSE if you do not want the balancing, or to TRUE
+to balance also when you supply none of them. See the section "Balancing
+the resources".}
+
+\item{reset}{If set to TRUE, then the resource rate and capacity are reset to
+the values calculated from the resource parameters, even if they were
+previously overwritten with custom values. If set to FALSE (default) then
+such custom values are kept.}
 
 \item{info_level}{Controls the amount of information the function reports
 about the choices it makes, see \code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
@@ -73,6 +104,53 @@ about the choices it makes, see \code{\link[mizer:default_info_level]{mizer::def
 \item{object}{A mizerMR object}
 }
 \description{
-Set up multiple resources
+Sets the parameters of the multiple size-structured resources: their
+replenishment rates, their carrying capacities, the interaction of the
+consumer species with them and their initial abundances.
 }
+\details{
+By default the rate and the capacity are calculated from the power-law
+coefficients in the \code{\link[=resource_params]{resource_params()}} data frame. If you give either a
+\code{resource_rate}, a \code{resource_capacity} or a \code{resource_level}, the other one
+is by default determined by the requirement that each resource replenishes at
+the same rate at which it is consumed, see the section "Balancing the
+resources" below. You should therefore only give one of them.
+
+If you provide the \code{resource_level} then that sets the \code{resource_capacity} to
+the current resource abundance divided by the resource level. So in that case
+you should not specify \code{resource_capacity} as well.
+
+A rate or capacity that you provide yourself is remembered: it is marked with
+a comment and is from then on no longer recalculated from the resource
+parameters. Use \code{reset = TRUE} to go back to the values calculated from the
+resource parameters.
+}
+\section{Balancing the resources}{
+
+
+You would usually set the resource dynamics only after having finished the
+calibration of the steady state. Balancing then preserves that steady state:
+the resource parameters are chosen so that each resource replenishes at
+exactly the rate at which it is consumed and the current resource abundances
+therefore do not change. Your choice of resource dynamics only affects the
+dynamics around the steady state. The higher the resource rate or the lower
+the resource capacity the less sensitive the model will be to changes in the
+competition for the resources.
+
+Balancing happens by default whenever you give exactly one of
+\code{resource_rate}, \code{resource_capacity} or \code{resource_level}, and then determines
+the other one. Set \code{balance = FALSE} if you do not want that. Setting
+\code{balance = TRUE} when you give none of them recalculates the capacities from
+the current rates.
+
+Unlike in mizer, where \code{\link[mizer:setResource]{mizer::setResource()}} only ever changes the resource,
+this function is also the place where the resource interaction, the resource
+parameters and the initial abundances are set, and those calls do not balance
+by default.
+
+Each resource is balanced with the balancing function belonging to its own
+dynamics, see \code{\link[=balanceResources]{balanceResources()}}, which also describes what happens to
+resources whose dynamics cannot be balanced.
+}
+
 \keyword{internal}

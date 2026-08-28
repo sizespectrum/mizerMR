@@ -1,4 +1,5 @@
-# Tests for scaleModel, scaleRates, setResource and summary methods for mizerMR
+# Tests for scaleModel, scaleRates, setResource, tuneSteadyState and summary
+# methods for mizerMR
 
 make_mr_params <- function() {
     rp <- data.frame(
@@ -85,4 +86,55 @@ test_that("the setResource report obeys info_level", {
     expect_no_warning(
         mizer::with_info_level(info_level = 0,
                                setResource(params, resource_rate = 5)))
+})
+
+
+# A model whose two resources between them reproduce the North Sea resource, so
+# that it starts out close to a steady state of the consumer dynamics.
+make_tune_params <- function() {
+    rp <- as.data.frame(NS_params@resource_params)
+    rp$kappa <- rp$kappa / 2
+    rp <- rbind(rp, rp)
+    rp$resource <- c("res1", "res2")
+    initial <- array(dim = c(2, length(NS_params@w_full)))
+    initial[1, ] <- NS_params@initial_n_pp / 2
+    initial[2, ] <- NS_params@initial_n_pp / 2
+    setMultipleResources(NS_params, resource_params = rp,
+                         initial_resource = initial)
+}
+
+# The largest relative change of the resources over one year of their own
+# dynamics, which vanishes exactly when they are balanced.
+mr_resource_drift <- function(params) {
+    NR <- unclass(initialNResource(params))
+    new <- unclass(mizerMR_dynamics(params, n = initialN(params),
+                                    n_pp = params@initial_n_pp,
+                                    n_other = initialNOther(params),
+                                    rates = getRates(params), t = 0, dt = 1))
+    max(abs((new - NR)[NR > 0] / NR[NR > 0]))
+}
+
+test_that("tuneSteadyState balances the resources", {
+    params <- make_tune_params()
+    expect_gt(mr_resource_drift(params), 1e-4)
+    tuned <- suppressWarnings(
+        suppressMessages(tuneSteadyState(params, t_max = 20,
+                                         progress_bar = FALSE)))
+    expect_lt(mr_resource_drift(tuned), 1e-10)
+    # The component is handed back with its own dynamics
+    expect_identical(tuned@other_dynamics[["MR"]], "mizerMR_dynamics")
+    # and the convergence diagnostic survives the rebalancing
+    expect_true(is.list(attr(tuned, "convergence")))
+    # and the resources still project
+    expect_no_error(project(tuned, t_max = 0.1, dt = 0.1, t_save = 0.1))
+})
+
+test_that("tuneSteadyState does not report the MR component as unhandled", {
+    params <- make_tune_params()
+    # Other warnings are the model's own business, so only the report about
+    # components mizer cannot handle is asserted against.
+    suppressWarnings(expect_no_warning(
+        suppressMessages(tuneSteadyState(params, t_max = 5,
+                                         progress_bar = FALSE)),
+        message = "dynamics of their own"))
 })

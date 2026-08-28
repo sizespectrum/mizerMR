@@ -17,6 +17,7 @@ S3method(getEncounter,mizerMR)
 S3method(getPredRate,mizerMR)
 S3method(getRates,mizerMR)
 S3method(getResourceMort,mizerMR)
+S3method(getResourceMort,mizerMRResourceView)
 S3method(initialNResource,mizerMR)
 S3method(plot,MRArrayResourceBySize)
 S3method(plot,MRArrayTimeByResourceBySize)
@@ -42,13 +43,16 @@ S3method(str,MRArrayTimeByResourceBySize)
 S3method(summary,MRArrayResourceBySize)
 S3method(summary,MRArrayTimeByResourceBySize)
 S3method(summary,mizerMR)
+S3method(tuneSteadyState,mizerMR)
 S3method(utils::upgrade,mizerMR)
 export("resource_capacity<-")
 export("resource_interaction<-")
+export("resource_level<-")
 export("resource_params<-")
 export("resource_rate<-")
 export(MRArrayResourceBySize)
 export(MRArrayTimeByResourceBySize)
+export(balanceResources)
 export(is.MRArrayResourceBySize)
 export(is.MRArrayTimeByResourceBySize)
 export(mizerMREncounter)
@@ -60,6 +64,7 @@ export(plotResourcePred)
 export(plotlyResourcePred)
 export(resource_capacity)
 export(resource_interaction)
+export(resource_level)
 export(resource_params)
 export(resource_rate)
 export(setMultipleResources)
@@ -119,6 +124,7 @@ importFrom(mizer,
   setLinetypes,
   setResource,
   species_params,
+  tuneSteadyState,
   validParams,
   valid_species_arg,
   w_full

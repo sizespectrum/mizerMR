@@ -1,19 +1,26 @@
-#' Multiple-resource methods for model rescaling and reporting
+#' Multiple-resource methods for model rescaling, calibration and reporting
 #'
-#' S3 methods that make mizer's `scaleModel()`, `scaleRates()`, `setResource()`
-#' and `summary()` aware of the multiple-resource component. The base
-#' `MizerParams` methods only know about the single built-in resource, which
-#' `setMultipleResources()` silences, so they would otherwise ignore (or, for
-#' `scaleModel()` and `setResource()`, error on) the resources stored in the
+#' S3 methods that make mizer's `scaleModel()`, `scaleRates()`, `setResource()`,
+#' `tuneSteadyState()` and `summary()` aware of the multiple-resource component.
+#' The base `MizerParams` methods only know about the single built-in resource,
+#' which `setMultipleResources()` silences, so they would otherwise ignore (or,
+#' for `scaleModel()` and `setResource()`, error on) the resources stored in the
 #' `MR` component.
 #'
 #' @param params A \linkS4class{mizerMR} object.
 #' @param factor The factor by which to rescale.
 #' @param object A \linkS4class{mizerMR} object.
+#' @param solver The solver to use, see [mizer::tuneSteadyState()].
+#' @param effort The fishing effort to use throughout.
+#' @param preserve Which of the reproduction parameters to preserve, see
+#'   [mizer::tuneSteadyState()].
+#' @param info_level Controls the amount of information the function reports
+#'   about the choices it makes, see [mizer::default_info_level()].
 #' @param ... Further arguments passed along the mizer method chain.
 #'
-#' @return For `scaleModel()`, `scaleRates()` and `setResource()`: the updated
-#'   `mizerMR` object. For `summary()`: the object, invisibly.
+#' @return For `scaleModel()`, `scaleRates()`, `setResource()` and
+#'   `tuneSteadyState()`: the updated `mizerMR` object. For `summary()`: the
+#'   object, invisibly.
 #' @name params_methods
 NULL
 
@@ -117,7 +124,8 @@ setResource.mizerMR <- function(params, ...) {
             paste0("This is a multiple-resource model. `setResource()` ",
                    "changes only the silenced built-in resource and does not ",
                    "affect the dynamics. Use `setMultipleResources()`, ",
-                   "`resource_rate<-` or `resource_capacity<-` instead."),
+                   "`resource_rate<-`, `resource_capacity<-` or ",
+                   "`resource_level<-` instead."),
             level = 1, severity = "warning", unhandled = "show")
     }
     ext <- params@extensions
@@ -126,6 +134,68 @@ setResource.mizerMR <- function(params, ...) {
     base <- do.call(mizer::setResource, c(list(base), args))
     base@extensions <- ext
     mizer::coerceToExtensionClass(base)
+}
+
+#' Tune a multiple-resource model to a steady state
+#'
+#' Extends [mizer::tuneSteadyState()] so that the multiple resources get the
+#' treatment that mizer gives its single built-in resource: they are held at
+#' their stored abundances while the consumer spectra are solved for, and
+#' afterwards their capacities are rebalanced, with [balanceResources()], so
+#' that those held abundances are a steady state of the resource dynamics under
+#' the new spectra. The rates are preserved and the capacities derived from
+#' them, which is the choice the base method makes for `cc_pp`.
+#'
+#' Without this the resources would be held fixed during the search and then
+#' handed back with the parameters they came in with, so the model returned
+#' would sit at a fixed point of the consumer dynamics but not of the resource
+#' dynamics. mizer reports exactly that for the components it does not know how
+#' to handle; because this method does handle the `MR` component, it takes it
+#' out of that report by pinning it itself for the duration of the search, which
+#' is what the base method does with every component anyway.
+#'
+#' The `"convergence"` attribute of the result is preserved. Its `residual`
+#' entry covers the consumers only — mizer keeps components out of that
+#' criterion — so it is not changed by the rebalancing. What the rebalancing
+#' moves is `attr(getSteadyResidual(params), "other")`, the rate of change of
+#' the resources themselves.
+#'
+#' @rdname params_methods
+#' @importFrom mizer tuneSteadyState
+#' @export
+tuneSteadyState.mizerMR <- function(params, solver = c("project", "newton"),
+                                    effort = params@initial_effort,
+                                    preserve = c("reproduction_level",
+                                                 "erepro", "R_max"),
+                                    info_level = mizer::default_info_level(),
+                                    ...) {
+    if (is.null(getComponent(params, "MR"))) {
+        return(NextMethod())
+    }
+    # Hold the resources at their stored abundances ourselves. The base method
+    # pins every component this way in any case; doing it here as well says
+    # that mizerMR has taken responsibility for this one, which keeps it out of
+    # the report about components mizer cannot handle.
+    mr_dynamics <- params@other_dynamics[["MR"]]
+    params@other_dynamics[["MR"]] <- "constant_other"
+    object <- NextMethod()
+
+    # `setMultipleResources()` returns a fresh object that drops attributes.
+    conv <- attr(object, "convergence")
+    is_sim <- is(object, "MizerSim")
+    tuned <- if (is_sim) object@params else object
+    tuned@other_dynamics[["MR"]] <- mr_dynamics
+    tuned <- setMultipleResources(tuned, balance = TRUE,
+                                  info_level = info_level)
+    if (is_sim) {
+        object@params <- tuned
+    } else {
+        object <- tuned
+    }
+    if (!is.null(conv)) {
+        attr(object, "convergence") <- conv
+    }
+    object
 }
 
 #' Summarise a multiple-resource model
