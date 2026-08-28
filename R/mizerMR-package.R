@@ -18,16 +18,15 @@ NULL
 globalVariables(c("expect_equal", "sp", "value", "w", "resource",
                   "Predator", "Species", "time"))
 
-#' Register mizerMR with mizer
+#' Initialise mizerMR
 #'
-#' Registers the package as a mizer extension when the namespace is loaded.
+#' Sets up active binding for SEAmodel dataset.
 #'
 #' @param libname Library path supplied by R.
 #' @param pkgname Package name supplied by R.
 #' @return Called for its side effect.
 #' @keywords internal
 .onLoad <- function(libname, pkgname) {
-    mizer::registerExtension(pkgname, requirement = "sizespectrum/mizerMR")
     if (exists("SEAmodel", envir = asNamespace(pkgname), inherits = FALSE)) {
         ns <- asNamespace(pkgname)
         raw_SEAmodel <- get("SEAmodel", envir = ns)

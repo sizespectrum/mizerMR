@@ -232,7 +232,8 @@ setMultipleResourcesInternal <- function(params,
     if (creating) {
         params <- mizer::recordExtension(
             params, "mizerMR",
-            version = as.character(utils::packageVersion("mizerMR")))
+            version = as.character(utils::packageVersion("mizerMR")),
+            requirement = "sizespectrum/mizerMR")
     } else {
         params <- mizer::recordExtension(params, "mizerMR")
     }
