@@ -4,13 +4,16 @@
 \alias{balanceComponent}
 \title{Replace the rate or the capacity by their balanced values}
 \usage{
-balanceComponent(params, derive_rate)
+balanceComponent(params, derive_rate, resources = TRUE)
 }
 \arguments{
 \item{params}{A MizerParams object with multiple resources set up.}
 
 \item{derive_rate}{If TRUE the rate is calculated from the capacity,
 otherwise the capacity is calculated from the rate.}
+
+\item{resources}{A logical vector saying for each resource whether its
+balanced value is stored. By default all resources are balanced.}
 }
 \value{
 The updated MizerParams object.

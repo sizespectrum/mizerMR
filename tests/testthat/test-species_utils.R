@@ -92,6 +92,113 @@ test_that("removeSpecies preserves resource capacity, rate and params", {
                  ignore_attr = TRUE)
 })
 
+# The rate of change of the resources per unit of abundance, without the sizes
+# at which a resource vanishes, where it is NaN
+mr_residual <- function(params) {
+    residual <- attr(getSteadyResidual(params), "other")$MR
+    residual[is.finite(residual)]
+}
+
+# The largest relative change between two arrays, at the entries where the
+# first one does not vanish
+max_rel_change <- function(new, old) {
+    new <- unclass(new)
+    old <- unclass(old)
+    max(abs(new - old)[old > 0] / old[old > 0])
+}
+
+test_that("removeSpecies with compensate = TRUE restores the rates of the remaining species", {
+    params <- make_mr_params()
+    remove <- c("Cod", "Haddock")
+    kept <- setdiff(params@species_params$species, remove)
+    expect_no_warning(
+        p2 <- removeSpecies(params, remove, compensate = TRUE)
+    )
+
+    expect_s3_class(p2, "mizerMR")
+    expect_identical(rownames(resource_interaction(p2)), kept)
+    expect_identical(p2@other_dynamics[["MR"]], "mizerMR_dynamics")
+    expect_equal(getEncounter(p2), getEncounter(params)[kept, ],
+                 ignore_attr = TRUE)
+    expect_equal(getFeedingLevel(p2), getFeedingLevel(params)[kept, ],
+                 ignore_attr = TRUE)
+    expect_equal(getMort(p2), getMort(params)[kept, ], ignore_attr = TRUE)
+})
+
+test_that("removeSpecies with compensate = TRUE keeps the resources at steady state", {
+    params <- setMultipleResources(make_mr_params(), balance = TRUE)
+    remove <- c("Cod", "Haddock")
+    expect_lt(max(abs(mr_residual(params))), 1e-10)
+
+    p2 <- removeSpecies(params, remove, compensate = TRUE)
+    expect_lt(max(abs(mr_residual(p2))), 1e-10)
+    # The capacities are rebalanced, the rates are kept
+    expect_equal(resource_rate(p2), resource_rate(params), ignore_attr = TRUE)
+    expect_gt(max_rel_change(resource_capacity(p2), resource_capacity(params)),
+              0.01)
+    # Without the compensation the removal moves the resources
+    p3 <- suppressMessages(suppressWarnings(removeSpecies(params, remove)))
+    expect_gt(max(abs(mr_residual(p3))), 1)
+})
+
+test_that("removeSpecies with compensate = TRUE leaves alone resources the removed species did not eat", {
+    params <- make_mr_params()
+    remove <- c("Cod", "Haddock")
+    interaction <- resource_interaction(params)
+    interaction[remove, "res2"] <- 0
+    resource_interaction(params) <- interaction
+    # The resources are not at steady state, so a rebalanced resource changes
+    expect_gt(max(abs(mr_residual(params))), 1)
+
+    p2 <- removeSpecies(params, remove, compensate = TRUE)
+    expect_equal(resource_capacity(p2)["res2", ],
+                 resource_capacity(params)["res2", ])
+    expect_gt(max_rel_change(resource_capacity(p2)["res1", ],
+                             resource_capacity(params)["res1", ]), 0.01)
+    residual <- attr(getSteadyResidual(p2), "other")$MR
+    expect_equal(residual["res2", ],
+                 attr(getSteadyResidual(params), "other")$MR["res2", ])
+    expect_lt(max(abs(residual["res1", ]), na.rm = TRUE), 1e-10)
+})
+
+test_that("removeSpecies with compensate = TRUE does not warn about a constant resource", {
+    rp <- data.frame(resource = c("res1", "res2"), kappa = c(0.1, 0.05),
+                     lambda = c(2.05, 2.1), r_pp = c(4, 2),
+                     dynamics = c("resource_semichemostat",
+                                  "resource_constant"))
+    params <- setMultipleResources(NS_params, resource_params = rp)
+    expect_no_warning(expect_message(
+        p2 <- removeSpecies(params, c("Cod", "Haddock"), compensate = TRUE),
+        "were not balanced"))
+    expect_equal(resource_capacity(p2)["res2", ],
+                 resource_capacity(params)["res2", ])
+    expect_lt(max(abs(attr(getSteadyResidual(p2), "other")$MR["res1", ]),
+                  na.rm = TRUE), 1e-10)
+})
+
+test_that("removeSpecies with compensate = FALSE does not compensate", {
+    params <- make_mr_params()
+    remove <- c("Cod", "Haddock")
+    kept <- setdiff(params@species_params$species, remove)
+    p_default <- suppressMessages(suppressWarnings(
+        removeSpecies(params, remove)))
+    p2 <- suppressMessages(suppressWarnings(
+        removeSpecies(params, remove, compensate = FALSE)))
+
+    for (p in list(p_default, p2)) {
+        expect_equal(p@ext_encounter, params@ext_encounter[kept, ],
+                     ignore_attr = TRUE)
+        expect_equal(p@mu_b, params@mu_b[kept, ], ignore_attr = TRUE)
+        expect_equal(resource_capacity(p), resource_capacity(params),
+                     ignore_attr = TRUE)
+        expect_equal(resource_interaction(p),
+                     resource_interaction(params)[kept, ], ignore_attr = TRUE)
+    }
+    expect_false(isTRUE(all.equal(unclass(getEncounter(p2)),
+                                  unclass(getEncounter(params))[kept, ],
+                                  check.attributes = FALSE)))
+})
+
 # renameSpecies ----------------------------------------------------------------
 
 test_that("renameSpecies updates interaction matrix row names", {
