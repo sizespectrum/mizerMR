@@ -259,9 +259,11 @@ setMultipleResourcesInternal <- function(params,
 #' @param params A MizerParams object with multiple resources set up.
 #' @param derive_rate If TRUE the rate is calculated from the capacity,
 #'   otherwise the capacity is calculated from the rate.
+#' @param resources A logical vector saying for each resource whether its
+#'   balanced value is stored. By default all resources are balanced.
 #' @return The updated MizerParams object.
 #' @keywords internal
-balanceComponent <- function(params, derive_rate) {
+balanceComponent <- function(params, derive_rate, resources = TRUE) {
     mr <- getComponent(params, "MR")
     balanced <- balanceResources(
         params,
@@ -270,12 +272,12 @@ balanceComponent <- function(params, derive_rate) {
                             else NULL)
     if (derive_rate) {
         rate <- mr$component_params$rate
-        rate[] <- balanced$resource_rate
+        rate[resources, ] <- balanced$resource_rate[resources, ]
         comment(rate) <- "set by balancing"
         params@other_params[["MR"]]$rate <- rate
     } else {
         capacity <- mr$component_params$capacity
-        capacity[] <- balanced$resource_capacity
+        capacity[resources, ] <- balanced$resource_capacity[resources, ]
         comment(capacity) <- "set by balancing"
         params@other_params[["MR"]]$capacity <- capacity
     }

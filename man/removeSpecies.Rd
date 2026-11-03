@@ -5,7 +5,13 @@
 \alias{removeSpecies.mizerMR}
 \title{Remove species from a mizerMR model}
 \usage{
-\method{removeSpecies}{mizerMR}(params, species, ...)
+\method{removeSpecies}{mizerMR}(
+  params,
+  species,
+  compensate = FALSE,
+  info_level = mizer::default_info_level(),
+  ...
+)
 }
 \arguments{
 \item{params}{A \linkS4class{mizerMR} object.}
@@ -13,6 +19,14 @@
 \item{species}{The species to be removed. A vector of species names, or a
 numeric vector of species indices, or a logical vector indicating for
 each species whether it is to be removed (TRUE) or not.}
+
+\item{compensate}{If \code{TRUE}, the remaining species keep the rates they had
+before the removal and the resources are rebalanced. See the section
+"Compensating for the removed species". Default is \code{FALSE}.}
+
+\item{info_level}{Controls the amount of information messages that are
+shown. Higher levels lead to more messages. Set to 0 to suppress all such
+messages.}
 
 \item{...}{Currently unused.}
 }
@@ -23,3 +37,23 @@ A \linkS4class{mizerMR} object with the specified species removed.
 Extends \code{\link[mizer:removeSpecies]{mizer::removeSpecies()}} to also trim the resource interaction
 matrix.
 }
+\section{Compensating for the removed species}{
+
+With \code{compensate = TRUE}, mizer adjusts the external rates of the remaining
+species so that at the initial state they keep the encounter rate, mortality
+and diffusion that they had before the removal, see \code{\link[mizer:removeSpecies]{mizer::removeSpecies()}}.
+The food that the remaining species found in the multiple resources is
+included in the encounter rate that is restored.
+
+The removed species also no longer eat the resources, so the resources they
+fed on are rebalanced with \code{\link[=balanceResources]{balanceResources()}}, as mizer rebalances its own
+resource: the capacity of each such resource is set so that at the initial
+state it replenishes at exactly the rate at which it is now consumed. The
+resource rate is kept. This replaces a capacity that you had set manually.
+A resource that was at steady state therefore stays at steady state, and
+one that was not is put at steady state. Resources whose consumption did not
+change are left alone. A resource whose dynamics has no balancing function
+cannot be rebalanced, and you are warned about it, unless it is held
+constant with \code{\link[mizer:resource_constant]{mizer::resource_constant()}}, which needs no balancing.
+}
+

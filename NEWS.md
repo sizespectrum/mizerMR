@@ -1,5 +1,14 @@
 # mizerMR (development version)
 
+* `removeSpecies()` supports mizer's new `compensate = TRUE`. The remaining
+  species keep the encounter rate, feeding level and mortality they had before
+  the removal, including the food they found in the multiple resources, and the
+  capacities of the resources that the removed species fed on are rebalanced,
+  keeping their rates, so that a model at steady state stays at steady state.
+  Previously the multiple resources were swapped for mizer's built-in resource
+  during the removal, so that the compensation failed. With the default
+  `compensate = FALSE` nothing changes.
+
 * Updated for mizer's transition from S4 to S3: `mizerMR` and
   `mizerMRResourceView` are now pure S3 classes, replacing S4 class definitions
   and `methods::as()` coercions.

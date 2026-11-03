@@ -78,12 +78,62 @@ addSpecies.mizerMR <- function(params, species_params,
 #' Extends [mizer::removeSpecies()] to also trim the resource interaction
 #' matrix.
 #'
+#' @section Compensating for the removed species:
+#' With `compensate = TRUE`, mizer adjusts the external rates of the remaining
+#' species so that at the initial state they keep the encounter rate, mortality
+#' and diffusion that they had before the removal, see [mizer::removeSpecies()].
+#' The food that the remaining species found in the multiple resources is
+#' included in the encounter rate that is restored.
+#'
+#' The removed species also no longer eat the resources, so the resources they
+#' fed on are rebalanced with [balanceResources()], as mizer rebalances its own
+#' resource: the capacity of each such resource is set so that at the initial
+#' state it replenishes at exactly the rate at which it is now consumed. The
+#' resource rate is kept. This replaces a capacity that you had set manually.
+#' A resource that was at steady state therefore stays at steady state, and
+#' one that was not is put at steady state. Resources whose consumption did not
+#' change are left alone. A resource whose dynamics has no balancing function
+#' cannot be rebalanced, and you are warned about it, unless it is held
+#' constant with [mizer::resource_constant()], which needs no balancing.
+#'
 #' @param params A \linkS4class{mizerMR} object.
+#' @param compensate If `TRUE`, the remaining species keep the rates they had
+#'   before the removal and the resources are rebalanced. See the section
+#'   "Compensating for the removed species". Default is `FALSE`.
 #' @inheritParams mizer::removeSpecies
 #' @return A \linkS4class{mizerMR} object with the specified species removed.
 #' @export
 #' @name removeSpecies
-removeSpecies.mizerMR <- function(params, species, ...) {
+removeSpecies.mizerMR <- function(params, species, compensate = FALSE,
+                                  info_level = mizer::default_info_level(),
+                                  ...) {
+    assert_that(is.flag(compensate), noNA(compensate))
+    if (compensate) {
+        if (is.null(getComponent(params, "MR"))) {
+            return(NextMethod())
+        }
+        # mizer calculates the compensation on the full model, with the
+        # abundances of the removed species set to zero, so the MR component
+        # has to stay in place for it rather than be stripped: the encounter
+        # rate and the feeding level that mizer restores include the food from
+        # the multiple resources.
+        old_mort <- unclass(getResourceMort(params))
+        old_interaction <- resource_interaction(params)
+        # Hold the resources fixed ourselves while mizer compensates, as
+        # `tuneSteadyState.mizerMR()` does. That says that mizerMR takes care of
+        # this component, which keeps it out of mizer's warning about the
+        # components it does not compensate.
+        mr_dynamics <- params@other_dynamics[["MR"]]
+        params@other_dynamics[["MR"]] <- "constant_other"
+        p <- NextMethod()
+        p@other_dynamics[["MR"]] <- mr_dynamics
+        p@other_params[["MR"]]$interaction <-
+            old_interaction[p@species_params$species, , drop = FALSE]
+        return(mizer::with_info_level(info_level = info_level, {
+            mrRebalanceAfterRemoval(p, old_mort)
+        }))
+    }
+
     rp <- resource_params(params)
     capacity <- resource_capacity(params)
     rate <- resource_rate(params)
@@ -104,6 +154,56 @@ removeSpecies.mizerMR <- function(params, species, ...) {
                          resource_capacity = capacity,
                          resource_rate = rate,
                          initial_resource = initial_resource)
+}
+
+#' Rebalance the resources after species have been removed
+#'
+#' Called by [removeSpecies()] with `compensate = TRUE` once the species have
+#' been removed. Rebalances the capacity of each resource whose mortality has
+#' changed, keeping its rate, so that at the initial state it replenishes at
+#' exactly the rate at which it is now consumed.
+#'
+#' A resource on which the removed species did not feed keeps its mortality,
+#' because the compensation restores the feeding levels of the remaining
+#' species. It is restored only up to round-off, though, so the comparison
+#' with the mortality before the removal cannot be exact, as it is in mizer,
+#' which has only one resource to rebalance. A resource counts as changed if
+#' its mortality changed anywhere by more than `tol` times its largest
+#' mortality.
+#'
+#' @param params A \linkS4class{mizerMR} object from which the species have
+#'   been removed.
+#' @param old_mort The resource mortality (resource x size) before the removal.
+#' @param tol The tolerance for an unchanged mortality, relative to the largest
+#'   mortality of that resource.
+#' @return The \linkS4class{mizerMR} object with the rebalanced capacities.
+#' @keywords internal
+mrRebalanceAfterRemoval <- function(params, old_mort, tol = 1e-8) {
+    change <- abs(unclass(getResourceMort(params)) - old_mort)
+    changed <- apply(change, 1, max) > tol * apply(abs(old_mort), 1, max)
+    if (!any(changed)) {
+        return(params)
+    }
+    rp <- resource_params(params)
+    # `resource_constant()` keeps the resource where it is anyway
+    no_balance <- changed & rp$dynamics != "resource_constant" &
+        vapply(rp$dynamics, function(d) is.null(mrBalanceFunction(d)),
+               logical(1))
+    if (any(no_balance)) {
+        mizer::signal_info(
+            "resource_capacity", paste0(
+                "There is no balancing function for the dynamics of the ",
+                "resource", if (sum(no_balance) > 1) "s " else " ",
+                toString(rp$resource[no_balance]), ", so ",
+                if (sum(no_balance) > 1) "their capacities" else "its capacity",
+                " could not be rebalanced after the removed species stopped ",
+                "eating ", if (sum(no_balance) > 1) "them" else "it", ". ",
+                if (sum(no_balance) > 1) "These resources are" else
+                    "This resource is",
+                " therefore not compensated for their removal."),
+            level = 1, severity = "warning", unhandled = "show")
+    }
+    balanceComponent(params, derive_rate = FALSE, resources = changed)
 }
 
 
