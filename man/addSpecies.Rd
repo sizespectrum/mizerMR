@@ -3,7 +3,7 @@
 \name{addSpecies}
 \alias{addSpecies}
 \alias{addSpecies.mizerMR}
-\title{Add species to a mizerMR model}
+\title{Add species while specifying their resource interactions}
 \usage{
 \method{addSpecies}{mizerMR}(
   params,
@@ -18,10 +18,10 @@
 )
 }
 \arguments{
-\item{params}{A \linkS4class{mizerMR} object.}
+\item{params}{A mizer params object for the original system.}
 
-\item{species_params}{A data frame with the species parameters of the new
-species.}
+\item{species_params}{Data frame with the species parameters of the new
+species we want to add to the system.}
 
 \item{gear_params}{Data frame with the gear parameters for the new
 species. If not provided then the new species will not be fished.}
@@ -51,15 +51,15 @@ to more messages. Set to 0 to suppress all such messages.}
 
 \item{...}{Currently unused.}
 
-\item{resource_interaction}{Optional matrix (new species x resources) of
-interaction values between new species and each resource. Defaults to 1
-for all new species and resources.}
+\item{resource_interaction}{Interactions of new species with each resource.
+A vector for one species or a matrix with named species and resource axes.
+Omitted values default to one.}
 }
 \value{
-A \linkS4class{mizerMR} object with the new species added.
+The updated multiple-resource model.
 }
 \description{
-Extends \code{\link[mizer:addSpecies]{mizer::addSpecies()}} to handle the multiple-resource interaction
-matrix. New species are added with a resource interaction of 1 for all
-resources by default, or as specified by \code{resource_interaction}.
+The MR interaction request is passed to the early transformation hook before
+any new-species rates are evaluated. Other structural operations use mizer's
+shared implementation and the same MR-owned transformation declarations.
 }

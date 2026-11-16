@@ -12,254 +12,140 @@ vignette: >
 ---
 
 ```{r setup, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>"
-)
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
 library(mizerMR)
 ```
 
-# Overview
+# Stored capabilities
 
-This vignette is aimed at developers who want to understand how mizerMR is
-built on top of mizer's extension machinery. It assumes you have read
-`vignette("extensions", package = "mizer")`.
+This development preview requires mizer 3.4.0.9012 or later. mizerMR records
+its extension version and uses the `mizerMR` S3 class to participate in the
+model's method chain. The multiple resources form one component named `MR`.
+Its state is a resource-by-size number-density array on the full size grid;
+its parameters contain resource-specific replenishment rates, capacities,
+species interactions and the resource parameter table.
 
-mizerMR uses `setComponent()` for the multiple-resource state,
-`other_params()` for resource metadata, and mizer's extension-chain S3 methods
-for mizer generics that need to know about the multiple resources. Its methods
-call `NextMethod()` so that mizerMR can compose with other extension packages,
-such as therMizer, instead of replacing entire mizer rate functions or plotting
-helpers.
+`setMultipleResources()` stores an assembled definition using
+`mizer::setComponent()`. The definition supplies separate callbacks for custom
+stepping, exact equations, convergence, biomass, tuning and transformations.
+The state and parameter values remain separate from these declarations.
+`mizer::getComponent(params, "MR")$definition` shows the stored specification.
+Changing ordinary resource parameter values retains an author's current
+capability choices.
 
-# How mizerMR currently works
+The package implements the semi-chemostat, logistic and constant resource laws.
+For those laws, `mrEquation()` returns the instantaneous derivative, while
+`mizerMR_dynamics()` performs the established custom time step. The equation
+and stepping contracts are separate: supplying a step does not imply that an
+extension has supplied an equation or a convergence assessment.
 
-## The resource state lives in a `setComponent()` component
+# Rates and convergence
 
-The multiple resources are stored as a single dynamical component named `"MR"`.
-The component state is an array of dimensions `(resource × size)` holding the
-number density of each resource at each size on mizer's full size grid.
-`setMultipleResources()` registers this component:
+`projectEncounter.mizerMR()` adds resource encounter to the result of
+`NextMethod()`. `projectResourceMort.mizerMR()` computes resource-specific
+mortality using the same effective predator rates. The MR equation receives
+these complete model rates, so resources remain coupled through the consumers.
+
+`mrConvergence()` reports one quantitative measure and tolerance per resource.
+The default measures the integrated absolute state derivative; an explicit
+biomass criterion instead measures the absolute integrated derivative. Both
+respect mizer's size-grid quadrature scheme. mizer combines these measures with
+consumer and other component assessments.
+
+The silenced core resource is explicitly declared a prescribed zero input.
+Rows using `resource_constant` are likewise declared prescribed through a
+structural mask. Zero observations, zero capacities and zero replenishment
+rates never imply that a coordinate has been removed from the model.
+
+Whole-model assessments include all dynamic resources. The current core
+stability implementation does not assemble Jacobians for arbitrary dynamic
+components, so whole-model stability of a dynamic MR model is unavailable.
+An explicitly conditional analysis can hold the entire MR component fixed;
+it describes that consumer subsystem and is labelled accordingly.
+
+# Tuning strategies
+
+The default MR strategy, `preserve_rate`, holds MR abundances during the
+consumer steady-state search and adjusts resource capacities afterwards. The
+alternative `preserve_capacity` adjusts replenishment rates. For example:
 
 ```r
-params <- setComponent(
-    params      = params,
-    component   = "MR",
-    initial_value = initial_resource,   # array (resource × size)
-    dynamics_fun  = "mizerMR_dynamics",
-    component_params = list(
-        rate        = resource_rate,        # array (resource × size)
-        capacity    = resource_capacity,    # array (resource × size)
-        interaction = resource_interaction  # matrix (species × resource)
-    )
+params <- tuneSteadyState(
+    params,
+    strategies = c("component:MR" = "preserve_capacity")
 )
 ```
 
-During a call to `project()`, mizer automatically calls `mizerMR_dynamics()` at
-each time step. That function iterates over resources and applies semi-chemostat
-dynamics to each row of the state array, using the per-resource mortality
-computed earlier in the rate pipeline.
+These strategies declare their adjustable parameter paths, nonnegative bounds
+and preserved values. Before a balancer runs, `mrTarget()` independently
+constructs the effective source and loss targets at the candidate state.
+`mrBalance()` implements the analytic, law-specific inverse. mizer verifies
+that the returned model retains that state, the declared preserved values and
+all effective equation quantities outside the authorised adjustment.
+Infeasible constraints stop; no numerical fallback silently changes the
+strategy.
 
-The component state at every saved time step ends up in `sim@n_other[, "MR"]`
-and is exposed to users via `NResource(sim)` and `finalNResource(sim)`.
+A third strategy, `evolve`, advances MR states during the search and requires
+the projection solver. It does not make an unsupported Newton treatment of
+dynamic components appear supported.
 
-## mizerMR registers as a dispatching extension
+MR explicitly adopts the known built-in reproduction specification through
+`mizer::mizerReproductionDefinition()`. Adoption is restricted to recognised
+effective rate and S3 method chains. A custom outer rate or reproduction method
+requires an author declaration; merely retaining the same stored RDD name is
+insufficient.
 
-mizerMR defines the S4 marker classes `mizerMR` and `mizerMRSim`. The package
-registers itself with mizer when it is loaded:
+# Measurements
 
-```r
-.onLoad <- function(libname, pkgname) {
-    mizer::registerExtensions(
-        stats::setNames("sizespectrum/mizerMR", pkgname))
-}
-```
-
-When `setMultipleResources()` has finished setting up the component state, it
-records the current session extension chain in the object and coerces the object
-to the appropriate dispatch class:
-
-```r
-params@extensions <- mizer::getRegisteredExtensions()
-mizer::coerceToExtensionClass(params)
-```
-
-This is the same two-step constructor pattern described in mizer's extension
-package vignette. The stored value for mizerMR is the package requirement string
-`"sizespectrum/mizerMR"`, which mizer can use when loading saved objects.
-
-## Projection methods extend the defaults
-
-The built-in mizer encounter and resource-mortality rate functions work with a
-single `n_pp` vector. mizerMR adds methods for the `mizerMR` extension class so
-that extension-aware projections understand the multi-resource array.
-
-### `projectEncounter.mizerMR`
-
-The method first calls `NextMethod()` to get the encounter rate from the rest of
-the extension chain (the fish community plus the silenced built-in resource,
-together with any other extensions' contributions). It then adds the encounter
-on the multiple resources.
-
-The encounter convolution is *linear* in the prey spectra, and all resources
-share mizer's full size grid. So the contributions of the individual resources
-do not need a separate Fourier transform each: they can be summed into a single
-combined prey spectrum for each predator and transformed once. With the species
-× resource interaction matrix \(\Theta\) and the resource state \(N\) (an array
-with one row per resource),
-\[
-\sum_r \mathrm{FFT}\bigl(\Theta_{\cdot r}\,N_r\bigr)
-   = \mathrm{FFT}\bigl(\Theta\,N\bigr),
-\]
-so a single transform of `interaction %*% n_other[["MR"]]` gives the whole
-resource encounter. This is what `mizerMRResourceEncounter()` computes, and it
-makes the encounter cost flat in the number of resources rather than growing
-with it. `projectEncounter.mizerMR` uses this fast path whenever the model uses
-mizer's default Fourier predation kernel:
+Use mizer's shared measurement interface to include resources:
 
 ```r
-projectEncounter.mizerMR <- function(params, n, n_pp, n_other, t = 0, ...) {
-    n_pp <- mizerMRValidBaseResource(params, n_pp)
-    encounter <- NextMethod(n = n, n_pp = n_pp, n_other = n_other, t = t)
-    n_mr <- n_other[["MR"]]
-    if (is.null(n_mr)) return(encounter)
-
-    # Fast path: one FFT for all resources combined.
-    if (is.null(comment(params@pred_kernel))) {
-        return(encounter + mizerMRResourceEncounter(params, n_other))
-    }
-
-    # Fallback for a user-supplied (non-Fourier) predation kernel: add each
-    # resource's contribution separately by exposing it through the standard
-    # `n_pp` and `interaction_resource` arguments and calling `NextMethod()`.
-    # ... (per-resource loop, see source) ...
-}
+biomass <- mizer::getBiomass(params, include = c("species", "components"))
+plot(biomass)
 ```
 
-The per-resource fallback loop is kept only for models with a custom,
-non-Fourier predation kernel, which `mizerMRResourceEncounter()` cannot handle.
-In that loop each resource is exposed in turn through the standard `n_pp` and
-`interaction_resource` arguments and `NextMethod()` is called again, so that
-other extension methods — for example therMizer's temperature-scaling of search
-volume — still affect the multiple-resource encounter contribution. (The
-`other_encounter` and `ext_encounter` contributions are already in `encounter`
-from the first `NextMethod()` call, so they are silenced inside the loop to
-avoid counting them once per resource.)
+The MR callback returns one stable series per resource, including its label,
+colour and linetype. It supports scalar weight and length bounds. Unsupported
+filters are reported as unavailable rather than silently ignored. Consumer-only
+measurement remains mizer's default, and `plotBiomass()` uses the same measured
+object as `plot(getBiomass())`.
 
-The exported `mizerMREncounter()` function is retained as a compatibility
-wrapper around `mizerMRResourceEncounter()`, but `setMultipleResources()` no
-longer installs it in `params@rates_funcs`.
+# Early transformations
 
-### `projectResourceMort.mizerMR`
+MR declares support for adding, removing, reordering and renaming species,
+changing the size grid, scaling abundance and scaling rates. The hooks run
+before dependent construction or rate calculations, with the original model,
+the candidate's new core layout and explicit species/grid maps.
 
-mizer's default `ResourceMort` returns a single vector (one value per size bin)
-representing mortality on `n_pp`. The mizerMR method returns a matrix
-`(resource × size)` by multiplying the predation rate matrix by the
-species–resource interaction:
+Only the interaction matrix follows species rows. On a grid change, overlapping
+MR state, replenishment rates and capacities retain their actual stored values,
+including frozen values. New bins are constructed from the declared resource
+power laws. There is no generic rule that resizes any array that happens to
+have a matching dimension.
 
-```r
-projectResourceMort.mizerMR <- function(params, n, n_pp, n_other, t,
-                                        pred_rate, ...) {
-    NextMethod()
-    t(params@other_params[["MR"]]$interaction) %*% pred_rate
-}
-```
+Abundance scaling changes MR abundance, capacity and the `kappa` resource
+parameter together. Rate scaling changes MR replenishment rates and `r_pp`.
+The core resource hook preserves its declared zero value. The hooks own only
+these declared fields; mizer checks their ownership before accepting the result.
 
-The `NextMethod()` call keeps the extension chain live. mizerMR does not use the
-single-resource mortality vector returned by mizer's base method; instead it
-returns a matrix that is later passed row-by-row to each per-resource dynamics
-function inside `mizerMR_dynamics()`.
+The thin `addSpecies.mizerMR()` method accepts the optional
+`resource_interaction` matrix. It validates and aligns its species/resource
+names, places a temporary request in MR-owned data, and calls `NextMethod()`.
+The early hook consumes and removes that request. No late repair strips the
+model's extension dispatch or recalculates interactions after rates have
+already been built.
 
-## The built-in single resource is silenced
+# Saved models and author-defined laws
 
-Because all resource dynamics are now handled by the "MR" component, the
-built-in mizer resource must not interfere. `setMultipleResources()` does two
-things to achieve this:
+`upgrade.mizerMR()` migrates old MR parameter layouts and registers capabilities
+for legacy supported models. It leaves version stamping to mizer's upgrade
+orchestrator and preserves current stored definitions. `validParams()` and
+`readParams()` run that chain automatically.
 
-```r
-mizer::initialNResource(params) <- 0         # abundance set to zero
-resource_dynamics(params) <- "resource_constant"  # kept at zero forever
-```
-
-## Resource parameters live in the component
-
-All of the data belonging to the multiple-resource component is stored in its
-`component_params`, accessible at `params@other_params[["MR"]]`. This holds the
-resource-level parameter data frame (`resource_params`, with columns kappa,
-lambda, r_pp, w_min, w_max, ...) alongside the per-size arrays derived from
-those parameters (the carrying `capacity` and replenishment `rate`) and the
-species-resource `interaction` matrix. Keeping everything in one place under
-the component keeps the MR state self-contained and consistent with how mizer
-stores a component's `component_params`.
-
-## Accessors, plots and species utilities are methods
-
-Functions like `NResource()`, `finalNResource()`, `plotSpectra()`, `getDiet()`,
-and `plotDiet()` need to behave differently depending on whether the model has
-multiple resources or not. They are mizer S3 generics, and mizerMR registers
-methods for `mizerMR` or `mizerMRSim` objects that use the multiple-resource
-component. Those methods still call `NextMethod()` so that other extension
-packages can participate in the same generic.
-
-```r
-NResource.mizerMRSim <- function(sim) {
-    NextMethod()
-    n_res <- aperm(simplify2array(NOther(sim)[, "MR"]), c(3, 1, 2))
-    dimnames(n_res)[[1]] <- dimnames(NOther(sim))[[1]]
-    names(dimnames(n_res))[[1]] <- names(dimnames(NOther(sim)))[[1]]
-    n_res
-}
-```
-
-When a user calls `NResource(sim)` and `sim` is a `mizerMRSim`, R dispatches
-to `NResource.mizerMRSim`. When `sim` is a plain `MizerSim` (no multiple
-resources), R dispatches to mizer's own `NResource.MizerSim`.
-
-The same pattern applies to `finalNResource`, `plotSpectra`, `getDiet`,
-`plotDiet`, and `animateSpectra`.
-
-Species-manipulation helpers follow the same rule. Methods such as
-`addSpecies.mizerMR`, `removeSpecies.mizerMR`, `renameSpecies.mizerMR` and
-`expandSizeGrid.mizerMR` strip the MR component temporarily when mizer's base
-operation needs to run on an ordinary single-resource object, call
-`NextMethod()`, and then rebuild the MR component on the returned object.
-
-## Model rescaling and reporting are methods
-
-A few mizer functions that transform or report on a whole model also need to be
-aware of the resources, because those functions only know about the single
-built-in resource that mizerMR has silenced. mizerMR therefore provides methods
-for them too:
-
-- `scaleModel.mizerMR` and `scaleRates.mizerMR` rescale the resource capacities,
-  abundances and rates stored in the MR component, which the base methods do not
-  see (the base `scaleModel()` would even error on a `mizerMR` object). They
-  delegate the consumer scaling to the base method.
-- `setResource.mizerMR` warns that it only affects the silenced built-in
-  resource and points the user to `setMultipleResources()` and the
-  `resource_rate<-` / `resource_capacity<-` setters.
-- `summary.mizerMR` reports the combined size range of all resources instead of
-  the (empty) built-in resource.
-
-`scaleModel.mizerMR` and `setResource.mizerMR` reach the base method by coercing
-to the plain class with the extension chain temporarily cleared, so that the
-base method's internal `validParams()` does not re-promote the object to the
-`mizerMR` class and dispatch back into the MR-aware setters.
-
-`project()` returns a `mizerMRSim` object automatically because the params object
-inside the simulation carries the `mizerMR` extension chain, so the correct
-methods fire without the user having to do anything special.
-
-## Summary of benefits
-
-| Aspect | Method approach |
-|---|---|
-| Dispatch logic | R method dispatch, with no repeated component guards |
-| Fallback to mizer | Methods call `NextMethod()` to keep the chain live |
-| Extensibility | Rate hooks, accessors, plots and species utilities follow standard R generic behaviour |
-| Correctness risk | MR-specific code is tied to the `mizerMR` class membership |
-
-The extension mechanism in mizer is designed with this kind of layering in
-mind. Using methods for projection hooks, accessors and plots keeps mizerMR
-composable with other extension packages and makes the codebase easier to
-maintain.
+Unknown resource laws may still supply their existing stepping function, and
+MR biomass can still be measured. They do not acquire inferred equations,
+autonomy, convergence, tuning or transformation support. Authors must provide
+these contracts explicitly. In particular, defining `balance_<law>` no longer
+registers balancing support. This prevents a model-changing operation from
+proceeding with an extension that has not declared how its state and parameters
+must be handled.

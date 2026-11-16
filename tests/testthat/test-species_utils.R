@@ -1,4 +1,6 @@
-# Tests for addSpecies, removeSpecies, renameSpecies and expandSizeGrid methods
+# Tests for the MR add-species wrapper and shared structural operations
+# Structural fixtures use steady = FALSE: their deliberately sparse resources
+# do not support the generic new species growing to maturity.
 
 make_mr_params <- function() {
     rp <- data.frame(
@@ -16,7 +18,7 @@ make_mr_params <- function() {
 test_that("addSpecies adds species with default resource_interaction of 1", {
     params <- make_mr_params()
     sp <- data.frame(species = "NewSp", w_max = 500, stringsAsFactors = FALSE)
-    p2 <- suppressMessages(suppressWarnings(addSpecies(params, sp)))
+    p2 <- suppressMessages(suppressWarnings(addSpecies(params, sp, steady = FALSE)))
 
     expect_s3_class(p2, "mizerMR")
     expect_true("NewSp" %in% p2@species_params$species)
@@ -33,7 +35,8 @@ test_that("addSpecies respects a user-supplied resource_interaction vector", {
     params <- make_mr_params()
     sp <- data.frame(species = "NewSp", w_max = 500, stringsAsFactors = FALSE)
     p2 <- suppressMessages(suppressWarnings(
-        addSpecies(params, sp, resource_interaction = c(0.3, 0.7))
+        addSpecies(params, sp, resource_interaction = c(0.3, 0.7),
+                   steady = FALSE)
     ))
     expect_equal(unname(resource_interaction(p2)["NewSp", ]), c(0.3, 0.7))
 })
@@ -53,7 +56,7 @@ test_that("addSpecies errors when resource_interaction has wrong dimensions", {
 test_that("addSpecies preserves resource capacity, rate and initial abundance", {
     params <- make_mr_params()
     sp <- data.frame(species = "NewSp", w_max = 500, stringsAsFactors = FALSE)
-    p2 <- suppressMessages(suppressWarnings(addSpecies(params, sp)))
+    p2 <- suppressMessages(suppressWarnings(addSpecies(params, sp, steady = FALSE)))
 
     expect_equal(resource_capacity(p2), resource_capacity(params),
                  ignore_attr = TRUE)

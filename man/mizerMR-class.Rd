@@ -13,10 +13,9 @@ Objects of class \code{mizerMR} are created by \code{\link[=setMultipleResources
 Objects of class \code{mizerMRSim} are returned automatically by \code{\link[mizer:project]{project()}}
 when called on a \code{mizerMR} params object.
 
-The classes are managed by mizer when the package is loaded: \code{.onLoad()} calls
-\code{\link[mizer:registerExtension]{mizer::registerExtension()}}, which recognises mizerMR as a dispatching
-extension from the S3 methods it registers for its marker class and inserts
-\code{mizerMR} into the S3 class vector in dispatch order relative to any other
-extension packages loaded in the same session.
+\code{\link[=setMultipleResources]{setMultipleResources()}} records mizerMR on the model with
+\code{\link[mizer:recordExtension]{mizer::recordExtension()}} and uses \code{\link[mizer:coerceToExtensionClass]{mizer::coerceToExtensionClass()}} to
+restore its S3 dispatch chain. Loading a package does not change existing
+models' extension chains.
 }
 \keyword{internal}

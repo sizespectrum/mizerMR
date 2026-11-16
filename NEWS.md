@@ -1,4 +1,42 @@
-# mizerMR (development version)
+# mizerMR 0.3.3.9002
+
+* Standalone resource balancing now uses the same declared tuning transaction as
+  `tuneSteadyState()`, including full effective rates and independent verification
+  of every affected equation. Unknown providers need explicit support; use
+  `balance = FALSE` for parameter edits that should not calibrate the model.
+  Explicitly constant resources no longer produce an unbalanced-resource report.
+* Capability adoption checks projection and construction methods as well as
+  rate methods. Saved author-replaced MR steps
+  and stored rate contributions remain unchanged when upgrading. Official
+  callbacks enforce their provider boundary even for earlier saved preview
+  templates; upgrades retain authored declarations and explicit removals.
+* Biomass measurements reject invalid lengths, conversion parameters and
+  resource states. Reapplying unchanged core resource arrays no longer warns
+  during structural bookkeeping; actual unsupported changes still warn.
+
+* This development preview requires mizer >= 3.4.0.9012. MR components now
+  store explicit equations, quantitative convergence measures, prescribed
+  input masks, biomass measurements and transformation hooks. Standard
+  `getBiomass(..., include = "components")` and `plotBiomass()` can include each
+  resource series with its declared label and style.
+
+* `tuneSteadyState()` uses registered MR strategies. The default
+  `preserve_rate` holds resource abundances and adjusts capacities;
+  `preserve_capacity` instead adjusts replenishment rates. Select an
+  alternative with `strategies = c("component:MR" = "preserve_capacity")`.
+  `evolve` advances the resources with the projection solver. Infeasible
+  parameter constraints stop without a numerical fallback or repair.
+
+* Species/grid changes and abundance/rate scaling update MR-owned arrays in
+  early transformation hooks. Species interactions follow explicit name/index
+  maps; frozen rate and capacity values survive in overlapping grid bins.
+  The core resource remains an explicitly prescribed zero input. The former
+  late species, grid, scaling and tuning method repairs have been removed.
+
+* Saved legacy models acquire declarations during the normal mizer upgrade
+  chain. Unknown resource laws remain projectable and measurable, but analyses,
+  tuning and transformations requiring missing author support stop clearly.
+  `balanceResources()` no longer infers support from a `balance_<law>` name.
 
 * Updated for mizer's transition from S4 to S3: `mizerMR` and
   `mizerMRResourceView` are now pure S3 classes, replacing S4 class definitions

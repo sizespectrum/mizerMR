@@ -14,8 +14,8 @@ experiences.
 \details{
 The class exists so that the balancing functions mizer provides for its
 resource dynamics (\code{\link[mizer:balance_resource_semichemostat]{mizer::balance_resource_semichemostat()}} and
-\code{\link[mizer:balance_resource_logistic]{mizer::balance_resource_logistic()}}), and any that a user writes for their
-own dynamics, can be used unchanged for each resource of a mizerMR model.
+\code{\link[mizer:balance_resource_logistic]{mizer::balance_resource_logistic()}}) can be used for each known resource
+law in a mizerMR model.
 Those functions take a MizerParams object and call \code{\link[mizer:getResourceMort]{mizer::getResourceMort()}}
 and \code{\link[mizer:initialNResource]{mizer::initialNResource()}} on it.
 

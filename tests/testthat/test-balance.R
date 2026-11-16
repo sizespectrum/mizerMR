@@ -88,11 +88,11 @@ test_that("Balancing works for logistic resource dynamics", {
                  mort[sel])
 })
 
-test_that("Resources whose dynamics cannot be balanced are left alone", {
+test_that("Explicit constant resources are preserved without balancing", {
     params <- mr_test_params(dynamics = c("resource_semichemostat",
                                           "resource_constant"))
     rate <- unclass(resource_rate(params))
-    expect_message(resource_level(params) <- 0.4, "were not balanced")
+    expect_no_message(resource_level(params) <- 0.4)
     # The constant resource keeps its rate, which its dynamics does not use
     expect_equal(unclass(resource_rate(params))[2, ], rate[2, ],
                  ignore_attr = TRUE)
@@ -250,4 +250,55 @@ test_that("Balancing preserves the resources during a projection", {
     sim <- project(params, t_max = 0.1, dt = 0.1, t_save = 0.1)
     expect_equal(unclass(finalNResource(sim)),
                  unclass(initialNResource(params)), ignore_attr = TRUE)
+})
+
+# This explicitly adopts a stationary full-rate wrapper for the test. Its
+# declared equations are independently checked by mizer's tuning transaction.
+review_adopt_mr_rates <- function(params) {
+    for (owner in c("consumers", "resource", "reproduction")) {
+        definition <- getProcess(params, owner)$definition
+        definition$stationary <- TRUE
+        params <- setProcess(params, owner, definition = definition)
+    }
+    definition <- getComponent(params, "MR")$definition
+    definition$stationary <- TRUE
+    setComponent(params, "MR", definition = definition)
+}
+
+test_that("Standalone MR balancing requires current support for full rates", {
+    rlang::local_bindings(review_mr_rates = function(params, ...) {
+        rates <- mizerRates(params, ...)
+        rates$resource_mort <- 2 * rates$resource_mort
+        rates
+    }, .env = globalenv())
+    p <- small_mr_model()
+    p <- setRateFunction(p, "Rates", "review_mr_rates")
+    expect_error(balanceResources(p, resource_rate = resource_rate(p)),
+                 "support|current|stationary")
+    p <- review_adopt_mr_rates(p)
+    before <- getRates(p)
+    balanced <- setMultipleResources(p, resource_rate = resource_rate(p),
+                                     balance = TRUE)
+    after <- getRates(balanced)
+    terms <- mrEquationRates(balanced, balanced$initial_n_other, after)
+    expect_equal(terms$source, terms$loss, ignore_attr = TRUE)
+    for (field in c("e_growth", "diffusion", "mort", "rdd")) {
+        expect_equal(after[[field]], before[[field]], ignore_attr = TRUE)
+    }
+})
+
+test_that("Standalone MR balancing verifies coupled consumers independently", {
+    rlang::local_bindings(review_mr_rates = function(params, ...) {
+        rates <- mizerRates(params, ...)
+        rates$mort <- rates$mort + mean(params$other_params$MR$capacity)
+        rates
+    }, .env = globalenv())
+    p <- small_mr_model()
+    initialNResource(p) <- initialNResource(p) / 2
+    p <- review_adopt_mr_rates(setRateFunction(p, "Rates", "review_mr_rates"))
+    original <- p
+    expect_error(setMultipleResources(p, resource_rate = resource_rate(p),
+                                      balance = TRUE),
+                 "preserv|equation|rates")
+    expect_equal(p, original)
 })

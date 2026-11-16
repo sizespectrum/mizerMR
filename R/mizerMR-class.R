@@ -7,11 +7,10 @@
 #' Objects of class `mizerMRSim` are returned automatically by [project()]
 #' when called on a `mizerMR` params object.
 #'
-#' The classes are managed by mizer when the package is loaded: `.onLoad()` calls
-#' [mizer::registerExtension()], which recognises mizerMR as a dispatching
-#' extension from the S3 methods it registers for its marker class and inserts
-#' `mizerMR` into the S3 class vector in dispatch order relative to any other
-#' extension packages loaded in the same session.
+#' [setMultipleResources()] records mizerMR on the model with
+#' [mizer::recordExtension()] and uses [mizer::coerceToExtensionClass()] to
+#' restore its S3 dispatch chain. Loading a package does not change existing
+#' models' extension chains.
 #'
 #' @name mizerMR-class
 #' @aliases mizerMRSim-class

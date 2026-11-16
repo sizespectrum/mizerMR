@@ -36,21 +36,17 @@ other one is calculated from the requirement that replenishment balances
 consumption. Whichever one you do not give is taken from the model, both for
 the resources that are balanced and for those that are not.
 
-Each resource is balanced by the balancing function belonging to its own
-dynamics function, which is the function whose name is obtained by prefixing
-the entry in the \code{dynamics} column of \code{\link[=resource_params]{resource_params()}} with \code{balance_}.
-Resources whose dynamics has no such function are left unchanged, because
-their dynamics has no steady state that could be arranged in this way. This
-is for example the case for a resource held constant with
-\code{\link[mizer:resource_constant]{mizer::resource_constant()}}, which is at steady state whatever its
-parameters.
+The semi-chemostat and logistic laws have explicit balancing support.
+Constant resources are already prescribed inputs and are left unchanged.
+Unknown resource laws are rejected before any changes. Author-defined
+equations require an explicit MR component tuning strategy; a function whose
+name starts with \code{balance_} does not register that support.
 
-The mortality that each resource experiences is calculated in the full
-multiple-resource model with \code{\link[mizer:getResourceMort]{mizer::getResourceMort()}}, because the
-predation mortality on any one resource depends on the feeding level of the
-predators and hence on all the resources together. Outside the size range of
-a resource both its abundance and its capacity are zero, so there is nothing
-to balance there and the consumption at those sizes is ignored.
+The selected strategy uses the complete effective rate context, including
+full-rate replacements. Mizer preflights declared support for every process
+and independently verifies the candidate's state and equation rates.
+Modified or composed models therefore need current declarations for every
+affected owner; an unregistered provider cannot be silently balanced.
 }
 \seealso{
 \code{\link[=setMultipleResources]{setMultipleResources()}},

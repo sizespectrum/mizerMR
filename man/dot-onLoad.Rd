@@ -2,7 +2,7 @@
 % Please edit documentation in R/mizerMR-package.R
 \name{.onLoad}
 \alias{.onLoad}
-\title{Register mizerMR with mizer}
+\title{Initialise mizerMR}
 \usage{
 .onLoad(libname, pkgname)
 }
@@ -15,6 +15,6 @@
 Called for its side effect.
 }
 \description{
-Registers the package as a mizer extension when the namespace is loaded.
+Sets up active binding for SEAmodel dataset.
 }
 \keyword{internal}
