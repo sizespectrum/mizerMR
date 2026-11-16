@@ -77,9 +77,6 @@ reference:
 - title: Species utilities
 - contents:
   - addSpecies
-  - removeSpecies
-  - renameSpecies
-  - expandSizeGrid
 - title: Internal helper functions
 - contents:
   - starts_with("valid")
@@ -96,4 +93,12 @@ reference:
   - plotDietData
   - expect_unchanged
   - .onLoad
-  - .strip_mr
+  - mrEquation
+  - mrEquationRates
+  - mrConvergence
+  - mrPrescribedMask
+  - mrBiomass
+  - mrTarget
+  - mrBalance
+  - mrTransform
+  - mrTransformCoreResource

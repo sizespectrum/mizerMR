@@ -137,7 +137,7 @@ test_that("Work with non-MR objects", {
 
 test_that("mizerMR methods fall back before MR component is installed", {
     params <- NS_params
-    params@extensions <- mizer::getRegisteredExtensions()
+    params <- mizer::recordExtension(params, "mizerMR")
     params <- mizer::coerceToExtensionClass(params)
     expect_equal(initialNResource(params),
                  mizer::initialNResource(NS_params), ignore_attr = TRUE)
@@ -164,8 +164,8 @@ test_that("Multiple resources compose with outer encounter methods", {
                                    initial_resource = initial)
     encounter <- getEncounter(params)
 
-    params@extensions <- c(doubleSearch = NA_character_, params@extensions)
-    mizer::registerExtensions(params@extensions)
+    params <- mizer::recordExtension(params, "doubleSearch",
+                                      version = "1", requirement = NA_character_)
     params <- mizer::coerceToExtensionClass(params)
 
     expect_equal(getEncounter(params), 2 * encounter, ignore_attr = TRUE)

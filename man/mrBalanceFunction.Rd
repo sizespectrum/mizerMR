@@ -13,10 +13,7 @@ mrBalanceFunction(dynamics)
 The balancing function, or NULL if there is none.
 }
 \description{
-The balancing function is the one whose name is the name of the dynamics
-function prefixed with \code{balance_}, following the convention of
-\code{\link[mizer:setResource]{mizer::setResource()}}. mizer's own balancing functions are looked up in the
-mizer namespace as well, so that they are found even when mizer has only
-been loaded and not attached.
+Only mizer's implemented semi-chemostat and logistic balancing functions
+are supported. Constant resources require no balancing; unknown laws error.
 }
 \keyword{internal}

@@ -1,6 +1,6 @@
 Package: mizerMR
 Title: Add multiple size-structured resources to a mizer model
-Version: 0.3.3.0
+Version: 0.3.3.9001
 Authors@R: c(
     person(given = "Gustav",
            family = "Delius",
@@ -20,7 +20,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 3.5),
-    mizer (>= 3.3.0),
+    mizer (>= 3.4.0.9011),
     mizerExperimental (>= 3.3.0)
 Remotes:
     github::sizespectrum/mizerExperimental
@@ -46,6 +46,8 @@ Collate:
     resource_dynamics.R
     resource_params.R
     balance.R
+    capabilities.R
+    transformations.R
     setMultipleResources.R
     params_methods.R
     test-helpers.R
@@ -65,4 +67,4 @@ Suggests:
     tibble
 VignetteBuilder: knitr
 Config/testthat/edition: 3
-Config/roxygen2/version: 8.1.0
+Config/roxygen2/version: 8.1.1

@@ -17,8 +17,8 @@
 #'
 #' The class exists so that the balancing functions mizer provides for its
 #' resource dynamics ([mizer::balance_resource_semichemostat()] and
-#' [mizer::balance_resource_logistic()]), and any that a user writes for their
-#' own dynamics, can be used unchanged for each resource of a mizerMR model.
+#' [mizer::balance_resource_logistic()]) can be used for each known resource
+#' law in a mizerMR model.
 #' Those functions take a MizerParams object and call [mizer::getResourceMort()]
 #' and [mizer::initialNResource()] on it.
 #'
@@ -97,14 +97,11 @@ mrResourceView <- function(base, resource_mort, abundance, resource_rate,
 #' consumption. Whichever one you do not give is taken from the model, both for
 #' the resources that are balanced and for those that are not.
 #'
-#' Each resource is balanced by the balancing function belonging to its own
-#' dynamics function, which is the function whose name is obtained by prefixing
-#' the entry in the `dynamics` column of [resource_params()] with `balance_`.
-#' Resources whose dynamics has no such function are left unchanged, because
-#' their dynamics has no steady state that could be arranged in this way. This
-#' is for example the case for a resource held constant with
-#' [mizer::resource_constant()], which is at steady state whatever its
-#' parameters.
+#' The semi-chemostat and logistic laws have explicit balancing support.
+#' Constant resources are already prescribed inputs and are left unchanged.
+#' Unknown resource laws are rejected before any changes. Author-defined
+#' equations require an explicit MR component tuning strategy; a function whose
+#' name starts with `balance_` does not register that support.
 #'
 #' The mortality that each resource experiences is calculated in the full
 #' multiple-resource model with [mizer::getResourceMort()], because the
@@ -138,6 +135,12 @@ balanceResources <- function(params, resource_rate = NULL,
         stop("You should only provide either the `resource_rate` or the `resource_capacity` because the other is determined by the requirement that the resources replenish at the same rate at which they are consumed.")
     }
     rp <- resource_params(params)
+    known <- sub("^mizer::", "", rp$dynamics) %in%
+        c("resource_semichemostat", "resource_logistic", "resource_constant")
+    if (any(!known)) {
+        stop("No balancing capability is declared for MR resources: ",
+             paste(rp$resource[!known], collapse = ", "), ".")
+    }
     # The arrays we work with. The one that was given replaces the one stored
     # in the model, the other one is the model's own and is what the balancing
     # falls back on where it is not determined.
@@ -220,22 +223,19 @@ balanceResources <- function(params, resource_rate = NULL,
 
 #' Find the balancing function belonging to a resource dynamics function
 #'
-#' The balancing function is the one whose name is the name of the dynamics
-#' function prefixed with `balance_`, following the convention of
-#' [mizer::setResource()]. mizer's own balancing functions are looked up in the
-#' mizer namespace as well, so that they are found even when mizer has only
-#' been loaded and not attached.
+#' Only mizer's implemented semi-chemostat and logistic balancing functions
+#' are supported. Constant resources require no balancing; unknown laws error.
 #'
 #' @param dynamics The name of the resource dynamics function.
 #' @return The balancing function, or NULL if there is none.
 #' @keywords internal
 mrBalanceFunction <- function(dynamics) {
-    fn <- get0(paste0("balance_", dynamics))
-    if (!is.function(fn)) {
-        fn <- get0(paste0("balance_", dynamics),
-                   envir = asNamespace("mizer"))
+    law <- sub("^mizer::", "", dynamics)
+    if (law == "resource_constant") return(NULL)
+    if (!law %in% c("resource_semichemostat", "resource_logistic")) {
+        stop("No balancing capability is declared for resource law '", law, "'.")
     }
-    if (is.function(fn)) fn else NULL
+    getExportedValue("mizer", paste0("balance_", law))
 }
 
 #' Convert a resource level to a resource capacity

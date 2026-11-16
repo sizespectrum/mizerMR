@@ -32,6 +32,8 @@ Migrations performed:
 \code{params@other_params$other$MR$resource_params}. It now lives alongside the
 other MR component parameters in \code{params@other_params$MR$resource_params}.
 This method moves it to the new location.
+\item Legacy MR components acquire explicit capability declarations for their
+supported laws. Existing current declarations are retained.
 }
 }
 \keyword{internal}

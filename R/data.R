@@ -13,9 +13,15 @@
 #' The original model code and parameter derivations are available at
 #' \url{https://github.com/astaaudzi/SEAmodel}.
 #'
-#' @format A [mizerMR-class] object (an S4 object extending
-#'   [mizer::MizerParams-class]) with 17 species and 3 resources.
+#' @format A [mizerMR-class] object extending the S3
+#'   [mizer::MizerParams-class], with 17 species and 3 resources.
 #'   The multiple resources are stored in `params@@other_params[["MR"]]`.
+#'
+#' @details The saved model refers to the author-defined `starvMort` mortality
+#'   contribution. Its original function must be supplied before evaluating
+#'   rates or projecting the model. The upgrade preserves that declaration;
+#'   it does not substitute a guessed starvation law. State and biomass
+#'   measurements remain available without evaluating that callback.
 #'
 #' @references Audzijonyte A, Delius GW, Stuart-Smith RD, Novaglio C, Edgar GJ,
 #'   Barrett NS, Blanchard JL (2023). Changes in sea floor productivity are

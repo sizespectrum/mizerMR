@@ -64,3 +64,30 @@ test_that("an already-current object is not re-upgraded", {
     expect_false(mizer:::needs_upgrading(params))
     expect_identical(validParams(params)@extensions, params@extensions)
 })
+
+
+test_that("legacy MR capabilities upgrade through validation and reading", {
+    original <- small_mr_model()
+    old <- original
+    old$other_params$MR$capability_version <- NULL
+    old$capabilities$components$MR <- NULL
+    old$extensions <- mizer::recordExtension(
+        old, "mizerMR", version = "0.3.3.0")$extensions
+    original_old <- old
+    upgraded <- validParams(old)
+    expect_equal(upgraded$initial_n_other$MR, original$initial_n_other$MR)
+    expect_equal(upgraded$other_params$MR$rate, original$other_params$MR$rate)
+    expect_identical(upgraded$other_params$MR$capability_version, 1L)
+    expect_identical(getComponent(upgraded, "MR")$definition$rate_fun,
+                     "mizerMR::mrEquation")
+    expect_equal(mizer:::extensionVersion(upgraded, "mizerMR"),
+                 as.character(utils::packageVersion("mizerMR")))
+    expect_identical(old, original_old)
+    file <- tempfile(fileext = ".rds")
+    on.exit(unlink(file))
+    saveRDS(old, file)
+    read <- mizer::readParams(file)
+    expect_identical(read$other_params$MR$capability_version, 1L)
+    expect_equal(read$initial_n_other$MR, original$initial_n_other$MR)
+    expect_length(mizer::getSteadyAssessment(read)$missing, 0)
+})

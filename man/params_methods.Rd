@@ -2,75 +2,29 @@
 % Please edit documentation in R/params_methods.R
 \name{params_methods}
 \alias{params_methods}
-\alias{scaleModel.mizerMR}
-\alias{scaleRates.mizerMR}
 \alias{setResource.mizerMR}
-\alias{tuneSteadyState.mizerMR}
 \alias{summary.mizerMR}
 \title{Multiple-resource methods for model rescaling, calibration and reporting}
 \usage{
-\method{scaleModel}{mizerMR}(params, factor, ...)
-
-\method{scaleRates}{mizerMR}(params, factor, ...)
-
 \method{setResource}{mizerMR}(params, ...)
-
-\method{tuneSteadyState}{mizerMR}(
-  params,
-  solver = c("project", "newton"),
-  effort = params@initial_effort,
-  preserve = c("reproduction_level", "erepro", "R_max"),
-  info_level = mizer::default_info_level(),
-  ...
-)
 
 \method{summary}{mizerMR}(object, ...)
 }
 \arguments{
 \item{params}{A \linkS4class{mizerMR} object.}
 
-\item{factor}{The factor by which to rescale.}
-
 \item{...}{Further arguments passed along the mizer method chain.}
-
-\item{solver}{The solver to use, see \code{\link[mizer:tuneSteadyState]{mizer::tuneSteadyState()}}.}
-
-\item{effort}{The fishing effort to use throughout.}
-
-\item{preserve}{Which of the reproduction parameters to preserve, see
-\code{\link[mizer:tuneSteadyState]{mizer::tuneSteadyState()}}.}
-
-\item{info_level}{Controls the amount of information the function reports
-about the choices it makes, see \code{\link[mizer:default_info_level]{mizer::default_info_level()}}.}
 
 \item{object}{A \linkS4class{mizerMR} object.}
 }
 \value{
-For \code{scaleModel()}, \code{scaleRates()}, \code{setResource()} and
-\code{tuneSteadyState()}: the updated \code{mizerMR} object. For \code{summary()}: the
-object, invisibly.
+For \code{setResource()}: the updated \code{mizerMR} object. For \code{summary()}:
+the object, invisibly.
 }
 \description{
-S3 methods that make mizer's \code{scaleModel()}, \code{scaleRates()}, \code{setResource()},
-\code{tuneSteadyState()} and \code{summary()} aware of the multiple-resource component.
-The base \code{MizerParams} methods only know about the single built-in resource,
-which \code{setMultipleResources()} silences, so they would otherwise ignore (or,
-for \code{scaleModel()} and \code{setResource()}, error on) the resources stored in the
-\code{MR} component.
-
-Extends \code{\link[mizer:scaleModel]{mizer::scaleModel()}} so that the resource carrying capacities and
-abundances of all resources are rescaled consistently. The base method scales
-the fish spectra and the resource \emph{abundances} (held in \code{initial_n_other}),
-but not the resource \emph{capacities} and \code{kappa} coefficients, which live in the
-\code{MR} component's parameters. The resource replenishment \emph{rate} is left
-unchanged, exactly as the built-in resource rate is in the base method, so
-that the steady state is preserved.
-
-Extends \code{\link[mizer:scaleRates]{mizer::scaleRates()}} so that the resource replenishment rate of all
-resources is rescaled by \code{factor} along with the consumer rates. Without this
-the base method would scale only the silenced built-in resource rate, leaving
-the active resource rates untouched and breaking the rescaling invariant
-(resource replenishment keeping pace with the rescaled search volume).
+The MR component declares scaling hooks and tuning strategies to mizer.
+These methods retain the resource setter and summary compatibility helpers;
+scaling and tuning use the shared mizer implementations directly.
 
 Extends \code{\link[mizer:setResource]{mizer::setResource()}}. In a multiple-resource model the built-in
 single resource is silenced and plays no part in the dynamics, so changing
@@ -79,34 +33,12 @@ when the user tries to change the resource rate, capacity or level, and
 directs them to \code{\link[=setMultipleResources]{setMultipleResources()}} and the related setters. Calls that
 only change, for example, the built-in resource dynamics (as mizer does
 internally) pass through silently. The work is delegated to the base method
-on the plain class so that the base accessors return the (vector-valued)
-built-in resource instead of the resource-by-size arrays of the MR component.
-
-Extends \code{\link[mizer:tuneSteadyState]{mizer::tuneSteadyState()}} so that the multiple resources get the
-treatment that mizer gives its single built-in resource: they are held at
-their stored abundances while the consumer spectra are solved for, and
-afterwards their capacities are rebalanced, with \code{\link[=balanceResources]{balanceResources()}}, so
-that those held abundances are a steady state of the resource dynamics under
-the new spectra. The rates are preserved and the capacities derived from
-them, which is the choice the base method makes for \code{cc_pp}.
+with only the MR layer removed so that the accessors return the
+vector-valued built-in resource instead of the resource-by-size arrays of
+the MR component.
 
 Extends the \code{summary()} method for \code{MizerParams} objects. The base method
 reports the resource size spectrum from the silenced built-in resource, which
 is empty for a multiple-resource model. This method instead reports the
 overall size range spanned by all resources combined.
-}
-\details{
-Without this the resources would be held fixed during the search and then
-handed back with the parameters they came in with, so the model returned
-would sit at a fixed point of the consumer dynamics but not of the resource
-dynamics. mizer reports exactly that for the components it does not know how
-to handle; because this method does handle the \code{MR} component, it takes it
-out of that report by pinning it itself for the duration of the search, which
-is what the base method does with every component anyway.
-
-The \code{"convergence"} attribute of the result is preserved. Its \code{residual}
-entry covers the consumers only — mizer keeps components out of that
-criterion — so it is not changed by the rebalancing. What the rebalancing
-moves is \code{attr(getSteadyResidual(params), "other")}, the rate of change of
-the resources themselves.
 }

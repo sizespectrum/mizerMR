@@ -5,8 +5,8 @@
 \alias{SEAmodel}
 \title{South-East Australian reef ecosystem model}
 \format{
-A \link[=mizerMR-class]{mizerMR} object (an S4 object extending
-\link[mizer:MizerParams-class]{mizer::MizerParams}) with 17 species and 3 resources.
+A \link[=mizerMR-class]{mizerMR} object extending the S3
+\link[mizer:MizerParams-class]{mizer::MizerParams}, with 17 species and 3 resources.
 The multiple resources are stored in \code{params@other_params[["MR"]]}.
 }
 \source{
@@ -30,6 +30,12 @@ spectra representing distinct primary production pathways:
 \details{
 The original model code and parameter derivations are available at
 \url{https://github.com/astaaudzi/SEAmodel}.
+
+The saved model refers to the author-defined \code{starvMort} mortality
+contribution. Its original function must be supplied before evaluating
+rates or projecting the model. The upgrade preserves that declaration;
+it does not substitute a guessed starvation law. State and biomass
+measurements remain available without evaluating that callback.
 }
 \references{
 Audzijonyte A, Delius GW, Stuart-Smith RD, Novaglio C, Edgar GJ,

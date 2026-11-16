@@ -125,6 +125,8 @@ setMultipleResourcesInternal <- function(params,
     # If there is no MR component yet then we need to create it. We'll
     # fill it in properly later
     creating <- is.null(getComponent(params, "MR"))
+    previously_known <- if (creating) FALSE else mrKnownDynamics(params)
+    capability_version <- params$other_params$MR$capability_version
     if (creating) {
         # Set built-in mizer resource to 0
         mizer::initialNResource(params) <- 0
@@ -148,7 +150,8 @@ setMultipleResourcesInternal <- function(params,
             component_params = list(rate = template,
                                     capacity = template,
                                     interaction = interaction_default,
-                                    resource_params = rp))
+                                    resource_params = rp,
+                                    capability_version = capability_version))
     }
 
     assert_that(is.flag(reset))
@@ -223,7 +226,8 @@ setMultipleResourcesInternal <- function(params,
         component_params = list(rate = resource_rate,
                                 capacity = resource_capacity,
                                 interaction = resource_interaction,
-                                resource_params = rp))
+                                resource_params = rp,
+                                capability_version = capability_version))
 
     # Record mizerMR in the object's extension chain. The version stamp is set
     # only when the component is first created (the object then conforms to the
@@ -242,6 +246,9 @@ setMultipleResourcesInternal <- function(params,
     # and after the object has been given its extension class, without which
     # `getResourceMort()` would not know about the multiple resources.
     params <- mizer::coerceToExtensionClass(params)
+    if (creating || previously_known != mrKnownDynamics(params)) {
+        params <- registerMRCapabilities(params, adopt_processes = creating)
+    }
     if (balance) {
         params <- balanceComponent(params, derive_rate =
                                        !is.null(resource_capacity_user))
@@ -433,30 +440,7 @@ valid_resource_capacity <- function(params, resource_params = NULL,
         resource_params <- resource_params(params)
     }
     rp <- resource_params
-    resource_capacity <- mr$component_params$capacity
-    resource_capacity[] <- 0
-    bin_average <- mr_bin_average(params)
-    wf <- w_full(params)
-    dwf <- dw_full(params)
-    # TODO: vectorise this
-    no_res <- nrow(rp)
-    for (i in seq_len(no_res)) {
-        if (bin_average) {
-            # Exact bin average of kappa * w^(-lambda) over each bin, restricted
-            # to the resource size range, so the capacity is the finite-volume
-            # cell average consumed by the bin-integrated encounter convolution.
-            resource_capacity[i, ] <- rp$kappa[[i]] *
-                power_law_bin_average(wf, dwf, -rp$lambda[[i]],
-                                      w_min = rp$w_min[[i]],
-                                      w_max = rp$w_max[[i]])
-        } else {
-            w_sel <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
-            resource_capacity[i, w_sel] <- rp$kappa[[i]] *
-                wf[w_sel] ^ -rp$lambda[[i]]
-        }
-    }
-
-    resource_capacity
+    mrPowerLawArrays(params, rp, mr$component_params$capacity)$capacity
 }
 
 #' Return valid resource rate array
@@ -510,30 +494,7 @@ valid_resource_rate <- function(params, resource_params = NULL,
         resource_params <- resource_params(params)
     }
     rp <- resource_params
-    resource_rate <- mr$component_params$rate
-    resource_rate[] <- 0
-    bin_average <- mr_bin_average(params)
-    wf <- w_full(params)
-    dwf <- dw_full(params)
-    # TODO: vectorise this
-    no_res <- nrow(rp)
-    for (i in seq_len(no_res)) {
-        if (bin_average) {
-            # Exact bin average of r_pp * w^(n-1) over each bin, restricted to
-            # the resource size range, so the relaxation rate is consistent with
-            # the finite-volume cell-average resource density.
-            resource_rate[i, ] <- rp$r_pp[[i]] *
-                power_law_bin_average(wf, dwf, rp$n[[i]] - 1,
-                                      w_min = rp$w_min[[i]],
-                                      w_max = rp$w_max[[i]])
-        } else {
-            w_sel <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
-            resource_rate[i, w_sel] <- rp$r_pp[[i]] *
-                wf[w_sel] ^ (rp$n[[i]] - 1)
-        }
-    }
-
-    resource_rate
+    mrPowerLawArrays(params, rp, mr$component_params$rate)$rate
 }
 
 
@@ -608,4 +569,28 @@ valid_initial_resource <- function(params, initial_resource = NULL) {
 
     # Return the current initial value
     mr$initial_value
+}
+
+
+# Pure array construction shared by setters and early transformation hooks.
+mrPowerLawArrays <- function(params, rp, template) {
+    rate <- capacity <- template
+    rate[] <- capacity[] <- 0
+    wf <- params$w_full
+    dwf <- params$dw_full
+    for (i in seq_len(nrow(rp))) {
+        if (mr_bin_average(params)) {
+            capacity[i, ] <- rp$kappa[[i]] * power_law_bin_average(
+                wf, dwf, -rp$lambda[[i]],
+                w_min = rp$w_min[[i]], w_max = rp$w_max[[i]])
+            rate[i, ] <- rp$r_pp[[i]] * power_law_bin_average(
+                wf, dwf, rp$n[[i]] - 1,
+                w_min = rp$w_min[[i]], w_max = rp$w_max[[i]])
+        } else {
+            keep <- wf >= rp$w_min[[i]] & wf <= rp$w_max[[i]]
+            capacity[i, keep] <- rp$kappa[[i]] * wf[keep]^-rp$lambda[[i]]
+            rate[i, keep] <- rp$r_pp[[i]] * wf[keep]^(rp$n[[i]] - 1)
+        }
+    }
+    list(rate = rate, capacity = capacity)
 }

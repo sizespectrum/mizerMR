@@ -14,7 +14,8 @@ mizerMR_dynamics <- function(params, n_other, n_pp, rates, ...) {
     rates_mod <- rates
     for (i in seq_len(no_res)) {
         rates_mod$resource_mort <- rates$resource_mort[i, ]
-        fn <- get0(rp$dynamics[[i]])
+        fn <- mizer_fn("resolve_model_callback")(
+            rp$dynamics[[i]], paste0("MR resource ", rp$resource[[i]]))
         new_n_res[i, ] <-
             fn(params, n_pp = n_res[i, ], n_other = n_other,
                rates = rates_mod,
