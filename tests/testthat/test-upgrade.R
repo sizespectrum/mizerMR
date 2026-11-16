@@ -91,3 +91,103 @@ test_that("legacy MR capabilities upgrade through validation and reading", {
     expect_equal(read$initial_n_other$MR, original$initial_n_other$MR)
     expect_length(mizer::getSteadyAssessment(read)$missing, 0)
 })
+
+test_that("legacy MR upgrades preserve unknown component steps", {
+    rlang::local_bindings(review_mr_step = function(n_other, ...) n_other$MR,
+                          .env = globalenv())
+    old <- small_mr_model()
+    old <- setComponent(old, "MR", dynamics_fun = "review_mr_step")
+    old$other_params$MR$capability_version <- NULL
+    old$capabilities$components$MR <- NULL
+    old <- recordExtension(old, "mizerMR", version = "0.3.3.0")
+    upgraded <- validParams(old)
+    expect_identical(upgraded$other_dynamics$MR, "review_mr_step")
+    expect_null(getComponent(upgraded, "MR")$definition$rate_fun)
+    sim <- project(upgraded, t_max = 0.1, dt = 0.1, t_save = 0.1,
+                   progress_bar = FALSE, info_level = 0)
+    expect_equal(finalParams(sim)$initial_n_other$MR, old$initial_n_other$MR)
+    expect_error(tuneSteadyState(upgraded, info_level = 0), "support|capabilit")
+})
+
+
+test_that("MR legacy adoption preserves author-owned rate contributions", {
+    rlang::local_bindings(review_mr_contribution = function(params, ...) {
+        params$initial_n * 0 + 0.1
+    }, .env = globalenv())
+    for (field in c("encounter_fun", "mort_fun")) {
+        p <- small_mr_model()
+        args <- list(p, "MR", "review_mr_contribution")
+        names(args) <- c("params", "component", field)
+        p <- do.call(setComponent, args)
+        before <- getRates(p)
+        p$other_params$MR$capability_version <- NULL
+        p$capabilities$components$MR <- NULL
+        old <- recordExtension(p, "mizerMR", version = "0.3.3.0")
+        upgraded <- validParams(old)
+        component <- getComponent(upgraded, "MR")
+        expect_identical(component[[field]], "review_mr_contribution")
+        expect_null(component$definition$transformations)
+        expect_null(component$definition$tuning)
+        expect_equal(getRates(upgraded), before, ignore_attr = TRUE)
+        expect_error(mizer::scaleModel(upgraded, 2), "support|transformation")
+    }
+})
+
+
+test_that("MR preview upgrades preserve authored definitions and removals", {
+    p <- small_mr_model()
+    p <- setComponent(p, "MR", convergence_fun = NULL, biomass_fun = NULL,
+                      autonomous = FALSE, tuning = NULL, transformations = NULL)
+    p <- recordExtension(p, "mizerMR", version = "0.3.3.9001")
+    specifications <- p$capabilities
+    up <- validParams(p)
+    expect_identical(up$capabilities, specifications)
+    expect_identical(up$other_params$MR$capability_version, 1L)
+    expect_identical(mizer:::extensionVersion(up, "mizerMR"), "0.3.3.9002")
+})
+
+# Simulate a preview template whose bindings were adopted around providers that
+# the earlier automatic adopter did not inspect. Retaining the stored template
+# must not make the official implementation claim support for those providers.
+review_bind_mr_template <- function(params) {
+    definition <- getComponent(params, "MR")$definition
+    params <- setComponent(params, "MR", definition = definition)
+    for (owner in c("consumers", "resource", "reproduction")) {
+        definition <- getProcess(params, owner)$definition
+        params <- setProcess(params, owner, definition = definition)
+    }
+    recordExtension(params, "mizerMR", version = "0.3.3.9001")
+}
+
+test_that("old MR templates cannot certify unknown component contributions", {
+    rlang::local_bindings(review_mr_mort = function(params, ...) {
+        params$initial_n * 0 + 0.01
+    }, .env = globalenv())
+    p <- small_mr_model()
+    definition <- getComponent(p, "MR")$definition
+    definition$mort_fun <- "review_mr_mort"
+    p <- setComponent(p, "MR", definition = definition)
+    old <- review_bind_mr_template(p)
+    up <- validParams(old)
+    expect_identical(up$capabilities, old$capabilities)
+    expect_identical(up$other_mort$MR, "review_mr_mort")
+    expect_equal(getRates(up), getRates(old), ignore_attr = TRUE)
+    expect_error(getSteadyAssessment(up), "built-in capability callbacks")
+    expect_error(scaleModel(up, 2), "built-in capability callbacks")
+    expect_error(balanceResources(up, resource_rate = resource_rate(up)),
+                 "built-in capability callbacks")
+    expect_identical(up$initial_n_other, old$initial_n_other)
+})
+
+test_that("old MR templates reject unknown construction providers", {
+    p <- small_mr_model()
+    rlang::local_bindings(
+        setPredKernel.mizerMR = function(params, ...) NextMethod(),
+        .env = globalenv()
+    )
+    old <- review_bind_mr_template(p)
+    up <- validParams(old)
+    expect_identical(up$capabilities, old$capabilities)
+    expect_error(scaleModel(up, 2), "built-in capability callbacks")
+    expect_identical(up$initial_n_other, old$initial_n_other)
+})

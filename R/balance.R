@@ -103,12 +103,11 @@ mrResourceView <- function(base, resource_mort, abundance, resource_rate,
 #' equations require an explicit MR component tuning strategy; a function whose
 #' name starts with `balance_` does not register that support.
 #'
-#' The mortality that each resource experiences is calculated in the full
-#' multiple-resource model with [mizer::getResourceMort()], because the
-#' predation mortality on any one resource depends on the feeding level of the
-#' predators and hence on all the resources together. Outside the size range of
-#' a resource both its abundance and its capacity are zero, so there is nothing
-#' to balance there and the consumption at those sizes is ignored.
+#' The selected strategy uses the complete effective rate context, including
+#' full-rate replacements. Mizer preflights declared support for every process
+#' and independently verifies the candidate's state and equation rates.
+#' Modified or composed models therefore need current declarations for every
+#' affected owner; an unregistered provider cannot be silently balanced.
 #'
 #' @param params A MizerParams object with multiple resources set up.
 #' @param resource_rate Optional. An array (resource x size) with the
@@ -162,63 +161,24 @@ balanceResources <- function(params, resource_rate = NULL,
         }
         capacity[] <- resource_capacity
     }
-    # The mortality has to be the one from the full multiple-resource model, so
-    # the object needs its extension class for `getResourceMort()` to dispatch
-    # to the mizerMR method.
-    params <- mizer::coerceToExtensionClass(params)
-    mort <- unclass(getResourceMort(params))
-    NR <- unclass(mr$initial_value)
-    if (!identical(dim(mort), dim(NR))) {
-        stop("The resource mortality does not have one row for each resource. Is mizerMR registered as an extension of this model?")
-    }
-
-    # The view is built from the model without its extension classes so that
-    # the mizer accessors called by the balancing functions see a single
-    # resource rather than the multiple-resource arrays.
-    if (isS4(params)) {
-        base <- mizer:::upgrade_s4_to_s3(params)
+    # Treat supplied arrays as explicit parameter edits, then balance the
+    # remaining parameter through the same transaction used during tuning.
+    # Its preflight and verification cover every active owner's equations.
+    params$other_params$MR$rate <- rate
+    params$other_params$MR$capacity <- capacity
+    strategy <- if (is.null(resource_rate)) {
+        "preserve_capacity"
     } else {
-        base <- params
+        "preserve_rate"
     }
-    class(base) <- "MizerParams"
-    base@extensions <- character()
-
-    unbalanced <- character()
-    for (i in seq_len(nrow(rp))) {
-        balance_fn <- mrBalanceFunction(rp$dynamics[[i]])
-        if (!is.function(balance_fn)) {
-            unbalanced <- c(unbalanced, rp$resource[[i]])
-            next
-        }
-        # Where the resource neither exists nor has room to exist there is
-        # nothing to balance, so the consumption there is ignored. Without this
-        # the balancing would object to a rate of zero at sizes outside the
-        # size range of the resource, where consumers do still feed on the
-        # other resources.
-        mu <- mort[i, ]
-        mu[NR[i, ] == 0 & capacity[i, ] == 0] <- 0
-        view <- mrResourceView(base, resource_mort = mu,
-                               abundance = NR[i, ],
-                               resource_rate = rate[i, ],
-                               resource_capacity = capacity[i, ])
-        balanced <- balance_fn(
-            view,
-            resource_rate = if (is.null(resource_rate)) NULL else rate[i, ],
-            resource_capacity = if (is.null(resource_capacity)) NULL else
-                capacity[i, ])
-        rate[i, ] <- balanced$resource_rate
-        capacity[i, ] <- balanced$resource_capacity
-    }
-    if (length(unbalanced) > 0) {
-        mizer::signal_info(
-            "balance",
-            paste0("The following resources were not balanced because there ",
-                   "is no balancing function for their dynamics: ",
-                   toString(unbalanced), "."),
-            level = 2, severity = "info", unhandled = "drop")
-    }
-
-    list(resource_rate = rate, resource_capacity = capacity)
+    plan <- mizer_fn("prepare_tuning")(
+        params, strategies = c("component:MR" = strategy),
+        owners = "component:MR", solver = "balance"
+    )
+    targets <- mizer_fn("capture_tuning_targets")(params, plan)
+    balanced <- mizer_fn("finish_tuning")(params, plan, targets)
+    list(resource_rate = balanced$other_params$MR$rate,
+         resource_capacity = balanced$other_params$MR$capacity)
 }
 
 #' Find the balancing function belonging to a resource dynamics function

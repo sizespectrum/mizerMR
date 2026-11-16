@@ -1,6 +1,6 @@
 Package: mizerMR
 Title: Add multiple size-structured resources to a mizer model
-Version: 0.3.3.9001
+Version: 0.3.3.9002
 Authors@R: c(
     person(given = "Gustav",
            family = "Delius",
@@ -20,7 +20,7 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 3.5),
-    mizer (>= 3.4.0.9011),
+    mizer (>= 3.4.0.9012),
     mizerExperimental (>= 3.3.0)
 Remotes:
     github::sizespectrum/mizerExperimental

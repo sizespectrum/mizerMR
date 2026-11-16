@@ -16,7 +16,8 @@
 #'   other MR component parameters in `params@other_params$MR$resource_params`.
 #'   This method moves it to the new location.
 #' * Legacy MR components acquire explicit capability declarations for their
-#'   supported laws. Existing current declarations are retained.
+#'   supported laws. Existing current declarations and author-replaced component
+#'   steps or stored rate contributions are retained.
 #'
 #' @param object A \linkS4class{mizerMR} object to be upgraded.
 #' @param ... Unused.
@@ -34,6 +35,7 @@ upgrade.mizerMR <- function(object, ...) {
         }
     }
     if (!is.null(object$initial_n_other$MR) &&
+            mrKnownComponentProviders(object) &&
             !identical(object$other_params$MR$capability_version, 1L)) {
         object <- registerMRCapabilities(object)
     }

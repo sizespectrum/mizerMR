@@ -33,9 +33,19 @@ setResource.mizerMR <- function(params, ...) {
     args <- list(...)
     touches <- intersect(c("resource_rate", "resource_capacity",
                            "resource_level"), names(args))
-    if (length(touches) > 0 &&
-            any(!vapply(args[touches], is.null, logical(1))) &&
-            !is.null(getComponent(params, "MR"))) {
+    changes <- vapply(touches, function(field) {
+        value <- args[[field]]
+        if (is.null(value)) return(FALSE)
+        current <- switch(field, resource_rate = params$rr_pp,
+                          resource_capacity = params$cc_pp,
+                          resource_level = params$initial_n_pp / params$cc_pp)
+        if (!is.numeric(value) || !length(value) %in% c(1L, length(current))) {
+            return(TRUE)
+        }
+        !isTRUE(all.equal(rep(as.numeric(value), length.out = length(current)),
+                          as.numeric(current), check.attributes = FALSE))
+    }, logical(1))
+    if (any(changes) && !is.null(getComponent(params, "MR"))) {
         # The user asked for something that is not going to happen, so this is
         # reported at severity "warning" and shown even when nothing is
         # collecting reports. See mizer::signal_info().

@@ -143,3 +143,41 @@ test_that("Empty logistic bins do not hide an undefined equation domain", {
     expect_error(mizer::getSteadyAssessment(p), "including empty bins")
     expect_false(mrPrescribedMask(p)[1, 1])
 })
+
+test_that("MR adoption does not hide unknown drivers or construction methods", {
+    for (generic in c("project", "project_simple", "setPredKernel")) {
+        local({
+            method <- paste0(generic, ".mizerMR")
+            rlang::local_bindings(!!!setNames(list(function(params, ...) {
+                NextMethod()
+            }), method), .env = globalenv())
+            p <- small_mr_model()
+            expect_false(mrKnownProviderLayer(p))
+            expect_null(getComponent(p, "MR")$definition$autonomous)
+            expect_error(mizer::addSpecies(
+                p, data.frame(species = "Added", w_max = 100), steady = FALSE
+            ), "support|transformation")
+        })
+    }
+})
+
+test_that("MR biomass distinguishes unsupported filters from invalid inputs", {
+    p <- small_mr_model()
+    for (scheme in c(FALSE, TRUE)) {
+        second_order_w(p) <- c(bin_average = scheme)
+        expect_error(getBiomass(p, include = "component:MR", min_l = -1),
+                     "length limits must be non-negative")
+        expect_error(getBiomass(p, include = "component:MR", min_l = NA_real_),
+                     "must not be NA")
+        unsupported <- getBiomass(p, include = "component:MR", min_w = c(1, 2))
+        expect_true(all(!attr(unsupported, "coverage")$available))
+        state <- p$initial_n_other
+        state$MR[1, 1] <- -1
+        expect_error(getBiomass(p, include = "component:MR", n_other = state),
+                     "non-negative resource abundances")
+        q <- p
+        q$resource_params$b <- -1
+        expect_error(getBiomass(q, include = "component:MR", min_l = 1),
+                     "positive finite weight-length")
+    }
+})

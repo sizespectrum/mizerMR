@@ -18,7 +18,7 @@ library(mizerMR)
 
 # Stored capabilities
 
-This development preview requires mizer 3.4.0.9011 or later. mizerMR records
+This development preview requires mizer 3.4.0.9012 or later. mizerMR records
 its extension version and uses the `mizerMR` S3 class to participate in the
 model's method chain. The multiple resources form one component named `MR`.
 Its state is a resource-by-size number-density array on the full size grid;

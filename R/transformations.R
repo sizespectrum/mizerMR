@@ -9,6 +9,7 @@
 #' @keywords internal
 #' @export
 mrTransform <- function(params, before, operation, details, ...) {
+    mrRequireProviders(before, construction = TRUE)
     old <- before$other_params$MR
     state <- before$initial_n_other$MR
     if (operation == "scale_abundance") {

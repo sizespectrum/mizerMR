@@ -67,11 +67,16 @@ mrCoreView <- function(params) {
 # Removing our layer for inspection must not hide an additional method that an
 # author registered on the mizerMR class itself.
 mrKnownProviderLayer <- function(params) {
-    generics <- c("projectRates", "projectEncounter", "projectFeedingLevel",
+    generics <- c("project", "project_simple", "projectRates",
+                  "projectEncounter", "projectFeedingLevel",
                   "projectEReproAndGrowth", "projectERepro", "projectEGrowth",
                   "projectDiffusion", "projectPredRate", "projectPredMort",
                   "projectFMort", "projectMort", "projectRDI", "projectRDD",
-                  "projectResourceMort", "balanceRDD")
+                  "projectResourceMort", "balanceRDD", "setParams",
+                  "setInteraction", "setPredKernel", "setMaxIntakeRate",
+                  "setMetabolicRate", "setExtMort", "setExtEncounter",
+                  "setExtDiffusion", "setSearchVolume", "setReproduction",
+                  "setFishing", "setResource", "setColours", "setLinetypes")
     all(vapply(generics, function(generic) {
         actual <- getS3method(generic, "mizerMR", optional = TRUE)
         expected <- get0(paste0(generic, ".mizerMR"),
@@ -80,16 +85,53 @@ mrKnownProviderLayer <- function(params) {
     }, logical(1)))
 }
 
+# Standard MR adds encounter and mortality through its S3 methods, not through
+# callbacks stored on the component. Such author callbacks own unknown data and
+# must survive migration without gaining automatic analysis or update support.
+mrKnownComponentProviders <- function(params) {
+    identical(params$other_dynamics$MR, "mizerMR_dynamics") &&
+        is.null(params$other_encounter$MR) && is.null(params$other_mort$MR)
+}
+
+# Saved capability templates retain their author's choices across upgrades.
+# Check the boundary of our implementations on use, including templates written
+# by previews that did not inspect all component providers or setter methods.
+mrRequireProviders <- function(params, construction = FALSE) {
+    step <- params$other_dynamics$MR
+    declared_step <- params$capabilities$components$MR$dynamics_fun
+    known_step <- identical(step, "mizerMR_dynamics") ||
+        (identical(step, "constant_other") &&
+             identical(declared_step, "mizerMR_dynamics"))
+    supported <- known_step && is.null(params$other_encounter$MR) &&
+        is.null(params$other_mort$MR) && mrKnownProviderLayer(params)
+    if (construction) {
+        binding <- mizer_fn("transformation_provider_binding")(
+            mrCoreView(params)
+        )
+        supported <- supported && all(endsWith(
+            unlist(binding$construction_methods, use.names = FALSE), "@mizer"
+        ))
+    }
+    if (!supported) {
+        stop("MR's built-in capability callbacks do not support these ",
+             "modified component or dispatch providers. Supply authored ",
+             "callbacks and capability definitions for the modified model.")
+    }
+    invisible(NULL)
+}
+
 registerMRCapabilities <- function(params, adopt_processes = TRUE) {
     params <- mizer::coerceToExtensionClass(params)
+    if (!mrKnownComponentProviders(params)) return(params)
     params <- mizer::setComponent(params, "MR",
                                   definition = mrCapabilityDefinition(params))
     params$other_params$MR$capability_version <- 1L
     if (!adopt_processes || !mrKnownProviderLayer(params)) return(params)
     base <- mrCoreView(params)
-    transformations <- setNames(lapply(names(mrTransformations()), function(x) {
-        list(action = "none")
-    }), names(mrTransformations()))
+    transformations <- function(owner) {
+        definition <- mizer_fn("default_provider_transformations")(base, owner)
+        definition$transformations
+    }
     consumer <- mizer_fn("default_provider_tuning")(base, "consumers")
     if (!is.null(consumer$tuning)) {
         params <- mizer::setProcess(
@@ -103,12 +145,13 @@ registerMRCapabilities <- function(params, adopt_processes = TRUE) {
             },
             stationary = TRUE,
             equation_rates_fun = "builtin_consumer_equation_rates",
-            tuning = consumer$tuning, transformations = transformations
+            tuning = consumer$tuning,
+            transformations = transformations("consumers")
         )
     }
     if (identical(params$resource_dynamics, "resource_constant") &&
             all(params$initial_n_pp == 0)) {
-        zero_transforms <- lapply(transformations, function(x) {
+        zero_transforms <- lapply(transformations("resource"), function(x) {
             list(action = "update",
                  transform_fun = "mizerMR::mrTransformCoreResource",
                  paths = list("initial_n_pp"))
@@ -135,7 +178,7 @@ registerMRCapabilities <- function(params, adopt_processes = TRUE) {
         params <- mizer::setProcess(
             params, "reproduction",
             definition = mizer::mizerReproductionDefinition(params),
-            transformations = transformations
+            transformations = transformations("reproduction")
         )
     }
     params
@@ -149,6 +192,7 @@ registerMRCapabilities <- function(params, adopt_processes = TRUE) {
 #' @keywords internal
 #' @export
 mrPrescribedMask <- function(params, ...) {
+    mrRequireProviders(params)
     mask <- params$initial_n_other$MR == 0
     mask[] <- FALSE
     laws <- params$other_params$MR$resource_params$dynamics
@@ -166,6 +210,7 @@ mrPrescribedMask <- function(params, ...) {
 #' @keywords internal
 #' @export
 mrEquationRates <- function(params, n_other, rates, ...) {
+    mrRequireProviders(params)
     if (!mrKnownDynamics(params)) {
         stop("MR equation support is unavailable for an unknown resource law.")
     }
@@ -248,7 +293,7 @@ mrConvergence <- function(params, n_other, rates, derivative = NULL,
 mrBiomass <- function(params, n_other, filters = list(), ...) {
     rp <- params$other_params$MR$resource_params
     values <- vapply(filters, function(x) {
-        is.numeric(x) && length(x) == 1L && !is.na(x)
+        is.numeric(x) && length(x) == 1L
     }, logical(1))
     result <- data.frame(series = rp$resource, value = NA_real_,
                          label = rp$resource, colour = rp$colour,
@@ -259,16 +304,40 @@ mrBiomass <- function(params, n_other, filters = list(), ...) {
         result$reason <- "MR biomass requires scalar size filters."
         return(result)
     }
+    if (anyNA(unlist(filters, use.names = FALSE))) {
+        stop("MR biomass size limits must not be NA or NaN.")
+    }
+    state <- n_other$MR
+    expected <- c(nrow(rp), length(params$w_full))
+    if (!is.numeric(state) || !identical(dim(state), expected) ||
+            any(!is.finite(state)) || any(state < 0)) {
+        stop("MR biomass requires finite non-negative resource abundances ",
+             "on the resource-by-size grid.")
+    }
     lower <- filters$min_w %||% min(params$w_full)
     upper <- filters$max_w %||% max(params$w_full)
     if (!is.null(filters$min_l) || !is.null(filters$max_l)) {
+        lengths <- unlist(filters[c("min_l", "max_l")], use.names = FALSE)
+        if (any(lengths < 0)) {
+            stop("MR biomass length limits must be non-negative.")
+        }
         mapping <- mizer_fn("resource_length_params")(params)
+        valid <- vapply(mapping, function(x) {
+            is.numeric(x) && length(x) == 1L && is.finite(x) && x > 0
+        }, logical(1))
+        if (!all(valid)) {
+            stop("MR biomass requires positive finite ",
+                 "weight-length parameters.")
+        }
         if (!is.null(filters$min_l)) {
             lower <- mapping$a * filters$min_l^mapping$b
         }
         if (!is.null(filters$max_l)) {
             upper <- mapping$a * filters$max_l^mapping$b
         }
+    }
+    if (anyNA(c(lower, upper))) {
+        stop("MR biomass size limits could not be converted to weights.")
     }
     selected <- params$w_full >= lower & params$w_full <= upper
     bin_weight <- mizer_fn("bin_average_weight")
@@ -370,6 +439,7 @@ mrBalancedParameters <- function(params, state, mortality, adjust) {
 #' @keywords internal
 #' @export
 mrBalance <- function(params, n_other, rates, settings, targets, ...) {
+    mrRequireProviders(params)
     adjusted <- mrBalancedParameters(params, n_other$MR, rates$resource_mort,
                                      settings$adjust)
     comment(adjusted) <- "set by balancing"

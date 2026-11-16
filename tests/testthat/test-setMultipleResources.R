@@ -171,8 +171,13 @@ test_that("Multiple resources compose with outer encounter methods", {
     expect_equal(getEncounter(params), 2 * encounter, ignore_attr = TRUE)
 
     old_extensions <- params@extensions
-    resource_rate(params) <- resource_rate(params)
+    expect_error(
+        `resource_rate<-`(params, value = resource_rate(params)),
+        "Missing current stationary tuning support"
+    )
+    resource_rate(params, balance = FALSE) <- resource_rate(params)
     expect_identical(params@extensions, old_extensions)
+    expect_equal(getEncounter(params), 2 * encounter, ignore_attr = TRUE)
 })
 
 test_that("power_law_bin_average handles a two-sided cutoff", {
